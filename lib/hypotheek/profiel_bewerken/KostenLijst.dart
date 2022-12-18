@@ -103,7 +103,6 @@ class ToevoegenKostenButton extends StatelessWidget {
         : null;
 
     final ButtonStyle flatButtonStyle = TextButton.styleFrom(
-      primary: Colors.white,
       backgroundColor: color ?? theme.primaryColor,
       minimumSize: Size(88, 54),
       padding: EdgeInsets.symmetric(horizontal: 16.0),

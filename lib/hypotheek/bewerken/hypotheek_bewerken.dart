@@ -16,7 +16,7 @@ import 'package:mortgage_insight/my_widgets/sliver_row_box.dart';
 import 'package:mortgage_insight/my_widgets/animated_scale_resize_switcher.dart';
 import 'package:mortgage_insight/my_widgets/selectable_button_group.dart';
 import 'package:mortgage_insight/my_widgets/simple_widgets.dart';
-import 'package:mortgage_insight/state_manager/widget_state.dart';
+import 'package:mortgage_insight/state_manager/edit_state.dart';
 import 'package:mortgage_insight/utilities/MyNumberFormat.dart';
 import '../../model/nl/hypotheek/financierings_norm/norm.dart';
 import '../../model/nl/hypotheek/hypotheek.dart';

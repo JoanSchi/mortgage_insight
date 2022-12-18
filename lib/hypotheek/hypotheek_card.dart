@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mortgage_insight/model/nl/hypotheek_container/hypotheek_container.dart';
 import 'package:mortgage_insight/routes/routes_items.dart';
-import 'package:mortgage_insight/state_manager/widget_state.dart';
+import 'package:mortgage_insight/state_manager/edit_state.dart';
 import '../model/nl/hypotheek/hypotheek.dart';
 import '../my_widgets/custom_fitted_box.dart';
 import '../my_widgets/mortgage_card.dart';

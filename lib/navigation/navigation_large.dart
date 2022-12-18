@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mortgage_insight/routes/routes_items.dart';
 import '../routes/page_route.dart';
-import '../state_manager/widget_state.dart';
+import '../state_manager/edit_state.dart';
 import '../theme/ltrb_navigation_style.dart';
 
 class LargeDrawer extends StatefulWidget {
@@ -78,7 +78,7 @@ class _LargeDrawerState extends State<LargeDrawer> {
           height: 2.0,
         ),
         Expanded(
-          child: RoutePage(),
+          child: MyRoutePage(),
         )
       ],
     );

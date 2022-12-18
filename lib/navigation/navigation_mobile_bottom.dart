@@ -10,7 +10,7 @@ import 'package:ltrb_navigation_drawer/ltrb_scrollview_listener.dart';
 import '../mobile/background_sliver_element.dart';
 import '../model/nl/hypotheek_container/hypotheek_container.dart';
 import '../routes/routes_items.dart';
-import '../state_manager/widget_state.dart';
+import '../state_manager/edit_state.dart';
 import '../theme/ltrb_navigation_style.dart';
 import '../utilities/device_info.dart';
 import 'navigation_mobile_left.dart';

@@ -10,7 +10,7 @@ import '../../my_widgets/custom_fitted_box.dart';
 import '../../my_widgets/mortgage_card.dart';
 import '../../my_widgets/summary_pie_chart/pie_chart.dart';
 import '../../routes/routes_items.dart';
-import '../../state_manager/widget_state.dart';
+import '../../state_manager/edit_state.dart';
 import '../../utilities/MyNumberFormat.dart';
 import '../../utilities/date.dart';
 import 'package:intl/intl.dart';

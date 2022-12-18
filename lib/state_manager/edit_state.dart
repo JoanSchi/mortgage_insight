@@ -2,20 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../routes/routes_items.dart';
 
-final routeMainProvider = StateNotifierProvider<RouteMainState, String>((ref) {
-  return RouteMainState('/');
-});
-
-class RouteMainState extends StateNotifier<String> {
-  RouteMainState(String initial) : super(initial);
-
-  set mainRoute(String route) {
-    state = route;
-  }
-
-  String get mainRoute => state;
-}
-
 final routePageProvider = StateNotifierProvider<RoutePageState, String>((ref) {
   return RoutePageState(routeIncome);
 });

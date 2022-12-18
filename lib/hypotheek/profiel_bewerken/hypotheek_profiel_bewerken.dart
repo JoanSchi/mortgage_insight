@@ -9,7 +9,7 @@ import 'package:mortgage_insight/model/nl/hypotheek_container/hypotheek_containe
 import 'package:mortgage_insight/my_widgets/my_page/my_page.dart';
 import 'package:mortgage_insight/my_widgets/simple_widgets.dart';
 import 'package:mortgage_insight/routes/routes_items.dart';
-import 'package:mortgage_insight/state_manager/widget_state.dart';
+import 'package:mortgage_insight/state_manager/edit_state.dart';
 import 'package:mortgage_insight/utilities/MyNumberFormat.dart';
 import 'package:go_router/go_router.dart';
 import '../../layout/transition/scale_size_transition.dart';

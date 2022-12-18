@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mortgage_insight/income/income_card.dart';
-
 import 'package:mortgage_insight/model/nl/hypotheek_container/hypotheek_container.dart';
 import 'package:mortgage_insight/my_widgets/my_page/my_page.dart';
-import 'package:mortgage_insight/state_manager/widget_state.dart';
+import 'package:mortgage_insight/state_manager/edit_state.dart';
 import 'package:mortgage_insight/utilities/device_info.dart';
 import '../my_widgets/my_page/my_large_page.dart';
 import '../routes/routes_items.dart';
 import '../theme/tabbar_overview_page_style.dart';
-
 import 'income_model.dart';
 
 enum IncomeCardOptions { edit, delete }
@@ -57,12 +55,9 @@ class _IncomePanelState extends ConsumerState<IncomePanel>
         EditRouteState<BewerkenInkomen>(
       route: routeIncomeEdit,
       object: BewerkenInkomen.nieuw(
-          lijst:
-              //     ref.read(partner ? inkomenPartnerProvider : inkomenProvider).list,
-              // partner: partner),
-              ref
-                  .read(hypotheekContainerProvider)
-                  .inkomenLijst(partner: partner),
+          lijst: ref
+              .read(hypotheekContainerProvider)
+              .inkomenLijst(partner: partner),
           partner: partner),
     );
   }
@@ -92,18 +87,10 @@ class _IncomePanelState extends ConsumerState<IncomePanel>
       tabs: [
         Tab(
           height: tabBarPageStyle?.height,
-          // icon: Icon(
-          //   Icons.person,
-          //   size: 56,
-          // ),
           text: 'Inkomen',
         ),
         Tab(
           height: tabBarPageStyle?.height,
-          // icon: Icon(
-          //   Icons.group,
-          //   size: 56,
-          // ),
           text: 'Partner',
         )
       ],

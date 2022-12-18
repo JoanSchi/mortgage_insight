@@ -1,14 +1,14 @@
+import 'package:flextable/FlexTable/body_layout.dart';
+import 'package:flextable/FlexTable/data_flexfable.dart';
+import 'package:flextable/FlexTable/table_bottombar.dart';
+import 'package:flextable/FlexTable/table_line.dart';
+import 'package:flextable/FlexTable/table_model.dart';
+import 'package:flextable/FlexTable/table_multi_panel_portview.dart';
+import 'package:flextable/sliver_to_viewportbox.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:sliver_table/FlexTable/BodyLayout.dart';
-import 'package:sliver_table/FlexTable/DataFlexTable.dart';
-import 'package:sliver_table/FlexTable/TableBottomBar.dart';
-import 'package:sliver_table/FlexTable/TableItems/Cells.dart';
-import 'package:sliver_table/FlexTable/TableLine.dart';
-import 'package:sliver_table/FlexTable/TableModel.dart';
-import 'package:sliver_table/FlexTable/TableMultiPanelPortView.dart';
-import 'package:sliver_table/SliverToViewPortBox.dart';
+import 'package:flextable/FlexTable/TableItems/Cells.dart';
 import '../../model/nl/schulden/schulden_aflopend_krediet.dart';
 import '../../utilities/MyNumberFormat.dart';
 import 'dart:math' as math;
@@ -119,8 +119,8 @@ class _DebtTableState extends State<DebtTable> {
             delegate: FlexTableToViewPortBoxDelegate(
                 flexTable: FlexTable(
           maxWidth: 980,
+          findSliverScrollPosition: true,
           tableModel: tableModel,
-          sliverController: widget.controller,
           alignment: Alignment.topCenter,
           sidePanelWidget: [
             if (!touch)

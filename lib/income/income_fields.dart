@@ -8,7 +8,7 @@ import 'package:mortgage_insight/layout/transition/scale_size_transition.dart';
 import 'package:mortgage_insight/model/nl/hypotheek_container/hypotheek_container.dart';
 import 'package:mortgage_insight/model/nl/inkomen/inkomen.dart';
 import 'package:mortgage_insight/my_widgets/calender_date_picker/month_year_picker.dart';
-import 'package:mortgage_insight/state_manager/widget_state.dart';
+import 'package:mortgage_insight/state_manager/edit_state.dart';
 import 'package:mortgage_insight/template_mortgage_items/AcceptCancelActions.dart';
 import 'package:mortgage_insight/utilities/MyNumberFormat.dart';
 import 'package:mortgage_insight/utilities/date.dart';

@@ -6,13 +6,13 @@ import 'package:ltrb_navigation_drawer/ltbr_drawer.dart';
 import 'package:ltrb_navigation_drawer/ltbr_drawer_model.dart';
 import 'package:ltrb_navigation_drawer/overlay_indicator/ltbr_drawer_indicator.dart';
 import 'package:mortgage_insight/navigation/navigation_mobile_left.dart';
-import 'package:mortgage_insight/state_manager/widget_state.dart';
+import 'package:mortgage_insight/state_manager/edit_state.dart';
 import '../debts/debt_panel.dart';
 import '../hypotheek/bewerken/hypotheek_bewerken.dart';
 import '../hypotheek/profiel_bewerken/hypotheek_profiel_bewerken.dart';
 import '../income/income_fields.dart';
 import '../navigation/navigation_mobile_bottom.dart';
-import '../routes/my_go_route.dart';
+import '../routes/page_navigator_observer.dart';
 import '../routes/page_route.dart';
 import '../routes/routes_items.dart';
 
@@ -23,8 +23,10 @@ class MobileRoute extends ConsumerStatefulWidget {
   ConsumerState<ConsumerStatefulWidget> createState() => MobileRouteState();
 }
 
-class MobileRouteState extends ConsumerState<MobileRoute> {
-  late MyGoRouter _router = MyGoRouter(
+class MobileRouteState extends ConsumerState<MobileRoute>
+    implements PageNavigatorObserverImplementation {
+  late GoRouter _router = GoRouter(
+    observers: [PageNavigatorObserver(implementation: this)],
     initialLocation: initialLocation,
     routes: [
       GoRoute(
@@ -54,10 +56,7 @@ class MobileRouteState extends ConsumerState<MobileRoute> {
             ),
           ]),
     ],
-  )
-    ..addDidPopListener(didPop)
-    ..addDidPushListener(didPush)
-    ..addDidRemoveListener(didRemove);
+  );
 
   String get initialLocation {
     String subRoute = ref.read(routeEditPageProvider).route;
@@ -71,9 +70,9 @@ class MobileRouteState extends ConsumerState<MobileRoute> {
 
   @override
   void dispose() {
-    _router.removeDidPopListener(didPop);
-    _router.removeDidPushListener(didPush);
-    _router.removeDidRemoveListener(didRemove);
+    // _router.removeDidPopListener(didPop);
+    // _router.removeDidPushListener(didPush);
+    // _router.removeDidRemoveListener(didRemove);
     super.dispose();
   }
 
@@ -108,13 +107,27 @@ class MobileRouteState extends ConsumerState<MobileRoute> {
       }
     });
 
+    //Use Router.withConfig as example
+
+    // return Router.withConfig(
+    //   config: _router,
+    // );
+
+    //  routeInformationProvider: config.routeInformationProvider,
+    //   routeInformationParser: config.routeInformationParser,
+    //   routerDelegate: config.routerDelegate,
+
     return Router(
         backButtonDispatcher:
             ChildBackButtonDispatcher(Router.of(context).backButtonDispatcher!)
               ..takePriority(),
+        routeInformationProvider: _router.routeInformationProvider,
         routeInformationParser: _router.routeInformationParser,
         routerDelegate: _router.routerDelegate);
   }
+
+  @override
+  void didReplace({Route? newRoute, Route? oldRoute}) {}
 }
 
 class MobileDocument extends StatefulWidget {
@@ -149,7 +162,7 @@ class _MobileDocumentState extends State<MobileDocument> {
                 BottomMobileDrawer(
               drawerModel: drawerModel,
             ),
-            body: RoutePage(),
+            body: MyRoutePage(),
             scrimeColorEnd: Color.fromARGB(159, 41, 125, 167),
             minimumSize: 64.0,
             navigationBarSize: 16.0,
@@ -172,7 +185,7 @@ class _MobileDocumentState extends State<MobileDocument> {
                 MobileLeftDrawer(
               drawerModel: drawerModel,
             ),
-            body: RoutePage(),
+            body: MyRoutePage(),
             scrimeColorEnd: Color.fromARGB(159, 41, 125, 167),
             minimumSize: 64.0,
             navigationBarSize: 16.0,

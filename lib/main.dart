@@ -4,16 +4,15 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mortgage_insight/model/nl/hypotheek_container/hypotheek_container.dart';
-import 'package:mortgage_insight/routes/my_go_route.dart';
-import 'package:mortgage_insight/state_manager/widget_state.dart';
 import 'package:mortgage_insight/theme/theme.dart';
 import 'package:mortgage_insight/utilities/device_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'large/large_document.dart';
 import 'medium/medium_document.dart';
 import 'mobile/mobile_document.dart';
-import 'mobile/mobile_start.dart';
 import 'dart:math' as math;
+
+import 'routes/main_route.dart';
 
 void main() {
   runApp(ProviderScope(child: MyApp()));
@@ -42,45 +41,13 @@ class AppBackground extends ConsumerStatefulWidget {
 }
 
 class AppBackgroundState extends ConsumerState<AppBackground> {
-  late String initialLocation = ref.read(routeMainProvider);
-
-  late GoRouter _router = MyGoRouter(
-    initialLocation: '/',
-    routes: [
-      GoRoute(
-        path: '/',
-        builder: (context, state) => Home(),
-      ),
-      GoRoute(
-        path: '/document',
-        builder: (context, state) => const Document(),
-      ),
-    ],
-  )..addDidPopListener(didPop);
-
-  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    debugPrint('didPop main previous settings: ${previousRoute?.settings}');
-    ref.read(routeMainProvider.notifier).mainRoute =
-        previousRoute?.settings.name ?? '/';
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
-    ref.listen<String>(routeMainProvider, (String? previous, String next) {
-      if (_router.location != next) _router.push(next);
-    });
+    GoRouter goRouter = ref.watch(routeMainProvider);
 
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-      Widget body = Router(
-          backButtonDispatcher: RootBackButtonDispatcher(),
-          routeInformationParser: _router.routeInformationParser,
-          routerDelegate: _router.routerDelegate);
+      Widget body = Router.withConfig(config: goRouter);
 
       if (constraints.biggest.shortestSide <= 900.0) {
         return body;

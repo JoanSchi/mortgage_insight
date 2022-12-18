@@ -17,7 +17,7 @@ import '../model/nl/hypotheek_container/hypotheek_container.dart';
 import 'navigation_login_button.dart';
 import '../routes/page_route.dart';
 import '../routes/routes_items.dart';
-import '../state_manager/widget_state.dart';
+import '../state_manager/edit_state.dart';
 import '../utilities/device_info.dart';
 
 class MediumDrawer extends StatefulWidget {
@@ -49,7 +49,7 @@ class _MediumDrawerState extends State<MediumDrawer> {
 
     return LtrbDrawer(
       buildOverlay: defaultArrowIndicator(),
-      body: RoutePage(),
+      body: MyRoutePage(),
       expandBody: false,
       allowMaximumSize: false,
       scrimeColorEnd: Color.fromARGB(9, 0, 0, 0),

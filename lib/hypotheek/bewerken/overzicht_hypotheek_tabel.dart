@@ -1,13 +1,12 @@
+import 'package:flextable/FlexTable/TableItems/Cells.dart';
+import 'package:flextable/FlexTable/data_flexfable.dart';
+import 'package:flextable/FlexTable/table_line.dart';
+import 'package:flextable/FlexTable/table_model.dart';
+import 'package:flextable/FlexTable/table_multi_panel_portview.dart';
+import 'package:flextable/sliver_to_viewportbox.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:sliver_table/FlexTable/DataFlexTable.dart';
-import 'package:sliver_table/FlexTable/TableItems/Cells.dart';
-import 'package:sliver_table/FlexTable/TableLine.dart';
-import 'package:sliver_table/FlexTable/TableModel.dart';
-import 'package:sliver_table/FlexTable/TableMultiPanelPortView.dart';
-import 'package:sliver_table/SliverToViewPortBox.dart';
-
 import 'package:mortgage_insight/hypotheek/bewerken/hypotheek_model.dart';
 import 'package:mortgage_insight/model/nl/hypotheek/hypotheek.dart';
 
@@ -111,7 +110,7 @@ class _OverzichtHypotheekTabelState extends State<OverzichtHypotheekTabel> {
                 flexTable: FlexTable(
             maxWidth: 980,
             tableModel: t,
-            sliverController: widget.controller,
+            findSliverScrollPosition: true,
             alignment: Alignment.topCenter,
             sidePanelWidget: [
               // if (false)

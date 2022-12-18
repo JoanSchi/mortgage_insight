@@ -2,15 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mortgage_insight/navigation/navigation_medium.dart';
-import '../routes/my_go_route.dart';
+import '../routes/page_navigator_observer.dart';
 
 class MediumRoute extends ConsumerStatefulWidget {
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => MediumRouteState();
 }
 
-class MediumRouteState extends ConsumerState<MediumRoute> {
-  late MyGoRouter _router = MyGoRouter(
+class MediumRouteState extends ConsumerState<MediumRoute>
+    implements PageNavigatorObserverImplementation {
+  late GoRouter _router = GoRouter(
+    observers: [PageNavigatorObserver(implementation: this)],
     initialLocation: initialLocation,
     routes: [
       GoRoute(
@@ -31,7 +33,7 @@ class MediumRouteState extends ConsumerState<MediumRoute> {
         // ]
       ),
     ],
-  )..addDidPopListener(didPop);
+  );
 
   String get initialLocation {
     // String? subRoute = ref.read(routeEditPageProvider)?.route;
@@ -45,7 +47,6 @@ class MediumRouteState extends ConsumerState<MediumRoute> {
 
   @override
   void dispose() {
-    _router.removeDidPopListener(didPop);
     super.dispose();
   }
 
@@ -72,6 +73,21 @@ class MediumRouteState extends ConsumerState<MediumRoute> {
               ..takePriority(),
         routeInformationParser: _router.routeInformationParser,
         routerDelegate: _router.routerDelegate);
+  }
+
+  @override
+  void didPush(Route route, Route? previousRoute) {
+    // TODO: implement didPush
+  }
+
+  @override
+  void didRemove(Route route, Route? previousRoute) {
+    // TODO: implement didRemove
+  }
+
+  @override
+  void didReplace({Route? newRoute, Route? oldRoute}) {
+    // TODO: implement didReplace
   }
 }
 

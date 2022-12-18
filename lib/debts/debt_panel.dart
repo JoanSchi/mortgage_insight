@@ -7,7 +7,7 @@ import 'package:mortgage_insight/model/nl/hypotheek_container/hypotheek_containe
 import 'package:mortgage_insight/model/nl/schulden/schulden_doorlopend_krediet.dart';
 import 'package:mortgage_insight/model/nl/schulden/schulden_lease_auto.dart';
 import 'package:mortgage_insight/model/nl/schulden/schulden_verzend_krediet.dart';
-import 'package:mortgage_insight/state_manager/widget_state.dart';
+import 'package:mortgage_insight/state_manager/edit_state.dart';
 import 'package:mortgage_insight/utilities/device_info.dart';
 import 'package:nested_scroll_view_3m/nested_scroll_view_3m.dart';
 import '../model/nl/schulden/schulden.dart';

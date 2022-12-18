@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mortgage_insight/model/nl/hypotheek_container/hypotheek_container.dart';
+import '../model/nl/hypotheek_container/hypotheek_container.dart';
 import 'dart:math' as math;
-import 'package:mortgage_insight/state_manager/widget_state.dart';
+import '../routes/main_route.dart';
 
 class Home extends ConsumerStatefulWidget {
   Home({Key? key}) : super(key: key);
@@ -247,9 +247,8 @@ class _NewDocumentState extends ConsumerState<NewDocument>
                     alignment: Alignment.centerRight,
                     child: Material(
                         child: TextButton(
-                            onPressed: () => ref
-                                .read(routeMainProvider.notifier)
-                                .mainRoute = '/document',
+                            onPressed: () =>
+                                ref.read(routeMainProvider).push('/document'),
                             child: Text('Creëer')))),
               ],
             ),

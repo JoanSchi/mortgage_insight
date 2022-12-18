@@ -7,7 +7,7 @@ import 'package:mortgage_insight/template_mortgage_items/AcceptCancelActions.dar
 import '../../model/nl/hypotheek_container/hypotheek_container.dart';
 import '../../model/nl/schulden/schulden.dart';
 import '../../model/nl/schulden/schulden_aflopend_krediet.dart';
-import '../../state_manager/widget_state.dart';
+import '../../state_manager/edit_state.dart';
 import 'aflopend_krediet_model.dart';
 import 'aflopend_krediet_segmenten.dart';
 import 'aflopend_krediet_overview.dart';

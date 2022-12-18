@@ -16,7 +16,7 @@ import 'package:mortgage_insight/navigation/navigation_login_button.dart';
 import 'package:mortgage_insight/utilities/device_info.dart';
 import '../layout/t.dart';
 import '../routes/routes_items.dart';
-import '../state_manager/widget_state.dart';
+import '../state_manager/edit_state.dart';
 import '../theme/ltrb_navigation_style.dart';
 
 class MobileDrawer extends ConsumerStatefulWidget {

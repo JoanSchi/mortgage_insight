@@ -8,22 +8,21 @@ import 'package:mortgage_insight/hypotheek/profiel_bewerken/hypotheek_profiel_be
 import 'package:mortgage_insight/hypotheek/hypotheek_panel.dart';
 import 'package:mortgage_insight/income/income_panel.dart';
 import 'package:mortgage_insight/routes/routes_items.dart';
-import 'package:mortgage_insight/state_manager/widget_state.dart';
+import 'package:mortgage_insight/state_manager/edit_state.dart';
 import 'package:mortgage_insight/utilities/device_info.dart';
-import 'package:sliver_table/FlexTable/Examples/Hypotheek.dart';
-import 'package:sliver_table/FlexTable/TableMultiPanelPortView.dart';
 import '../debts/debt_panel.dart';
 import '../income/income_fields.dart';
-import 'my_go_route.dart';
+import 'page_navigator_observer.dart';
 
-class RoutePage extends ConsumerStatefulWidget {
-  RoutePage();
+class MyRoutePage extends ConsumerStatefulWidget {
+  MyRoutePage();
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => RoutePageState();
+  ConsumerState<ConsumerStatefulWidget> createState() => MyRoutePageState();
 }
 
-class RoutePageState extends ConsumerState<RoutePage> {
+class MyRoutePageState extends ConsumerState<MyRoutePage>
+    implements PageNavigatorObserverImplementation {
   static GoRouterPageBuilder noTransitionPage(
     Widget child,
   ) {
@@ -35,7 +34,8 @@ class RoutePageState extends ConsumerState<RoutePage> {
         );
   }
 
-  late MyGoRouter _router = MyGoRouter(
+  late GoRouter _router = GoRouter(
+    observers: [PageNavigatorObserver(implementation: this)],
     initialLocation: initialLocation,
     routes: [
       GoRoute(
@@ -109,21 +109,7 @@ class RoutePageState extends ConsumerState<RoutePage> {
       GoRoute(
         path: '/$routeTable',
         name: routeTable,
-        builder: (context, state) => FlexTable(
-          backgroundColor: Colors.grey[50],
-          tableModel: hypotheekExample1(tableColumns: 2).tableModel(
-            autoFreezeListX: true,
-            autoFreezeListY: true,
-          ),
-          tableBuilder: HypoteekTableBuilder(),
-          // sidePanelWidget: [
-          //   if (scaleSlider)
-          //     (tableModel) => FlexTableLayoutParentDataWidget(
-          //         tableLayoutPosition: FlexTableLayoutPosition.bottom(),
-          //         child: TableBottomBar(
-          //             tableModel: tableModel, maxWidthSlider: 200.0))
-          // ],
-        ),
+        builder: (context, state) => Container(color: Colors.blue[300]),
       ),
       GoRoute(
         path: '/$routeGraph',
@@ -131,10 +117,7 @@ class RoutePageState extends ConsumerState<RoutePage> {
         builder: (context, state) => Container(color: Colors.pink[300]),
       ),
     ],
-  )
-    ..addDidPopListener(didPop)
-    ..addDidPushListener(didPush)
-    ..addDidRemoveListener(didRemove);
+  );
 
   String get initialLocation {
     String route = '/${ref.read(routePageProvider)}';
@@ -160,9 +143,6 @@ class RoutePageState extends ConsumerState<RoutePage> {
 
   @override
   void dispose() {
-    _router.removeDidPopListener(didPop);
-    _router.removeDidPushListener(didPush);
-    _router.removeDidRemoveListener(didRemove);
     super.dispose();
   }
 
@@ -225,7 +205,11 @@ class RoutePageState extends ConsumerState<RoutePage> {
         backButtonDispatcher:
             ChildBackButtonDispatcher(Router.of(context).backButtonDispatcher!)
               ..takePriority(),
+        routeInformationProvider: _router.routeInformationProvider,
         routeInformationParser: _router.routeInformationParser,
         routerDelegate: _router.routerDelegate);
   }
+
+  @override
+  void didReplace({Route? newRoute, Route? oldRoute}) {}
 }
