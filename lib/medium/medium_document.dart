@@ -1,93 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mortgage_insight/navigation/navigation_medium.dart';
-import '../routes/page_navigator_observer.dart';
 
-class MediumRoute extends ConsumerStatefulWidget {
+class MediumRoute extends StatefulWidget {
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => MediumRouteState();
+  State<StatefulWidget> createState() => MediumRouteState();
 }
 
-class MediumRouteState extends ConsumerState<MediumRoute>
-    implements PageNavigatorObserverImplementation {
-  late GoRouter _router = GoRouter(
-    observers: [PageNavigatorObserver(implementation: this)],
-    initialLocation: initialLocation,
+class MediumRouteState extends State<MediumRoute> {
+  GoRouter _router = GoRouter(
+    initialLocation: '/',
     routes: [
       GoRoute(
         path: '/',
         name: 'MediumDocument',
         builder: (context, state) => MediumDocument(),
-        // routes: [
-        //   GoRoute(
-        //     path: '$routeIncomeEdit',
-        //     name: routeIncomeEdit,
-        //     builder: (context, state) => IncomeEdit(),
-        //   ),
-        //   GoRoute(
-        //     path: '$routeAddDebtsEdit',
-        //     name: routeAddDebtsEdit,
-        //     builder: (context, state) => AddDebts(),
-        //   ),
-        // ]
       ),
     ],
   );
 
-  String get initialLocation {
-    // String? subRoute = ref.read(routeEditPageProvider)?.route;
-
-    // String route = (subRoute == null) ? '/' : '/$subRoute';
-
-    // debugPrint('initialLocation Mobile: $route');
-
-    return '/';
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    // if ((route.settings.name ?? '').contains('Edit')) {
-    //   scheduleMicrotask(() {
-    //     ref.read(routeEditPageProvider.notifier).editState = null;
-    //   });
-    // }
-  }
-
   @override
   Widget build(BuildContext context) {
-    // ref.listen<EditRouteState?>(routeEditPageProvider,
-    //     (EditRouteState? previous, EditRouteState? next) {
-    //   if (next != null) {
-    //     _router.pushNamed(next.route);
-    //   }
-    // });
-
     return Router(
         backButtonDispatcher:
             ChildBackButtonDispatcher(Router.of(context).backButtonDispatcher!)
               ..takePriority(),
         routeInformationParser: _router.routeInformationParser,
         routerDelegate: _router.routerDelegate);
-  }
-
-  @override
-  void didPush(Route route, Route? previousRoute) {
-    // TODO: implement didPush
-  }
-
-  @override
-  void didRemove(Route route, Route? previousRoute) {
-    // TODO: implement didRemove
-  }
-
-  @override
-  void didReplace({Route? newRoute, Route? oldRoute}) {
-    // TODO: implement didReplace
   }
 }
 

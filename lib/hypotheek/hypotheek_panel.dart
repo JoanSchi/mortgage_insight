@@ -56,35 +56,35 @@ class HypotheekPanelState extends ConsumerState<HypotheekPanel>
 
   add() {
     final hypotheekContainer = ref.read(hypotheekContainerProvider);
+// TODO: Fix
+    // switch (tab) {
+    //   case profielenTab:
+    //     {
+    //       ref.read(routeEditPageProvider.notifier).editState = EditRouteState(
+    //           route: routeNieweHypotheekProfielEdit,
+    //           object: HypotheekProfielViewModel(
+    //             hypotheekProfielen:
+    //                 hypotheekContainer.container.hypotheekProfielen,
+    //           ));
 
-    switch (tab) {
-      case profielenTab:
-        {
-          ref.read(routeEditPageProvider.notifier).editState = EditRouteState(
-              route: routeNieweHypotheekProfielEdit,
-              object: HypotheekProfielViewModel(
-                hypotheekProfielen:
-                    hypotheekContainer.container.hypotheekProfielen,
-              ));
+    //       break;
+    //     }
+    //   case profielTab:
+    //     {
+    //       ref.read(routeEditPageProvider.notifier).editState = EditRouteState(
+    //           route: routeMortgageEdit,
+    //           object: HypotheekViewModel(
+    //             inkomenLijst: hypotheekContainer.inkomenLijst(),
+    //             inkomenLijstPartner:
+    //                 hypotheekContainer.inkomenLijst(partner: true),
+    //             profiel: hypotheekContainer
+    //                 .huidigeHypotheekProfielContainer!.profiel,
+    //             schuldenLijst: hypotheekContainer.schuldenContainer.list,
+    //           ));
 
-          break;
-        }
-      case profielTab:
-        {
-          ref.read(routeEditPageProvider.notifier).editState = EditRouteState(
-              route: routeMortgageEdit,
-              object: HypotheekViewModel(
-                inkomenLijst: hypotheekContainer.inkomenLijst(),
-                inkomenLijstPartner:
-                    hypotheekContainer.inkomenLijst(partner: true),
-                profiel: hypotheekContainer
-                    .huidigeHypotheekProfielContainer!.profiel,
-                schuldenLijst: hypotheekContainer.schuldenContainer.list,
-              ));
-
-          break;
-        }
-    }
+    //       break;
+    //     }
+    // }
   }
 
   @override

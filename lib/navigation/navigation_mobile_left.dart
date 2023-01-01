@@ -15,6 +15,7 @@ import 'package:mortgage_insight/navigation/navigation_document_examples.dart';
 import 'package:mortgage_insight/navigation/navigation_login_button.dart';
 import 'package:mortgage_insight/utilities/device_info.dart';
 import '../layout/t.dart';
+import '../routes/route_document.dart';
 import '../routes/routes_items.dart';
 import '../state_manager/edit_state.dart';
 import '../theme/ltrb_navigation_style.dart';
@@ -75,14 +76,14 @@ class _DrawerState extends ConsumerState<MobileDrawer> {
     Widget listItem(int index) {
       final i = mortgageItemsList[index];
 
-      final selected = ref.watch(routePageProvider.select((id) => id == i.id));
+      final selected = watchSelectedRoutePage(ref, i.id);
 
       return MyTile(
         title: i.title,
         selected: selected,
         onTap: () {
           widget.drawerModel.pop();
-          ref.read(routePageProvider.notifier).pageRoute = i.id;
+          setRoutePage(ref: ref, name: i.id);
         },
       );
     }
@@ -289,14 +290,14 @@ class _LeftDrawerState extends ConsumerState<MobileLeftDrawer> {
     Widget listItem(int index) {
       final i = mortgageItemsList[index];
 
-      final selected = ref.watch(routePageProvider.select((id) => id == i.id));
+      final selected = watchSelectedRoutePage(ref, i.id);
 
       return MyTile(
         title: i.title,
         selected: selected,
         onTap: () {
           widget.drawerModel.pop();
-          ref.read(routePageProvider.notifier).pageRoute = i.id;
+          setRoutePage(ref: ref, name: i.id);
         },
       );
     }

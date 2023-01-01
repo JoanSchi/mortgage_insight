@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../model/nl/hypotheek_container/hypotheek_container.dart';
 import 'dart:math' as math;
-import '../routes/main_route.dart';
+import '../routes/route_main.dart';
 
 class Home extends ConsumerStatefulWidget {
   Home({Key? key}) : super(key: key);
@@ -247,8 +247,7 @@ class _NewDocumentState extends ConsumerState<NewDocument>
                     alignment: Alignment.centerRight,
                     child: Material(
                         child: TextButton(
-                            onPressed: () =>
-                                ref.read(routeMainProvider).push('/document'),
+                            onPressed: () => routeMain.push('/document'),
                             child: Text('Creëer')))),
               ],
             ),

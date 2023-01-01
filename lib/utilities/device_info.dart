@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-enum FormFactorType { SmallPhone, LargePhone, Tablet, Monitor }
+enum FormFactorType { SmallPhone, LargePhone, Tablet, Monitor, Unknown }
 
 class DeviceOS {
   // Syntax sugar, proxy the UniversalPlatform methods so our views can reference a single class
@@ -53,6 +53,24 @@ class DeviceScreen3 {
   EdgeInsets get padding => mediaQuery.padding;
   EdgeInsets get viewInsets => mediaQuery.viewInsets;
   double get topPadding => mediaQuery.padding.top;
+
+  /// See scrollable -> sroll_configuration -> buildScrollbar
+  ///
+  /// The platform is used to decide if scrollbar is visible
+  ///
+
+  bool get hasScrollBars {
+    switch (theme.platform) {
+      case TargetPlatform.android:
+      case TargetPlatform.iOS:
+      case TargetPlatform.fuchsia:
+        return false;
+      case TargetPlatform.linux:
+      case TargetPlatform.macOS:
+      case TargetPlatform.windows:
+        return true;
+    }
+  }
 
   DeviceScreen3.of(BuildContext context)
       : mediaQuery = MediaQuery.of(context),

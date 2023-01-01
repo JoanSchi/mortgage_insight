@@ -89,6 +89,7 @@ class _MySliverAppBarState extends State<MySliverAppBar>
     switch (deviceScreen.formFactorType) {
       case FormFactorType.SmallPhone:
       case FormFactorType.LargePhone:
+      case FormFactorType.Unknown:
         topPadding = deviceScreen.topPadding;
 
         if (deviceScreen.isPortrait) {
@@ -199,6 +200,7 @@ class MobileSliverPersistentHeaderDelegate
 
     switch (screen.formFactorType) {
       case FormFactorType.SmallPhone:
+      case FormFactorType.Unknown:
         orientation = screen.orientation;
         useBorder = true;
         pinnedHeader = false;

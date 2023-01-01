@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mortgage_insight/model/nl/hypotheek_container/hypotheek_container.dart';
+import 'package:mortgage_insight/routes/route_document.dart';
 import 'package:mortgage_insight/routes/routes_items.dart';
 import '../model/nl/inkomen/inkomen.dart';
 import '../my_widgets/custom_fitted_box.dart';
@@ -159,16 +160,16 @@ class _IncomeCardState extends ConsumerState<IncomeCard> {
     );
   }
 
-  void edit() =>
-      ref.read(routeEditPageProvider.notifier).editState = EditRouteState(
-          route: routeIncomeEdit,
-          object: BewerkenInkomen.bestaand(
-            lijst: ref
-                .read(hypotheekContainerProvider)
-                .inkomenLijst(partner: widget.partner),
-            partner: widget.partner,
-            inkomen: widget.inkomenItem,
-          ));
+  void edit() => editRoute(
+      ref: ref,
+      name: routeIncomeEdit,
+      edit: BewerkenInkomen.bestaand(
+        lijst: ref
+            .read(hypotheekContainerProvider)
+            .inkomenLijst(partner: widget.partner),
+        partner: widget.partner,
+        inkomen: widget.inkomenItem,
+      ));
 
   void onSelected(String selected) {
     switch (selected) {

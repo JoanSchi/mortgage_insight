@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mortgage_insight/income/income_card.dart';
 import 'package:mortgage_insight/model/nl/hypotheek_container/hypotheek_container.dart';
 import 'package:mortgage_insight/my_widgets/my_page/my_page.dart';
+import 'package:mortgage_insight/routes/route_document.dart';
 import 'package:mortgage_insight/state_manager/edit_state.dart';
 import 'package:mortgage_insight/utilities/device_info.dart';
 import '../my_widgets/my_page/my_large_page.dart';
@@ -51,10 +52,10 @@ class _IncomePanelState extends ConsumerState<IncomePanel>
   }
 
   add() {
-    ref.read(routeEditPageProvider.notifier).editState =
-        EditRouteState<BewerkenInkomen>(
-      route: routeIncomeEdit,
-      object: BewerkenInkomen.nieuw(
+    editRoute(
+      ref: ref,
+      name: routeIncomeEdit,
+      edit: BewerkenInkomen.nieuw(
           lijst: ref
               .read(hypotheekContainerProvider)
               .inkomenLijst(partner: partner),
@@ -121,10 +122,13 @@ class _IncomePanelState extends ConsumerState<IncomePanel>
               alignment: Alignment.bottomRight, child: floatingActionButton))
     ]);
 
+    switch (deviceScreen.platform) {
+    }
     switch (deviceScreen.formFactorType) {
       case FormFactorType.SmallPhone:
       case FormFactorType.LargePhone:
       case FormFactorType.Tablet:
+      case FormFactorType.Unknown:
         return MyPage(
             title: 'Inkomen',
             imageName: 'graphics/fit_wallet.png',

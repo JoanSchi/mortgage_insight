@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:mortgage_insight/model/nl/hypotheek_container/hypotheek_container.dart';
+import 'package:mortgage_insight/routes/route_document.dart';
 import 'package:mortgage_insight/theme/theme.dart';
 import 'package:mortgage_insight/utilities/device_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,7 +12,7 @@ import 'medium/medium_document.dart';
 import 'mobile/mobile_document.dart';
 import 'dart:math' as math;
 
-import 'routes/main_route.dart';
+import 'routes/route_main.dart';
 
 void main() {
   runApp(ProviderScope(child: MyApp()));
@@ -35,19 +35,17 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class AppBackground extends ConsumerStatefulWidget {
+class AppBackground extends StatefulWidget {
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => AppBackgroundState();
+  State<StatefulWidget> createState() => AppBackgroundState();
 }
 
-class AppBackgroundState extends ConsumerState<AppBackground> {
+class AppBackgroundState extends State<AppBackground> {
   @override
   Widget build(BuildContext context) {
-    GoRouter goRouter = ref.watch(routeMainProvider);
-
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-      Widget body = Router.withConfig(config: goRouter);
+      Widget body = Router.withConfig(config: routeMain);
 
       if (constraints.biggest.shortestSide <= 900.0) {
         return body;
@@ -84,28 +82,28 @@ setOverlayStyle() {
       systemNavigationBarIconBrightness: Brightness.dark));
 }
 
+class MyWidget extends StatelessWidget {
+  const MyWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Document(formFactorType: DeviceScreen3.of(context).formFactorType);
+  }
+}
+
 class Document extends ConsumerStatefulWidget {
-  const Document({Key? key}) : super(key: key);
+  final FormFactorType formFactorType;
+  const Document({Key? key, required this.formFactorType}) : super(key: key);
 
   @override
   ConsumerState<Document> createState() => _DocumentState();
 }
 
-class _DocumentState extends ConsumerState<Document>
-    with WidgetsBindingObserver {
+class _DocumentState extends ConsumerState<Document> {
   @override
   void initState() {
     super.initState();
     setOverlayStyle();
-    WidgetsBinding.instance.addObserver(this);
-
-    // if (DeviceOS.isWeb) {
-    //   import 'dart:html' as html;
-
-    //   html.window.onBeforeUnload.listen((event) async {
-    //     save(ref.read(dataMortgageProvider));
-    //   });
-    // }
 
     Future.delayed(Duration(seconds: 30), () async {
       print('delay');
@@ -115,19 +113,44 @@ class _DocumentState extends ConsumerState<Document>
   }
 
   @override
+  void didChangeDependencies() {
+    ref.read(routeDocumentProvider).formFactorType = widget.formFactorType;
+    super.didChangeDependencies();
+  }
+
+  @override
+  void didUpdateWidget(Document oldWidget) {
+    if (widget.formFactorType != oldWidget.formFactorType) {
+      ref.read(routeDocumentProvider).formFactorType = widget.formFactorType;
+    }
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     Widget body;
+    RouteDocument d = ref.watch(routeDocumentProvider);
 
     switch (DeviceScreen3.of(context).formFactorType) {
       case FormFactorType.SmallPhone:
       case FormFactorType.LargePhone:
-        body = MobileRoute();
+        // body = MobileRoute();
+        final router = d.listOfRoutes[AppRoute.mobile];
+
+        body = router == null
+            ? Text(':(')
+            : Router(
+                backButtonDispatcher: ChildBackButtonDispatcher(
+                    Router.of(context).backButtonDispatcher!)
+                  ..takePriority(),
+                routeInformationProvider: router.routeInformationProvider,
+                routeInformationParser: router.routeInformationParser,
+                routerDelegate: router.routerDelegate);
         break;
       case FormFactorType.Tablet:
         body = MediumRoute();
@@ -135,13 +158,16 @@ class _DocumentState extends ConsumerState<Document>
       case FormFactorType.Monitor:
         body = LargeRoute();
         break;
+      case FormFactorType.Unknown:
+        {
+          throw ('FormFactorType is unknown.');
+        }
     }
 
     return Theme(data: buildFactorTheme(context), child: body);
   }
 
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    print('AppLifecycleState $state');
     switch (state) {
       case AppLifecycleState.resumed:
         break;

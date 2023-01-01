@@ -1,9 +1,9 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mortgage_insight/routes/route_document.dart';
 import 'package:mortgage_insight/routes/routes_items.dart';
-import '../routes/page_route.dart';
-import '../state_manager/edit_state.dart';
+import '../routes/route_page.dart';
 import '../theme/ltrb_navigation_style.dart';
 
 class LargeDrawer extends StatefulWidget {
@@ -106,8 +106,8 @@ class _HorizontalTabBarState extends ConsumerState<HorizontalTabBar> {
                 scrollDirection: Axis.horizontal,
                 itemBuilder: (BuildContext context, int index) {
                   final MortgageItems mi = mortgageItemsList[index];
-                  final bool selected =
-                      ref.watch(routePageProvider.select((id) => id == mi.id));
+                  final bool selected = ref.watch(routeDocumentProvider
+                      .select((value) => value.pageRouteName == mi.id));
 
                   return InkWell(
                       key: Key(mi.id),
@@ -126,7 +126,7 @@ class _HorizontalTabBarState extends ConsumerState<HorizontalTabBar> {
                         ),
                       ),
                       onTap: () {
-                        ref.read(routePageProvider.notifier).pageRoute = mi.id;
+                        setRoutePage(ref: ref, name: mi.id);
                       });
                 },
                 itemCount: mortgageItemsList.length)));

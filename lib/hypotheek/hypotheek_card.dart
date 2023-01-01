@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mortgage_insight/model/nl/hypotheek_container/hypotheek_container.dart';
-import 'package:mortgage_insight/routes/routes_items.dart';
-import 'package:mortgage_insight/state_manager/edit_state.dart';
 import '../model/nl/hypotheek/hypotheek.dart';
 import '../my_widgets/custom_fitted_box.dart';
 import '../my_widgets/mortgage_card.dart';
 import '../utilities/MyNumberFormat.dart';
 import 'package:intl/intl.dart';
 import '../utilities/date.dart';
-import 'bewerken/hypotheek_model.dart';
 
 class HypotheekCard extends ConsumerStatefulWidget {
   final Hypotheek hypotheek;
@@ -81,16 +78,16 @@ class _HypotheekCardState extends ConsumerState<HypotheekCard> {
 
   void edit() {
     final hypotheekContainer = ref.read(hypotheekContainerProvider);
-
-    ref.read(routeEditPageProvider.notifier).editState = EditRouteState(
-        route: routeMortgageEdit,
-        object: HypotheekViewModel(
-            inkomenLijst: hypotheekContainer.inkomenLijst(),
-            inkomenLijstPartner: hypotheekContainer.inkomenLijst(partner: true),
-            profiel:
-                hypotheekContainer.huidigeHypotheekProfielContainer!.profiel,
-            schuldenLijst: hypotheekContainer.schuldenContainer.list,
-            id: widget.hypotheek.id));
+    //ToDo
+    // ref.read(routeEditPageProvider.notifier).editState = EditRouteState(
+    //     route: routeMortgageEdit,
+    //     object: HypotheekViewModel(
+    //         inkomenLijst: hypotheekContainer.inkomenLijst(),
+    //         inkomenLijstPartner: hypotheekContainer.inkomenLijst(partner: true),
+    //         profiel:
+    //             hypotheekContainer.huidigeHypotheekProfielContainer!.profiel,
+    //         schuldenLijst: hypotheekContainer.schuldenContainer.list,
+    //         id: widget.hypotheek.id));
   }
 
   void onSelected(String selected) {

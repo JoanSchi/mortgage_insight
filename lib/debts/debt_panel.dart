@@ -8,6 +8,7 @@ import 'package:mortgage_insight/model/nl/schulden/schulden_doorlopend_krediet.d
 import 'package:mortgage_insight/model/nl/schulden/schulden_lease_auto.dart';
 import 'package:mortgage_insight/model/nl/schulden/schulden_verzend_krediet.dart';
 import 'package:mortgage_insight/state_manager/edit_state.dart';
+import 'package:mortgage_insight/state_manager/state_edit_object.dart';
 import 'package:mortgage_insight/utilities/device_info.dart';
 import 'package:nested_scroll_view_3m/nested_scroll_view_3m.dart';
 import '../model/nl/schulden/schulden.dart';
@@ -29,8 +30,9 @@ class LastPanel extends ConsumerStatefulWidget {
 
 class _DebtPanelState extends ConsumerState<LastPanel> {
   add() {
-    ref.read(routeEditPageProvider.notifier).editState =
-        EditRouteState(route: routeDebtsEdit);
+    // TODO: Fix
+    // ref.read(routeEditPageProvider.notifier).editState =
+    //     EditRouteState(route: routeDebtsEdit);
   }
 
   @override
@@ -168,7 +170,7 @@ class BewerkSchulden extends StatelessWidget {
 class SelectieNieuwOfBestaandeSchuld extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    Schuld? s = ref.watch(routeEditPageProvider).object;
+    Schuld? s = ref.watch(editObjectProvider).object;
 
     if (s != null && s.id > 0) {
       return MessageListenerWidget<AcceptCancelBackMessage>(
@@ -197,7 +199,7 @@ class _DebtPageViewerState extends ConsumerState<SchuldSelectiePageViewer> {
   setDebt(Schuld? schuld) {
     setState(() {
       if (schuld != null) {
-        ref.watch(routeEditPageProvider).object = schuld.copyWith();
+        ref.watch(editObjectProvider).object = schuld.copyWith();
         _pageController.animateToPage(1,
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut);
@@ -220,7 +222,7 @@ class _DebtPageViewerState extends ConsumerState<SchuldSelectiePageViewer> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    Schuld? s = ref.watch(routeEditPageProvider).object;
+    Schuld? s = ref.watch(editObjectProvider).object;
 
     final list = LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) =>

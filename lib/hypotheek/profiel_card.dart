@@ -90,13 +90,13 @@ class _ProfielCardState extends ConsumerState<ProfielCard> {
 
   void edit() {
     final profielContainer = ref.read(hypotheekContainerProvider);
-
-    ref.read(routeEditPageProvider.notifier).editState = EditRouteState(
-      route: routeNieweHypotheekProfielEdit,
-      object: HypotheekProfielViewModel(
-          hypotheekProfielen: profielContainer.container.hypotheekProfielen,
-          profiel: profielContainer.huidigeHypotheekProfielContainer?.profiel),
-    );
+// TODO: Fix
+    // ref.read(routeEditPageProvider.notifier).editState = EditRouteState(
+    //   route: routeNieweHypotheekProfielEdit,
+    //   object: HypotheekProfielViewModel(
+    //       hypotheekProfielen: profielContainer.container.hypotheekProfielen,
+    //       profiel: profielContainer.huidigeHypotheekProfielContainer?.profiel),
+    // );
   }
 
   void onSelected(String selected) {

@@ -89,7 +89,8 @@ class _AflopendKredietPanelState extends ConsumerState<AflopendKredietPanel> {
 
               break;
             case AcceptCancelBack.cancel:
-              ref.read(routeEditPageProvider.notifier).clear();
+              // TODO: Fix
+              // ref.read(routeEditPageProvider.notifier).clear();
               //import 'package:go_router/go_router.dart';
               context.pop();
               break;

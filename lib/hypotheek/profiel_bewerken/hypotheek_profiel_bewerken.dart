@@ -8,8 +8,6 @@ import 'package:mortgage_insight/model/nl/hypotheek/hypotheek.dart';
 import 'package:mortgage_insight/model/nl/hypotheek_container/hypotheek_container.dart';
 import 'package:mortgage_insight/my_widgets/my_page/my_page.dart';
 import 'package:mortgage_insight/my_widgets/simple_widgets.dart';
-import 'package:mortgage_insight/routes/routes_items.dart';
-import 'package:mortgage_insight/state_manager/edit_state.dart';
 import 'package:mortgage_insight/utilities/MyNumberFormat.dart';
 import 'package:go_router/go_router.dart';
 import '../../layout/transition/scale_size_transition.dart';
@@ -18,8 +16,8 @@ import '../../my_widgets/sliver_row_box.dart';
 import '../../my_widgets/animated_scale_resize_switcher.dart';
 import '../../my_widgets/selectable_button_group.dart';
 import '../../my_widgets/selectable_popupmenu.dart';
+import '../../state_manager/state_edit_object.dart';
 import '../../utilities/device_info.dart';
-import '../bewerken/hypotheek_model.dart';
 
 const _horizontal = 8.0;
 
@@ -38,7 +36,7 @@ class _BewerkHypotheekProfielState
 
   @override
   void initState() {
-    nieuwHypotheekProfielViewModel = ref.read(routeEditPageProvider).object;
+    nieuwHypotheekProfielViewModel = ref.read(editObjectProvider).object;
     super.initState();
   }
 
@@ -72,17 +70,18 @@ class _BewerkHypotheekProfielState
 
               if (nieuwHypotheekProfielViewModel.isNieuw) {
                 scheduleMicrotask(() {
-                  ref.read(routeEditPageProvider.notifier).editState =
-                      EditRouteState(
-                          route: routeMortgageEdit,
-                          object: HypotheekViewModel(
-                              inkomenLijst: hypotheekContainer.inkomenLijst(),
-                              inkomenLijstPartner: hypotheekContainer
-                                  .inkomenLijst(partner: true),
-                              profiel: hypotheekContainer
-                                  .huidigeHypotheekProfielContainer!.profiel,
-                              schuldenLijst:
-                                  hypotheekContainer.schuldenContainer.list));
+                  // TODO: Fix
+                  //   ref.read(routeEditPageProvider.notifier).editState =
+                  //       EditRouteState(
+                  //           route: routeMortgageEdit,
+                  //           object: HypotheekViewModel(
+                  //               inkomenLijst: hypotheekContainer.inkomenLijst(),
+                  //               inkomenLijstPartner: hypotheekContainer
+                  //                   .inkomenLijst(partner: true),
+                  //               profiel: hypotheekContainer
+                  //                   .huidigeHypotheekProfielContainer!.profiel,
+                  //               schuldenLijst:
+                  //                   hypotheekContainer.schuldenContainer.list));
                 });
               } else {
                 scheduleMicrotask(() {

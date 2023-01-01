@@ -23,6 +23,7 @@ import '../../model/nl/hypotheek/hypotheek.dart';
 import '../../model/nl/hypotheek/kosten_hypotheek.dart';
 import '../../my_widgets/my_page/my_page.dart';
 import '../../my_widgets/selectable_popupmenu.dart';
+import '../../state_manager/state_edit_object.dart';
 import '../../utilities/device_info.dart';
 import 'verdeling_leningen.dart';
 
@@ -72,7 +73,7 @@ class _HypotheekBewerkPanelState extends ConsumerState<HypotheekBewerkPanel> {
 
   @override
   void initState() {
-    hypotheekViewModel = ref.read(routeEditPageProvider).object;
+    hypotheekViewModel = ref.read(editObjectProvider).object;
     super.initState();
   }
 

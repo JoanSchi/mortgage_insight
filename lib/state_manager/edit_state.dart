@@ -2,57 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../routes/routes_items.dart';
 
-final routePageProvider = StateNotifierProvider<RoutePageState, String>((ref) {
-  return RoutePageState(routeIncome);
-});
-
-class RoutePageState extends StateNotifier<String> {
-  RoutePageState(String initial) : super(initial);
-
-  set pageRoute(String route) {
-    state = route;
-  }
-
-  String get pageRoute => state;
-}
-
-class EditRouteState<T> {
-  String route;
-  T? object;
-
-  EditRouteState({
-    this.route = '',
-    this.object,
-  });
-
-  void clear() {
-    route = '';
-    object = null;
-  }
-}
-
-final routeEditPageProvider =
-    StateNotifierProvider<RouteEditPageState, EditRouteState>((ref) {
-  return RouteEditPageState(EditRouteState());
-});
-
-class RouteEditPageState extends StateNotifier<EditRouteState> {
-  RouteEditPageState(EditRouteState initial) : super(initial);
-
-  set editState(EditRouteState route) {
-    // assert((route != null && state == null) || (route == null && state != null),
-    //     'EditRouteState: route is null: ${route == null} state is null: ${state == null} ');
-
-    state = route;
-  }
-
-  clear() {
-    state.clear();
-  }
-
-  EditRouteState get editState => state;
-}
-
 final pageHypotheekProvider = ChangeNotifierProvider<PageHypotheekState>((ref) {
   return PageHypotheekState();
 });

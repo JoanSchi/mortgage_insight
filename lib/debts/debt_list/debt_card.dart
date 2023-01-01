@@ -9,8 +9,6 @@ import '../../model/nl/schulden/schulden_aflopend_krediet.dart';
 import '../../my_widgets/custom_fitted_box.dart';
 import '../../my_widgets/mortgage_card.dart';
 import '../../my_widgets/summary_pie_chart/pie_chart.dart';
-import '../../routes/routes_items.dart';
-import '../../state_manager/edit_state.dart';
 import '../../utilities/MyNumberFormat.dart';
 import '../../utilities/date.dart';
 import 'package:intl/intl.dart';
@@ -205,8 +203,10 @@ class _AflopendKredietCardState extends ConsumerState<AflopendKredietCard> {
     );
   }
 
-  void edit() => ref.read(routeEditPageProvider.notifier).editState =
-      EditRouteState(route: routeDebtsEdit, object: widget.ak.copyWith());
+  void edit() => {};
+  // TODO: Fix
+  // ref.read(routeEditPageProvider.notifier).editState =
+  //     EditRouteState(route: routeDebtsEdit, object: widget.ak.copyWith());
 
   void onSelected(String selected) {
     switch (selected) {
@@ -354,8 +354,10 @@ class _DoorlopendKredietCardCardState
     );
   }
 
-  void edit() => ref.read(routeEditPageProvider.notifier).editState =
-      EditRouteState(route: routeDebtsEdit, object: widget.dk.copyWith());
+  void edit() => {};
+  // TODO: Fix
+  // ref.read(routeEditPageProvider.notifier).editState =
+  // EditRouteState(route: routeDebtsEdit, object: widget.dk.copyWith());
 
   void onSelected(String selected) {
     switch (selected) {
@@ -505,8 +507,10 @@ class _VerzendKredietCardCardState extends ConsumerState<VerzendKredietCard> {
     );
   }
 
-  void edit() => ref.read(routeEditPageProvider.notifier).editState =
-      EditRouteState(route: routeDebtsEdit, object: widget.vk.copyWith());
+  void edit() => {};
+  // TODO: Fix
+  // ref.read(routeEditPageProvider.notifier).editState =
+  // EditRouteState(route: routeDebtsEdit, object: widget.vk.copyWith());
 
   void onSelected(String selected) {
     switch (selected) {
@@ -673,9 +677,11 @@ class _LeaseAutoCardState extends ConsumerState<LeaseAutoCard> {
     );
   }
 
-  void edit() => ref.read(routeEditPageProvider.notifier).editState =
-      EditRouteState<Schuld>(
-          route: routeDebtsEdit, object: widget.ola.copyWith());
+  void edit() => {};
+  // TODO: Fix
+  // ref.read(routeEditPageProvider.notifier).editState =
+  // EditRouteState<Schuld>(
+  //     route: routeDebtsEdit, object: widget.ola.copyWith());
 
   void onSelected(String selected) {
     switch (selected) {

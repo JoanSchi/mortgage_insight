@@ -9,6 +9,7 @@ import 'package:ltrb_navigation_drawer/ltbr_drawer_widgets.dart';
 import 'package:ltrb_navigation_drawer/ltrb_scrollview_listener.dart';
 import '../mobile/background_sliver_element.dart';
 import '../model/nl/hypotheek_container/hypotheek_container.dart';
+import '../routes/route_document.dart';
 import '../routes/routes_items.dart';
 import '../state_manager/edit_state.dart';
 import '../theme/ltrb_navigation_style.dart';
@@ -100,8 +101,7 @@ class _BottomDrawerState extends ConsumerState<BottomMobileDrawer> {
       (BuildContext context, int index) {
         final i = mortgageItemsList[index];
 
-        final selected =
-            ref.watch(routePageProvider.select((id) => id == i.id));
+        final selected = watchSelectedRoutePage(ref, i.id);
 
         return BackgroundSliverElement(
           start: index == 0 && !haslogo,
@@ -112,7 +112,7 @@ class _BottomDrawerState extends ConsumerState<BottomMobileDrawer> {
             selected: selected,
             onTap: () {
               widget.drawerModel.pop();
-              ref.read(routePageProvider.notifier).pageRoute = i.id;
+              setRoutePage(ref: ref, name: i.id);
             },
           ),
         );
