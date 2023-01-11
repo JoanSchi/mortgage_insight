@@ -50,10 +50,9 @@ class TabBarPageStyle extends ThemeExtension<TabBarPageStyle> {
 buildTabBarOverviewPageStyle(FormFactorType formFactorType) {
   switch (formFactorType) {
     case FormFactorType.SmallPhone:
-
     case FormFactorType.LargePhone:
-
     case FormFactorType.Tablet:
+    case FormFactorType.Unknown:
       return TabBarPageStyle(
         indicatorColor: Color(0xFF5a92a9),
       );

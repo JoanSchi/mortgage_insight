@@ -43,7 +43,7 @@ IconThemeData _customIconTheme(IconThemeData original) {
 }
 
 ThemeData buildTheme() {
-  final base = ThemeData(useMaterial3: true);
+  final base = ThemeData(useMaterial3: false);
   return base.copyWith(
       appBarTheme: const AppBarTheme(
         systemOverlayStyle: SystemUiOverlayStyle.dark,

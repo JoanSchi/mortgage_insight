@@ -15,9 +15,9 @@ import 'package:mortgage_insight/navigation/navigation_document_examples.dart';
 import 'package:mortgage_insight/navigation/navigation_login_button.dart';
 import 'package:mortgage_insight/utilities/device_info.dart';
 import '../layout/t.dart';
-import '../routes/route_document.dart';
-import '../routes/routes_items.dart';
-import '../state_manager/edit_state.dart';
+import '../state_manager/routes/routes_app.dart';
+import '../state_manager/routes/routes_handle_app.dart';
+import 'navigation_page_items.dart';
 import '../theme/ltrb_navigation_style.dart';
 
 class MobileDrawer extends ConsumerStatefulWidget {
@@ -83,7 +83,7 @@ class _DrawerState extends ConsumerState<MobileDrawer> {
         selected: selected,
         onTap: () {
           widget.drawerModel.pop();
-          setRoutePage(ref: ref, name: i.id);
+          HandleRoutes.setRoutePage(ref, i.id);
         },
       );
     }
@@ -297,7 +297,7 @@ class _LeftDrawerState extends ConsumerState<MobileLeftDrawer> {
         selected: selected,
         onTap: () {
           widget.drawerModel.pop();
-          setRoutePage(ref: ref, name: i.id);
+          HandleRoutes.setRoutePage(ref, i.id);
         },
       );
     }

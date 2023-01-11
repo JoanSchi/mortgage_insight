@@ -2,17 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mortgage_insight/model/nl/hypotheek_container/hypotheek_container.dart';
-import 'package:mortgage_insight/routes/route_document.dart';
+import 'package:go_router/go_router.dart';
+import 'package:mortgage_insight/my_widgets/oh_no.dart';
+import 'package:mortgage_insight/state_manager/routes/routes_app.dart';
 import 'package:mortgage_insight/theme/theme.dart';
-import 'package:mortgage_insight/utilities/device_info.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'large/large_document.dart';
-import 'medium/medium_document.dart';
-import 'mobile/mobile_document.dart';
 import 'dart:math' as math;
 
-import 'routes/route_main.dart';
+import 'package:mortgage_insight/utilities/device_info.dart';
 
 void main() {
   runApp(ProviderScope(child: MyApp()));
@@ -35,17 +31,45 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class AppBackground extends StatefulWidget {
+class AppBackground extends ConsumerStatefulWidget {
   @override
-  State<StatefulWidget> createState() => AppBackgroundState();
+  ConsumerState<ConsumerStatefulWidget> createState() => AppBackgroundState();
 }
 
-class AppBackgroundState extends State<AppBackground> {
+class AppBackgroundState extends ConsumerState<AppBackground> {
+  @override
+  void didChangeDependencies() {
+    setOverlayStyle();
+    updateFormFactorType();
+    super.didChangeDependencies();
+  }
+
+  @override
+  void didUpdateWidget(covariant AppBackground oldWidget) {
+    updateFormFactorType();
+    super.didUpdateWidget(oldWidget);
+  }
+
+  void updateFormFactorType() {
+    ref
+        .read(routeDocumentProvider.notifier)
+        .setFormFactorType(DeviceScreen3.of(context).formFactorType);
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-      Widget body = Router.withConfig(config: routeMain);
+      final GoRouter? route = ref.watch(routeDocumentProvider
+          .select((value) => value.routes[AppRoutes.main]));
+
+      if (route == null) {
+        return OhNo(
+          text: 'Main route not found',
+        );
+      }
+
+      Widget body = Router.withConfig(config: route);
 
       if (constraints.biggest.shortestSide <= 900.0) {
         return body;
@@ -77,108 +101,7 @@ setOverlayStyle() {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarBrightness: Brightness.light,
-      statusBarIconBrightness: Brightness.light,
+      statusBarIconBrightness: Brightness.dark,
       systemNavigationBarColor: Colors.white, //Color(0xFFf1f4fb),
       systemNavigationBarIconBrightness: Brightness.dark));
-}
-
-class MyWidget extends StatelessWidget {
-  const MyWidget({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Document(formFactorType: DeviceScreen3.of(context).formFactorType);
-  }
-}
-
-class Document extends ConsumerStatefulWidget {
-  final FormFactorType formFactorType;
-  const Document({Key? key, required this.formFactorType}) : super(key: key);
-
-  @override
-  ConsumerState<Document> createState() => _DocumentState();
-}
-
-class _DocumentState extends ConsumerState<Document> {
-  @override
-  void initState() {
-    super.initState();
-    setOverlayStyle();
-
-    Future.delayed(Duration(seconds: 30), () async {
-      print('delay');
-      SharedPreferences pref = await SharedPreferences.getInstance();
-      pref.setString('test3', 'hihi');
-    });
-  }
-
-  @override
-  void didChangeDependencies() {
-    ref.read(routeDocumentProvider).formFactorType = widget.formFactorType;
-    super.didChangeDependencies();
-  }
-
-  @override
-  void didUpdateWidget(Document oldWidget) {
-    if (widget.formFactorType != oldWidget.formFactorType) {
-      ref.read(routeDocumentProvider).formFactorType = widget.formFactorType;
-    }
-    super.didUpdateWidget(oldWidget);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    Widget body;
-    RouteDocument d = ref.watch(routeDocumentProvider);
-
-    switch (DeviceScreen3.of(context).formFactorType) {
-      case FormFactorType.SmallPhone:
-      case FormFactorType.LargePhone:
-        // body = MobileRoute();
-        final router = d.listOfRoutes[AppRoute.mobile];
-
-        body = router == null
-            ? Text(':(')
-            : Router(
-                backButtonDispatcher: ChildBackButtonDispatcher(
-                    Router.of(context).backButtonDispatcher!)
-                  ..takePriority(),
-                routeInformationProvider: router.routeInformationProvider,
-                routeInformationParser: router.routeInformationParser,
-                routerDelegate: router.routerDelegate);
-        break;
-      case FormFactorType.Tablet:
-        body = MediumRoute();
-        break;
-      case FormFactorType.Monitor:
-        body = LargeRoute();
-        break;
-      case FormFactorType.Unknown:
-        {
-          throw ('FormFactorType is unknown.');
-        }
-    }
-
-    return Theme(data: buildFactorTheme(context), child: body);
-  }
-
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    switch (state) {
-      case AppLifecycleState.resumed:
-        break;
-      case AppLifecycleState.inactive:
-        break;
-      case AppLifecycleState.paused:
-        ref.read(hypotheekContainerProvider).saveHypotheekContainer();
-        break;
-      case AppLifecycleState.detached:
-        ref.read(hypotheekContainerProvider).saveHypotheekContainer();
-        break;
-    }
-  }
 }

@@ -7,11 +7,11 @@ import 'package:ltrb_navigation_drawer/ltbr_drawer.dart';
 import 'package:ltrb_navigation_drawer/ltbr_drawer_model.dart';
 import 'package:ltrb_navigation_drawer/ltbr_drawer_widgets.dart';
 import 'package:ltrb_navigation_drawer/ltrb_scrollview_listener.dart';
-import '../mobile/background_sliver_element.dart';
+import '../route_widgets/start/background_sliver_element.dart';
 import '../model/nl/hypotheek_container/hypotheek_container.dart';
-import '../routes/route_document.dart';
-import '../routes/routes_items.dart';
-import '../state_manager/edit_state.dart';
+import '../state_manager/routes/routes_app.dart';
+import '../state_manager/routes/routes_handle_app.dart';
+import 'navigation_page_items.dart';
 import '../theme/ltrb_navigation_style.dart';
 import '../utilities/device_info.dart';
 import 'navigation_mobile_left.dart';
@@ -112,7 +112,7 @@ class _BottomDrawerState extends ConsumerState<BottomMobileDrawer> {
             selected: selected,
             onTap: () {
               widget.drawerModel.pop();
-              setRoutePage(ref: ref, name: i.id);
+              HandleRoutes.setRoutePage(ref, i.id);
             },
           ),
         );

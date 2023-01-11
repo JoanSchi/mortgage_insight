@@ -9,16 +9,15 @@ import 'package:ltrb_navigation_drawer/ltbr_drawer.dart';
 import 'package:ltrb_navigation_drawer/ltbr_drawer_model.dart';
 import 'package:ltrb_navigation_drawer/ltbr_drawer_widgets.dart';
 import 'package:ltrb_navigation_drawer/overlay_indicator/ltbr_drawer_indicator.dart';
-
 import '../layout/transition/scale_size_transition.dart';
-import '../routes/route_document.dart';
+import '../route_widgets/document/route_widget_page.dart';
+import '../state_manager/routes/routes_app.dart';
+import '../state_manager/routes/routes_handle_app.dart';
 import '../theme/ltrb_navigation_style.dart';
 import 'navigation_document_examples.dart';
 import '../model/nl/hypotheek_container/hypotheek_container.dart';
 import 'navigation_login_button.dart';
-import '../routes/route_page.dart';
-import '../routes/routes_items.dart';
-import '../state_manager/edit_state.dart';
+import 'navigation_page_items.dart';
 import '../utilities/device_info.dart';
 
 class MediumDrawer extends StatefulWidget {
@@ -677,7 +676,7 @@ class _MenuListState extends State<MenuList> {
                               alignment: Alignment.center,
                               child: SelectedIconButton<String>(
                                   onChanged: (String value) {
-                                    setRoutePage(ref: ref, name: value);
+                                    HandleRoutes.setRoutePage(ref, value);
                                   },
                                   value: item.id,
                                   groupValue: route,
@@ -714,7 +713,7 @@ class _MenuListState extends State<MenuList> {
                                 selectedBackbround:
                                     navigationStyle?.backgroundSelectedItem,
                                 onChanged: (String value) {
-                                  setRoutePage(ref: ref, name: value);
+                                  HandleRoutes.setRoutePage(ref, value);
                                 },
                                 onPress: () => widget.drawerModel.pop(),
                                 value: item.id,

@@ -1,9 +1,10 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mortgage_insight/routes/route_document.dart';
-import 'package:mortgage_insight/routes/routes_items.dart';
-import '../routes/route_page.dart';
+import 'package:mortgage_insight/state_manager/routes/routes_app.dart';
+import 'package:mortgage_insight/navigation/navigation_page_items.dart';
+import '../route_widgets/document/route_widget_page.dart';
+import '../state_manager/routes/routes_handle_app.dart';
 import '../theme/ltrb_navigation_style.dart';
 
 class LargeDrawer extends StatefulWidget {
@@ -126,7 +127,7 @@ class _HorizontalTabBarState extends ConsumerState<HorizontalTabBar> {
                         ),
                       ),
                       onTap: () {
-                        setRoutePage(ref: ref, name: mi.id);
+                        HandleRoutes.setRoutePage(ref, mi.id);
                       });
                 },
                 itemCount: mortgageItemsList.length)));
@@ -249,24 +250,3 @@ class LinePaint extends CustomPainter {
         bottomPadding != oldDelegate.bottomPadding;
   }
 }
-
-
-
-//   t(){
-      
-//       ListView.builder(itemBuilder: itemBuilder)
-//       final i = mortgageItemsList[index];
-
-//       final selected = ref.watch(routePageProvider.select((id) => id == i.id));
-
-//       return MyTile(
-//         title: i.title,
-//         selected: selected,
-//         onTap: () {
-//           widget.drawerModel.pop();
-//           ref.read(routePageProvider.notifier).pageRoute = i.id;
-//         },
-//       );
-//     }
-//   }
-// }
