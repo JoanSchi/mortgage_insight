@@ -93,7 +93,7 @@ class DeviceScreen3 {
       case TargetPlatform.macOS:
       case TargetPlatform.linux:
       case TargetPlatform.windows:
-        if (size.width > 900.0 && size.height > 600.0) {
+        if (size.width > 1200.0 && size.height > 600.0) {
           return FormFactorType.Monitor;
         } else if (size.width > 500 && size.height > 500) {
           return FormFactorType.Tablet;
@@ -116,9 +116,7 @@ class DeviceScreen3 {
 
   bool get isPortrait => size.width < size.height;
 
-  //Joan
-  bool get narrowNavigation => size.width <= 900.0;
+  bool get isTabletWidthNarrow => size.width < 900.0;
 
-  //
   bool get wrapSelectionWidgets => size.width > 500.0;
 }

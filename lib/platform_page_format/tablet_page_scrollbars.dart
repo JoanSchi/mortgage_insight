@@ -1,14 +1,22 @@
 import 'package:custom_sliver_appbar/title_image_appbar/title_image_appbar.dart';
 import 'package:flutter/material.dart';
-import 'package:mortgage_insight/platform_page_format/my_page.dart';
+import 'package:mortgage_insight/platform_page_format/default_page.dart';
+import 'package:mortgage_insight/platform_page_format/fabProperties.dart';
 import 'package:mortgage_insight/platform_page_format/page_actions.dart';
+import 'package:mortgage_insight/utilities/device_info.dart';
+
+import 'page_bottom_actions_layout.dart';
+import 'page_properties.dart';
 
 class TablePageScrollBars extends StatelessWidget {
   final String? title;
   final WidgetBuilder? imageBuilder;
-  final PageProperties positionPageActions;
+  final PageProperties pageProperties;
   final PreferredSizeWidget? bottom;
   final BodyBuilder bodyBuilder;
+  final int notificationDepth;
+
+  final FabProperties? fabProperties;
 
   const TablePageScrollBars({
     Key? key,
@@ -16,42 +24,80 @@ class TablePageScrollBars extends StatelessWidget {
     this.imageBuilder,
     PageProperties? pageProperties,
     this.bottom,
+    this.fabProperties,
+    required this.notificationDepth,
     required this.bodyBuilder,
-  })  : positionPageActions =
-            pageProperties ?? const PageProperties(hasNavigationBar: false),
+  })  : pageProperties = pageProperties ?? const PageProperties(),
         super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final mediaQuery = MediaQuery.of(context);
-    final height = mediaQuery.size.height;
+    final deviceScreen = DeviceScreen3.of(context);
+    final isNarrow = deviceScreen.isTabletWidthNarrow;
 
-    final titleHeight = kToolbarHeight;
-    final imageHeight = 100.0;
+    final Widget? left = buildActionRow(
+        context: context,
+        action:
+            pageActionsToIconButton(context, pageProperties.leftTopActions));
+    final Widget? right = buildActionRow(
+        context: context,
+        action:
+            pageActionsToIconButton(context, pageProperties.rightTopActions));
 
-    final body = bodyBuilder(context: context, nested: false);
+    Widget body = Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      child: PageActionBottomLayout(
+          leftBottomActions: pageProperties.leftBottomActions,
+          rightBottomActions: pageProperties.rightBottomActions,
+          body: bodyBuilder(context: context, nested: false)),
+    );
+
+    final titleHeight =
+        (isNarrow && (title != null || left != null || right != null))
+            ? 56.0
+            : 0.0;
+
+    final floatingActionButton =
+        fabProperties == null ? null : Fab(fabProperties: fabProperties!);
 
     return Scaffold(
       appBar: TitleImageAppBar(
-        orientation: Orientation.landscape,
-        title: title,
-        backgroundColor: theme.backgroundColor,
-        backgroundColorScrolledUnder: theme.colorScheme.onSurface,
-        leftActions: buildActionRow(
-            context: context,
-            action: pageActionsToIconButton(
-                context, positionPageActions.leftBarActions)),
-        rightActions: buildActionRow(
-            context: context,
-            action: pageActionsToIconButton(
-                context, positionPageActions.rightBarActions)),
-        titleHeight: titleHeight,
-        imageHeight: imageHeight,
-        imageBuilder: imageBuilder,
-        bottom: bottom,
-      ),
+          orientation: isNarrow ? Orientation.portrait : Orientation.landscape,
+          notificationPredicate: (ScrollNotification notification) =>
+              notification.depth == notificationDepth,
+          title: titleHeight != 0.0 ? title : null,
+          backgroundColor: theme.backgroundColor,
+          backgroundColorScrolledUnder: theme.colorScheme.onSurface,
+          leftActions: left,
+          rightActions: right,
+          titleTextStyle: TextStyle(fontSize: 24.0),
+          titleHeight: titleHeight,
+          imageHeight: imageBuilder != null ? 120.0 : 0.0,
+          imageBuilder: imageBuilder,
+          bottomPositionImage: isNarrow ? 42.0 : 0.0,
+          bottom: bottom,
+          appBarBackgroundBuilder: (
+              {required BuildContext context,
+              required EdgeInsets padding,
+              required double safeTopPadding,
+              required bool scrolledUnder,
+              Widget? child}) {
+            final scrolledUnderColor = scrolledUnder
+                ? theme.colorScheme.surface
+                : theme.bottomAppBarColor;
+
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Material(
+                  color: scrolledUnderColor,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(8.0))),
+                  child: child),
+            );
+          }),
       body: body,
+      floatingActionButton: floatingActionButton,
     );
   }
 }

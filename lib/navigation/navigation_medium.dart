@@ -27,8 +27,8 @@ class MediumDrawer extends StatefulWidget {
   State<MediumDrawer> createState() => _MediumDrawerState();
 }
 
-const double minSizePortrait = 84.0;
-const double minSizeLandscape = 208.0;
+const double narrowMinSize = 84.0;
+const double minSize = 208.0;
 const List<double> sizeExtend = [650.0, 500.0];
 const boxPaddingStart = EdgeInsets.all(0.0);
 const boxPaddingEnd = EdgeInsets.all(16.0);
@@ -45,7 +45,7 @@ class _MediumDrawerState extends State<MediumDrawer> {
     final deviceScreen = DeviceScreen3.of(context);
 
     final minimumSize =
-        deviceScreen.isPortrait ? minSizePortrait : minSizeLandscape;
+        deviceScreen.isTabletWidthNarrow ? narrowMinSize : minSize;
 
     return LtrbDrawer(
       buildOverlay: defaultArrowIndicator(),
@@ -153,7 +153,7 @@ class LeftNavigation extends ConsumerWidget {
     ThemeData dataTheme = Theme.of(context);
     final navigationStyle = dataTheme.extension<LtrbNavigationStyle>();
 
-    final minScaleLogo = drawerModel.minimumSize == minSizePortrait ? 0.0 : 0.9;
+    final minScaleLogo = drawerModel.minimumSize == narrowMinSize ? 0.0 : 0.9;
     double maxLogo = 148.0;
 
     double minSize = drawerModel.minimumSize;

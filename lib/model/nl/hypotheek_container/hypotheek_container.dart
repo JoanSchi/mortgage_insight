@@ -1,11 +1,15 @@
 import 'dart:convert';
 
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mortgage_insight/model/nl/inkomen/inkomen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mortgage_insight/model/nl/hypotheek/hypotheek.dart';
 import '../../../utilities/date.dart';
-import '../inkomen/inkomen.dart';
+import '../schulden/remove_schulden.dart';
+import '../schulden/schulden.dart';
+import '../schulden/schulden.dart';
 import '../schulden/schulden.dart';
 
 final sharedPrefs = FutureProvider<SharedPreferences>(
@@ -39,17 +43,20 @@ class HypotheekContainerChangeNotifier extends ChangeNotifier {
    *
    */
 
-  InkomenContainer inkomenContainer(bool partner) =>
+  InkomensOverzicht inkomenContainer(bool partner) =>
       (partner ? container.inkomenPartner : container.inkomen);
 
-  List<Inkomen> inkomenLijst({bool partner: false}) =>
-      (partner ? container.inkomenPartner : container.inkomen).list;
+  IList<Inkomen> inkomenLijst({bool partner: false}) =>
+      (partner ? container.inkomenPartner : container.inkomen).lijst;
 
-  void addIncome(
-      {required DateTime? oldDate,
-      required Inkomen newItem,
-      required bool partner}) {
-    container.addIncome(oldDate: oldDate, newItem: newItem, partner: partner);
+  void addInkomen({
+    required DateTime? oldDate,
+    required Inkomen newItem,
+  }) {
+    container.addInkomen(
+      oldDate: oldDate,
+      newItem: newItem,
+    );
     container.updateHypotheekInkomens();
     notifyListeners();
   }
@@ -71,7 +78,7 @@ class HypotheekContainerChangeNotifier extends ChangeNotifier {
    *
    */
 
-  SchuldenContainer get schuldenContainer => container.schuldenContainer;
+  SchuldenOverzicht get schuldenOverzicht => container.schuldenOverzicht;
 
   addSchuld(Schuld schuld) {
     container.addSchuld(schuld);
@@ -139,18 +146,19 @@ class HypotheekContainerChangeNotifier extends ChangeNotifier {
 
 class HypotheekContainer {
   HypotheekProfielen hypotheekProfielen;
-  InkomenContainer inkomen;
-  InkomenContainer inkomenPartner;
-  SchuldenContainer schuldenContainer;
+  InkomensOverzicht inkomen;
+  InkomensOverzicht inkomenPartner;
+  SchuldenOverzicht schuldenOverzicht;
 
   HypotheekContainer({
-    InkomenContainer? inkomen,
-    InkomenContainer? inkomenPartner,
-    SchuldenContainer? schuldenContainer,
+    InkomensOverzicht? inkomen,
+    InkomensOverzicht? inkomenPartner,
+    SchuldenOverzicht? schuldenOverzicht,
     HypotheekProfielen? hypotheekProfielen,
-  })  : inkomen = inkomen ?? InkomenContainer(),
-        inkomenPartner = inkomenPartner ?? InkomenContainer(),
-        schuldenContainer = schuldenContainer ?? SchuldenContainer(),
+  })  : inkomen = inkomen ?? InkomensOverzicht(lijst: IList()),
+        inkomenPartner = inkomenPartner ?? InkomensOverzicht(lijst: IList()),
+        schuldenOverzicht =
+            schuldenOverzicht ?? SchuldenOverzicht(lijst: IList()),
         hypotheekProfielen = hypotheekProfielen ?? HypotheekProfielen();
 
   /* Inkomen
@@ -159,16 +167,16 @@ class HypotheekContainer {
    *
    *
    */
-  void addIncome(
-      {required DateTime? oldDate,
-      required Inkomen newItem,
-      required bool partner}) {
-    final list = (partner ? inkomenPartner : inkomen).list;
+  void addInkomen({
+    required DateTime? oldDate,
+    required Inkomen newItem,
+  }) {
+    IList<Inkomen> list = (newItem.partner ? inkomenPartner : inkomen).lijst;
 
     if (oldDate != null) {
       final totalMonthsOldDate = oldDate.year * 12 + oldDate.month;
 
-      list.removeWhere((element) {
+      list = list.removeWhere((element) {
         final totalMonths = element.datum.year * 12 + element.datum.month;
         return totalMonthsOldDate == totalMonths;
       });
@@ -187,24 +195,28 @@ class HypotheekContainer {
             element.datum.year * 12 + element.datum.month;
 
         if (totalMonthsNewItem == totalMonthsOfElement) {
-          list[i] = newItem;
+          list = list.replace(i, newItem);
           break merged;
         } else if (totalMonthsNewItem < totalMonthsOfElement) {
-          list.insert(i, newItem);
+          list = list.insert(i, newItem);
           break merged;
         }
       }
 
-      list.add(newItem);
+      list = list.add(newItem);
     }
 
-    updateInkomen(partner);
+    if (newItem.partner) {
+      inkomenPartner = inkomenPartner.copyWith(lijst: list);
+    } else {
+      inkomen = inkomen.copyWith(lijst: list);
+    }
   }
 
   void removeIncome({required Inkomen removeItem, required bool partner}) {
-    final list = (partner ? inkomenPartner : inkomen).list;
+    IList<Inkomen> list = (partner ? inkomenPartner : inkomen).lijst;
 
-    list.removeWhere((Inkomen element) {
+    list = list.removeWhere((Inkomen element) {
       final totalMonthsOfElement =
           element.datum.year * 12 + element.datum.month;
 
@@ -214,14 +226,10 @@ class HypotheekContainer {
       return totalMonthsOfElement == totalMonthsNewItem;
     });
 
-    updateInkomen(partner);
-  }
-
-  updateInkomen(bool partner) {
     if (partner) {
-      inkomenPartner = inkomenPartner.copyWith();
+      inkomenPartner = inkomenPartner.copyWith(lijst: list);
     } else {
-      inkomen = inkomen.copyWith();
+      inkomen = inkomen.copyWith(lijst: list);
     }
   }
 
@@ -233,14 +241,14 @@ class HypotheekContainer {
    */
 
   addSchuld(Schuld schuld) {
-    final list = schuldenContainer.list;
+    var list = schuldenOverzicht.lijst;
 
-    if (schuld.id == 0) {
+    if (schuld.id == -1) {
       int dt = dateID;
 
-      for (int i = 0; i < 998; i++) {
+      while (true) {
         if (list.indexWhere((Schuld s) => s.id == dt) == -1) {
-          list.add(schuld..id = dt);
+          list = list.add(schuld.copyWith(id: dt));
           break;
         }
         dt++;
@@ -248,21 +256,18 @@ class HypotheekContainer {
     } else {
       final index = list.indexWhere((Schuld s) => s.id == schuld.id);
       if (index == -1) {
-        list.add(schuld);
+        list = list.add(schuld);
       } else {
-        list[index] = schuld;
+        list.replace(index, schuld);
       }
     }
-    updateSchulden();
+    schuldenOverzicht = schuldenOverzicht.copyWith(lijst: list);
   }
 
   removeSchuld(Schuld schuld) {
-    schuldenContainer.list.removeWhere((Schuld s) => s.id == schuld.id);
-    updateSchulden();
-  }
-
-  updateSchulden() {
-    schuldenContainer = schuldenContainer.copyWith();
+    schuldenOverzicht = schuldenOverzicht.copyWith(
+        lijst: schuldenOverzicht.lijst
+            .removeWhere((Schuld s) => s.id == schuld.id));
   }
 
   /* Hypotheekprofielen
@@ -317,18 +322,18 @@ class HypotheekContainer {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'hypotheekProfielen': hypotheekProfielen.toMap(),
-      'inkomen': inkomen.toMap(),
-      'inkomenPartner': inkomenPartner.toMap(),
-      'schuldenContainer': schuldenContainer.toMap(),
+      'inkomen': inkomen.toJson(),
+      'inkomenPartner': inkomenPartner.toJson(),
+      'schuldenOverzicht': schuldenOverzicht.toJson(),
     };
   }
 
   factory HypotheekContainer.fromMap(Map<String, dynamic> map) {
     return HypotheekContainer(
       hypotheekProfielen: HypotheekProfielen.fromMap(map['hypotheekProfielen']),
-      inkomen: InkomenContainer.fromMap(map['inkomen']),
-      inkomenPartner: InkomenContainer.fromMap(map['inkomenPartner']),
-      schuldenContainer: SchuldenContainer.fromMap(map['schuldenContainer']),
+      inkomen: InkomensOverzicht.fromJson(map['inkomen']),
+      inkomenPartner: InkomensOverzicht.fromJson(map['inkomenPartner']),
+      schuldenOverzicht: SchuldenOverzicht.fromJson(map['schuldenOverzicht']),
     );
   }
 

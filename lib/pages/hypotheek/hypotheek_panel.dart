@@ -5,8 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mortgage_insight/pages/hypotheek/hypotheek_card.dart';
 import 'package:mortgage_insight/pages/hypotheek/profiel_card.dart';
 import 'package:mortgage_insight/model/nl/hypotheek_container/hypotheek_container.dart';
-import 'package:mortgage_insight/platform_page_format/my_page.dart';
-import 'package:nested_scroll_view_3m/nested_scroll_view_3m.dart';
+import 'package:mortgage_insight/platform_page_format/default_page.dart';
 import '../../model/nl/hypotheek/hypotheek.dart';
 import '../../utilities/device_info.dart';
 import 'state_hypotheek/state_page_hypotheek.dart';
@@ -204,7 +203,7 @@ class HypotheekPanelState extends ConsumerState<HypotheekPanel>
             controller: tabController,
           );
 
-    return MyPage(
+    return DefaultPage(
         bottom: bottomAppBar,
         title: 'Hypotheek',
         imageBuilder: (_) => Image(
@@ -251,7 +250,7 @@ class ListViewHypotheekProfielen extends ConsumerWidget {
           SliverOverlapInjector(
             // This is the flip side of the SliverOverlapAbsorber
             // above.
-            handle: NestedScrollView3M.sliverOverlapAbsorberHandleFor(context),
+            handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
           ),
         if (hypotheekProfielen.profielen.length > 0)
           SliverGrid(
@@ -329,7 +328,7 @@ class ListViewHypotheekProfiel extends ConsumerWidget {
           SliverOverlapInjector(
             // This is the flip side of the SliverOverlapAbsorber
             // above.
-            handle: NestedScrollView3M.sliverOverlapAbsorberHandleFor(context),
+            handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
           ),
         if (list.length > 0)
           SliverGrid(

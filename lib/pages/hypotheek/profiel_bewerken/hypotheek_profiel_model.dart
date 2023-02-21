@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mortgage_insight/model/nl/hypotheek/hypotheek.dart';
 import 'package:mortgage_insight/utilities/Kalender.dart';
 import '../../../model/nl/hypotheek/kosten_hypotheek.dart';
-import '../../../my_widgets/sliver_row_box.dart';
+import '../../../my_widgets/remove_sliver_row_box.dart';
 import 'hypotheek_profiel_bewerken.dart';
 
 class HypotheekProfielViewModel with ChangeNotifier {

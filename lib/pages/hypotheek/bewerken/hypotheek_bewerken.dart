@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mortgage_insight/pages/debts/date_picker.dart';
+import 'package:mortgage_insight/pages/schulden/date_picker.dart';
 import 'package:mortgage_insight/pages/hypotheek/bewerken/financieringsnorm_tabel.dart';
 import 'package:mortgage_insight/pages/hypotheek/bewerken/hypotheek_model.dart';
 import 'package:mortgage_insight/pages/hypotheek/bewerken/hypotheek_verleng_card.dart';
@@ -12,17 +12,16 @@ import 'package:mortgage_insight/pages/hypotheek/profiel_bewerken/KostenLijst.da
 import 'package:mortgage_insight/layout/transition/scale_size_transition.dart';
 import 'package:mortgage_insight/model/nl/hypotheek_container/hypotheek_container.dart';
 import 'package:mortgage_insight/my_widgets/header_layout.dart';
-import 'package:mortgage_insight/my_widgets/sliver_row_box.dart';
+import 'package:mortgage_insight/my_widgets/remove_sliver_row_box.dart';
 import 'package:mortgage_insight/my_widgets/animated_scale_resize_switcher.dart';
-import 'package:mortgage_insight/my_widgets/selectable_button_group.dart';
+import 'package:mortgage_insight/my_widgets/remove_selectable_group.dart';
 import 'package:mortgage_insight/my_widgets/simple_widgets.dart';
 import 'package:mortgage_insight/utilities/MyNumberFormat.dart';
-import 'package:nested_scroll_view_3m/nested_scroll_view_3m.dart';
 import '../../../model/nl/hypotheek/financierings_norm/norm.dart';
 import '../../../model/nl/hypotheek/hypotheek.dart';
 import '../../../model/nl/hypotheek/kosten_hypotheek.dart';
-import '../../../platform_page_format/my_page.dart';
-import '../../../my_widgets/selectable_popupmenu.dart';
+import '../../../platform_page_format/default_page.dart';
+import '../../../my_widgets/remove_selectable_popupmenu.dart';
 import '../../../state_manager/state_edit_object.dart';
 import '../../../utilities/device_info.dart';
 import '../state_hypotheek/state_page_hypotheek.dart';
@@ -52,7 +51,7 @@ class BewerkHypotheekState extends ConsumerState<BewerkHypotheek> {
         break;
     }
 
-    return MyPage(
+    return DefaultPage(
         title: 'Toevoegen',
         imageBuilder: (_) => Image(
             image: AssetImage(
@@ -118,8 +117,7 @@ class _HypotheekBewerkPanelState extends ConsumerState<HypotheekBewerkPanel> {
             SliverOverlapInjector(
               // This is the flip side of the SliverOverlapAbsorber
               // above.
-              handle:
-                  NestedScrollView3M.sliverOverlapAbsorberHandleFor(context),
+              handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
             ),
           HypotheekBewerkOmschrijvingToevoegOptie(
             hypotheekViewModel: hypotheekViewModel,

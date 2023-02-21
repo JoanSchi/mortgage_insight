@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:mortgage_insight/my_widgets/animated_scale_resize_switcher.dart';
 import '../../../model/nl/hypotheek/kosten_hypotheek.dart';
-import '../../../my_widgets/sliver_row_box.dart';
-import '../../../my_widgets/selectable_popupmenu.dart';
+import '../../../my_widgets/remove_sliver_row_box.dart';
+import '../../../my_widgets/remove_selectable_popupmenu.dart';
 import '../../../utilities/MyNumberFormat.dart';
 
 class TotaleKostenRowItem extends StatefulWidget {

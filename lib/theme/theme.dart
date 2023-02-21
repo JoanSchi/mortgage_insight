@@ -49,6 +49,7 @@ ThemeData buildTheme() {
         systemOverlayStyle: SystemUiOverlayStyle.dark,
         elevation: 0,
       ),
+      materialTapTargetSize: MaterialTapTargetSize.padded,
       colorScheme: _shrineColorScheme,
       primaryColor: color100,
       scaffoldBackgroundColor: Colors.white,
@@ -58,6 +59,12 @@ ThemeData buildTheme() {
         colorScheme: _shrineColorScheme,
         textTheme: ButtonTextTheme.normal,
       ),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+          backgroundColor: color900,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0),
+          )),
       toggleableActiveColor: color100,
       primaryIconTheme: _customIconTheme(base.iconTheme),
       textTheme: _buildShrineTextTheme(base.textTheme),

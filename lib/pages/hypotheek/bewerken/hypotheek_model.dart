@@ -5,8 +5,8 @@ import 'package:mortgage_insight/utilities/Kalender.dart';
 import '../../../model/nl/hypotheek/hypotheek_doorbereken.dart';
 import '../../../model/nl/hypotheek/financierings_norm/norm.dart';
 import '../../../model/nl/inkomen/inkomen.dart';
-import '../../../model/nl/schulden/schulden.dart';
-import '../../../my_widgets/sliver_row_box.dart';
+import '../../../model/nl/schulden/remove_schulden.dart';
+import '../../../my_widgets/remove_sliver_row_box.dart';
 import '../../../utilities/MyNumber.dart';
 import 'hypotheek_bewerken.dart';
 
@@ -44,7 +44,7 @@ class HypotheekViewModel with ChangeNotifier {
 
   final List<Inkomen> inkomenLijst;
   final List<Inkomen> inkomenLijstPartner;
-  final List<Schuld> schuldenLijst;
+  final List<RemoveSchuld> schuldenLijst;
   List<Hypotheek> verlengen = [];
   String idVerlengenGeselecteerd = '';
   int bepaaldeMaximaleTermijnInJaren = 0;

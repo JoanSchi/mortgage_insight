@@ -22,12 +22,12 @@ class RadioSimpel<T> extends StatelessWidget {
   }
 }
 
-class CheckboxSimpel extends StatelessWidget {
+class RemoveCheckboxSimpel extends StatelessWidget {
   final String title;
   final ValueChanged<bool?>? onChanged;
   final bool value;
 
-  CheckboxSimpel({
+  RemoveCheckboxSimpel({
     required this.title,
     required this.onChanged,
     required this.value,

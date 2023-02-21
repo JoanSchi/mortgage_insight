@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:mortgage_insight/model/nl/hypotheek/financierings_norm/norm.dart';
-import 'package:mortgage_insight/model/nl/inkomen/inkomen.dart';
 import 'package:mortgage_insight/utilities/Kalender.dart';
-import '../../schulden/schulden.dart';
+import '../../inkomen/inkomen.dart';
+import '../../schulden/remove_schulden.dart';
 import '../parallel_leningen.dart';
 import 'financierings_last_tabel.dart';
 import '../hypotheek.dart';
@@ -16,7 +16,7 @@ class BerekenNormInkomen {
   List<Hypotheek> parallelHypotheken;
   List<Inkomen> inkomenLijst;
   List<Inkomen> inkomenLijstPartner;
-  List<Schuld> schuldenLijst;
+  List<RemoveSchuld> schuldenLijst;
 
   BerekenNormInkomen({
     required this.hypotheek,
@@ -174,7 +174,7 @@ class BerekenNormInkomen {
 
   double somSchuld() => schuldenLijst.fold(
       0.0,
-      (double previousValue, Schuld schuld) =>
+      (double previousValue, RemoveSchuld schuld) =>
           previousValue + schuld.maandLast(hypotheek.startDatum));
 }
 
@@ -210,20 +210,20 @@ class InkomensOpDatum {
   }
 
   double get hoogsteBrutoInkomen {
-    final a = inkomen?.brutoJaar(datum) ?? 0.0;
-    final b = inkomenPartner?.brutoJaar(datum) ?? 0.0;
+    final a = inkomen?.indexatieTotaalBrutoJaar(datum) ?? 0.0;
+    final b = inkomenPartner?.indexatieTotaalBrutoJaar(datum) ?? 0.0;
     return a < b ? b : a;
   }
 
   double get laagsteBrutoInkomen {
-    final a = inkomen?.brutoJaar(datum) ?? 0.0;
-    final b = inkomenPartner?.brutoJaar(datum) ?? 0.0;
+    final a = inkomen?.indexatieTotaalBrutoJaar(datum) ?? 0.0;
+    final b = inkomenPartner?.indexatieTotaalBrutoJaar(datum) ?? 0.0;
     return a < b ? a : b;
   }
 
   double get totaal =>
-      (inkomen?.brutoJaar(datum) ?? 0.0) +
-      (inkomenPartner?.brutoJaar(datum) ?? 0.0);
+      (inkomen?.indexatieTotaalBrutoJaar(datum) ?? 0.0) +
+      (inkomenPartner?.indexatieTotaalBrutoJaar(datum) ?? 0.0);
 
   bool heeftInkomen(bool partner) =>
       (partner ? inkomenPartner : inkomen) != null;
@@ -250,8 +250,8 @@ class InkomensOpDatum {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'datum': datum.millisecondsSinceEpoch,
-      'inkomen': inkomen?.toMap(),
-      'inkomenPartner': inkomenPartner?.toMap(),
+      'inkomen': inkomen?.toJson(),
+      'inkomenPartner': inkomenPartner?.toJson(),
     };
   }
 
@@ -259,10 +259,10 @@ class InkomensOpDatum {
     return InkomensOpDatum(
       datum: DateTime.fromMillisecondsSinceEpoch(map['datum'] as int),
       inkomen: map['inkomen'] != null
-          ? Inkomen.fromMap(map['inkomen'] as Map<String, dynamic>)
+          ? Inkomen.fromJson(map['inkomen'] as Map<String, dynamic>)
           : null,
       inkomenPartner: map['inkomenPartner'] != null
-          ? Inkomen.fromMap(map['inkomenPartner'] as Map<String, dynamic>)
+          ? Inkomen.fromJson(map['inkomenPartner'] as Map<String, dynamic>)
           : null,
     );
   }
@@ -346,7 +346,8 @@ class BerekenMaximaleLening {
     final List<InkomenPot> inkomenPotten = gegevens.inkomenOpDatum
         .toIterable()
         .map((Inkomen e) => InkomenPot(
-            inkomen: e.brutoJaar(gegevens.startDatum), pensioen: e.pensioen))
+            inkomen: e.indexatieTotaalBrutoJaar(gegevens.startDatum),
+            pensioen: e.pensioen))
         .toList();
 
     double lastenBox1 = somLeningen.somLastBox1;

@@ -14,6 +14,29 @@
             "request": "launch",
             "type": "dart",
             "flutterMode": "profile"
-        }
+        },
+
+      
+        {
+            "deviceId" : "emulator-5554",
+            "name": "Pixel 4 XL",
+            "request": "launch",
+            "type": "dart"
+        },
+
+        {
+            "deviceId" : "emulator-5556",
+            "name": "Pixel C 32",
+            "request": "launch",
+            "type": "dart"
+        },
+
+        
+    ],
+    "compounds": [
+		{
+			"name": "All Android 32",
+			"configurations": ["Pixel C 32","Pixel 4 XL"],
+		}
     ]
 }

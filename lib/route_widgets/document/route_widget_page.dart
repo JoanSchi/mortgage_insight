@@ -4,15 +4,20 @@ import 'package:go_router/go_router.dart';
 import 'package:mortgage_insight/my_widgets/oh_no.dart';
 import 'package:mortgage_insight/state_manager/routes/routes_app.dart';
 
-class MyRoutePage extends ConsumerWidget {
-  const MyRoutePage({
-    super.key,
-  });
+class MyRoutePage extends ConsumerStatefulWidget {
+  const MyRoutePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final GoRouter? router = ref.watch(
-        routeDocumentProvider.select((value) => value.routes[AppRoutes.page]));
+  ConsumerState<ConsumerStatefulWidget> createState() => _MyRoutePageState();
+}
+
+class _MyRoutePageState extends ConsumerState<MyRoutePage> {
+  late GoRouter? _router =
+      ref.read(routeDocumentProvider).routes[AppRoutes.page];
+
+  @override
+  Widget build(BuildContext context) {
+    final router = _router;
 
     return router == null
         ? OhNo(text: 'Page router is not found')

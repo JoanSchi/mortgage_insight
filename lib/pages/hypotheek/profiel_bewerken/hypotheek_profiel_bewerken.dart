@@ -1,22 +1,21 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mortgage_insight/pages/debts/date_picker.dart';
+import 'package:mortgage_insight/pages/schulden/date_picker.dart';
 import 'package:mortgage_insight/pages/hypotheek/profiel_bewerken/KostenLijst.dart';
 import 'package:mortgage_insight/pages/hypotheek/profiel_bewerken/hypotheek_profiel_model.dart';
 import 'package:mortgage_insight/model/nl/hypotheek/hypotheek.dart';
 import 'package:mortgage_insight/model/nl/hypotheek_container/hypotheek_container.dart';
-import 'package:mortgage_insight/platform_page_format/my_page.dart';
+import 'package:mortgage_insight/platform_page_format/default_page.dart';
 import 'package:mortgage_insight/my_widgets/simple_widgets.dart';
 import 'package:mortgage_insight/utilities/MyNumberFormat.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nested_scroll_view_3m/nested_scroll_view_3m.dart';
 import '../../../layout/transition/scale_size_transition.dart';
 import '../../../model/nl/hypotheek/kosten_hypotheek.dart';
-import '../../../my_widgets/sliver_row_box.dart';
+import '../../../my_widgets/remove_sliver_row_box.dart';
 import '../../../my_widgets/animated_scale_resize_switcher.dart';
-import '../../../my_widgets/selectable_button_group.dart';
-import '../../../my_widgets/selectable_popupmenu.dart';
+import '../../../my_widgets/remove_selectable_group.dart';
+import '../../../my_widgets/remove_selectable_popupmenu.dart';
 import '../../../state_manager/state_edit_object.dart';
 import '../../../utilities/device_info.dart';
 
@@ -48,7 +47,7 @@ class _BewerkHypotheekProfielState
     final deviceScreen = DeviceScreen3.of(context);
     final theme = deviceScreen.theme;
 
-    return MyPage(
+    return DefaultPage(
         title: 'Profiel',
         imageBuilder: (_) => Image(
             image: AssetImage(
@@ -99,7 +98,7 @@ class _BewerkHypotheekProfielState
                     SliverOverlapInjector(
                       // This is the flip side of the SliverOverlapAbsorber
                       // above.
-                      handle: NestedScrollView3M.sliverOverlapAbsorberHandleFor(
+                      handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
                           context),
                     ),
                   HypotheekProfielOptiePanel(

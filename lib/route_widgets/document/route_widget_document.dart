@@ -16,6 +16,9 @@ class Document extends ConsumerStatefulWidget {
 }
 
 class _DocumentState extends ConsumerState<Document> {
+  late GoRouter? _router =
+      ref.read(routeDocumentProvider).routes[AppRoutes.document];
+
   @override
   void initState() {
     super.initState();
@@ -45,9 +48,7 @@ class _DocumentState extends ConsumerState<Document> {
   @override
   Widget build(BuildContext context) {
     Widget body;
-    GoRouter? router = ref.watch(routeDocumentProvider
-        .select((value) => value.routes[AppRoutes.document]));
-
+    final router = _router;
     body = router == null
         ? OhNo(text: 'AppRoute main is not found.')
         : Router(

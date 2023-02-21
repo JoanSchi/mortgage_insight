@@ -37,6 +37,8 @@ class AppBackground extends ConsumerStatefulWidget {
 }
 
 class AppBackgroundState extends ConsumerState<AppBackground> {
+  GoRouter? route;
+
   @override
   void didChangeDependencies() {
     setOverlayStyle();
@@ -54,46 +56,45 @@ class AppBackgroundState extends ConsumerState<AppBackground> {
     ref
         .read(routeDocumentProvider.notifier)
         .setFormFactorType(DeviceScreen3.of(context).formFactorType);
+    route = ref.read(routeDocumentProvider).routes[AppRoutes.main];
   }
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-      final GoRouter? route = ref.watch(routeDocumentProvider
-          .select((value) => value.routes[AppRoutes.main]));
+    if (route == null) {
+      return OhNo(
+        text: 'Main route not found',
+      );
+    }
 
-      if (route == null) {
-        return OhNo(
-          text: 'Main route not found',
-        );
-      }
+    debugPrint('MediaQuery Size: ${MediaQuery.of(context).size}');
+    debugPrint('main route location: ${route?.location}');
 
-      Widget body = Router.withConfig(config: route);
+    return Router.withConfig(config: route!);
 
-      if (constraints.biggest.shortestSide <= 900.0) {
-        return body;
-      } else {
-        final width = constraints.biggest.width;
+    //   if (constraints.biggest.shortestSide <= 900.0) {
+    //     return body;
+    //   } else {
+    //     final width = constraints.biggest.width;
 
-        double left = 0.0;
-        double top = 0.0;
-        double right = 0.0;
-        double bottom = 0.0;
+    //     double left = 0.0;
+    //     double top = 0.0;
+    //     double right = 0.0;
+    //     double bottom = 0.0;
 
-        if (width > 1200.0) {
-          left = math.min((width - 1200) / 2.0, 300.0);
-          right = left;
-        }
+    //     if (width > 1200.0) {
+    //       left = math.min((width - 1200) / 2.0, 300.0);
+    //       right = left;
+    //     }
 
-        return Stack(
-          children: [
-            Positioned(
-                left: left, top: top, right: right, bottom: bottom, child: body)
-          ],
-        );
-      }
-    });
+    //     return Stack(
+    //       children: [
+    //         Positioned(
+    //             left: left, top: top, right: right, bottom: bottom, child: body)
+    //       ],
+    //     );
+    //   }
+    // });
   }
 }
 

@@ -4,12 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mortgage_insight/route_widgets/document/route_widget_mobile.dart';
 
-import '../../pages/debts/debt_panel.dart';
+import '../../pages/schulden/schuld_keuze_panel.dart';
+import '../../pages/schulden/schulden_overzicht_panel.dart';
 import '../../pages/hypotheek/bewerken/hypotheek_bewerken.dart';
 import '../../pages/hypotheek/hypotheek_panel.dart';
 import '../../pages/hypotheek/profiel_bewerken/hypotheek_profiel_bewerken.dart';
-import '../../pages/income/income_fields.dart';
-import '../../pages/income/income_panel.dart';
+
+import '../../pages/inkomen/inkomen_bewerken/inkomen_bewerken_panel.dart';
+import '../../pages/inkomen/inkomen_panel.dart';
 import '../../route_widgets/document/route_widget_document.dart';
 import '../../route_widgets/document/route_widget_large.dart';
 import '../../route_widgets/document/route_widget_medium.dart';
@@ -22,8 +24,7 @@ enum AppLayout { mobile, tablet, large, unknown }
 
 enum AppRoutes { main, document, page }
 
-void editRoute<T>(
-    {required WidgetRef ref, required String name, required T edit}) {
+void editRoute<T>({required WidgetRef ref, required String name, T? edit}) {
   ref.read(routeDocumentProvider.notifier).setEditRouteName(name: name);
   ref.read(editObjectProvider.notifier).state = EditObject<T>(object: edit);
 }
@@ -49,7 +50,8 @@ class RouteNotifier extends StateNotifier<AppRouteStates> {
   }
 
   void setMainName(String name) {
-    state = state.copyWith(mainRouteName: name)
+    state = state
+      ..mainRouteName = name
       ..routes[AppRoutes.main]?.goNamed(name);
   }
 
@@ -138,7 +140,6 @@ AppLayout _appLayoutFromType(FormFactorType type) {
       {
         return AppLayout.mobile;
       }
-
     case FormFactorType.Tablet:
       {
         return AppLayout.tablet;
@@ -225,7 +226,7 @@ GoRouter _appRoute(String initialLocation) {
 GoRouter _mobile(String initialLocation) {
   return GoRouter(
     initialLocation: initialLocation,
-    observers: [BlubObserver()],
+    // observers: [BlubObserver()],
     routes: [
       GoRoute(
           path: '/',
@@ -240,7 +241,7 @@ GoRouter _mobile(String initialLocation) {
             GoRoute(
               path: '$routeDebtsEdit',
               name: routeDebtsEdit,
-              builder: (context, state) => BewerkSchulden(),
+              builder: (context, state) => SchuldKeuzePanel(),
             ),
             GoRoute(
               path: '$routeNieweHypotheekProfielEdit',
@@ -257,20 +258,45 @@ GoRouter _mobile(String initialLocation) {
   );
 }
 
+// class MyWidget extends ConsumerWidget {
+//   const MyWidget({super.key});
+
+//   @override
+//   Widget build(BuildContext context, ref) {
+//     return Scaffold(
+//         body: SafeArea(
+//       child: Column(
+//         children: [
+//           TextButton(
+//               child: Text('go'),
+//               onPressed: () {
+//                 ref
+//                     .read(routeDocumentProvider.notifier)
+//                     .setEditRouteName(name: routeIncomeEdit);
+//               }),
+//           TextField()
+//         ],
+//       ),
+//     ));
+//   }
+// }
+
 GoRouter _page(String initialLocation) {
   return GoRouter(
-    observers: [BlubObserver()],
+    // observers: [BlubObserver()],
     initialLocation: initialLocation,
     routes: [
       GoRoute(
         path: '/',
         name: 'b',
-        builder: (context, state) => Container(),
+        builder: (context, state) {
+          return Container();
+        },
       ),
       GoRoute(
           path: '/$routeIncome',
           name: routeIncome,
-          // builder: (context, state) => IncomePanel(),
+          // builder: (context, state) => MyWidget(),
           pageBuilder: noTransitionPage(IncomePanel()),
           routes: [
             GoRoute(
@@ -285,14 +311,14 @@ GoRouter _page(String initialLocation) {
           path: '/$routeDebts',
           name: routeDebts,
           pageBuilder: noTransitionPage(
-            LastPanel(),
+            SchuldenOverzichtPanel(),
           ),
           routes: [
             GoRoute(
                 path: '$routeDebtsEdit',
                 name: routeDebtsEdit,
                 pageBuilder: noTransitionPage(
-                  BewerkSchulden(),
+                  SchuldKeuzePanel(),
                 )),
           ]),
       GoRoute(

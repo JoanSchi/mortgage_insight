@@ -3,7 +3,7 @@ import 'package:mortgage_insight/model/nl/hypotheek/financierings_norm/norm_woni
 import 'package:mortgage_insight/model/nl/hypotheek/hypotheek.dart';
 import 'package:mortgage_insight/model/nl/hypotheek/parallel_leningen.dart';
 import '../inkomen/inkomen.dart';
-import '../schulden/schulden.dart';
+import '../schulden/remove_schulden.dart';
 import 'financierings_norm/norm_inkomen.dart';
 import 'hypotheek_iterator.dart';
 
@@ -11,7 +11,7 @@ class DoorBerekenen {
   HypotheekProfiel profiel;
   List<Inkomen> inkomenLijst;
   List<Inkomen> inkomenPartnerLijst;
-  List<Schuld> schuldenLijst;
+  List<RemoveSchuld> schuldenLijst;
 
   DoorBerekenen({
     required this.profiel,

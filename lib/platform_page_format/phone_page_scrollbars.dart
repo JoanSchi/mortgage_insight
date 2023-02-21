@@ -1,9 +1,13 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:custom_sliver_appbar/shapeborder_appbar/shapeborder_lb_rb_rounded.dart';
 import 'package:custom_sliver_appbar/title_image_appbar/title_image_appbar.dart';
 import 'package:flutter/material.dart';
-import 'package:mortgage_insight/platform_page_format/my_page.dart';
-
+import 'package:mortgage_insight/platform_page_format/default_page.dart';
+import 'package:mortgage_insight/platform_page_format/fabProperties.dart';
+import 'package:mortgage_insight/utilities/device_info.dart';
 import 'page_actions.dart';
+import 'page_bottom_actions_layout.dart';
+import 'page_properties.dart';
 
 class PhonePageScrollBars extends StatelessWidget {
   final String? title;
@@ -11,6 +15,8 @@ class PhonePageScrollBars extends StatelessWidget {
   final PageProperties pageProperties;
   final PreferredSizeWidget? bottom;
   final BodyBuilder bodyBuilder;
+  final FabProperties? fabProperties;
+  final int notificationDept;
 
   const PhonePageScrollBars({
     Key? key,
@@ -18,18 +24,21 @@ class PhonePageScrollBars extends StatelessWidget {
     this.imageBuilder,
     PageProperties? pageProperties,
     this.bottom,
+    this.fabProperties,
+    required this.notificationDept,
     required this.bodyBuilder,
-  })  : pageProperties =
-            pageProperties ?? const PageProperties(hasNavigationBar: false),
+  })  : pageProperties = pageProperties ?? const PageProperties(),
         super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final mediaQuery = MediaQuery.of(context);
-    final height = mediaQuery.size.height;
+    final deviceScreen = DeviceScreen3.of(context);
+    final isPortrait = deviceScreen.isPortrait;
 
-    final titleHeight = kToolbarHeight;
+    final height = deviceScreen.size.height;
+
+    double toolbarHeight = 0.0;
     final imageHeight = 100.0;
     final bottomHeight = bottom?.preferredSize.height ?? 0.0;
 
@@ -38,62 +47,99 @@ class PhonePageScrollBars extends StatelessWidget {
 
     double heightLeft = height - bottomHeight;
 
-    final Widget? left;
-    final Widget? right;
-    final Widget body;
+    final Widget? left = buildActionRow(
+      context: context,
+      action: pageActionsToIconButton(context, pageProperties.leftTopActions),
+    );
 
-    if (height < 900) {
-      left = buildActionRow(
-        context: context,
-        action: pageActionsToIconButton(context, [
-          ...pageProperties.leftBarActions,
-          ...pageProperties.firstPageActions
-        ]),
-      );
-      right = buildActionRow(
-          context: context,
-          action: pageActionsToIconButton(context, [
-            ...pageProperties.secondPageActions,
-            ...pageProperties.rightBarActions
-          ]));
+    final Widget? right = buildActionRow(
+      context: context,
+      action: pageActionsToIconButton(context, pageProperties.rightTopActions),
+    );
 
-      body = bodyBuilder(context: context, nested: false);
-    } else {
-      left = buildActionRow(
-          context: context,
-          action:
-              pageActionsToIconButton(context, pageProperties.leftBarActions));
-      right = buildActionRow(
-          context: context,
-          action:
-              pageActionsToIconButton(context, pageProperties.rightBarActions));
-      // TODO: Wrap actions
-      body = bodyBuilder(context: context, nested: false);
-    }
+    Widget body = bodyBuilder(context: context, nested: false);
 
-    if (title != null &&
-        (heightLeft - titleHeight > 600.0 || left != null || right != null)) {
+    final padding = 8.0;
+
+    double leftPaddingAppBar =
+        !isPortrait && pageProperties.hasNavigationBar ? 56.0 : 0.0;
+
+    body = Padding(
+      padding: EdgeInsets.only(
+          left: !isPortrait && pageProperties.hasNavigationBar ? 56.0 : padding,
+          top: padding,
+          right: padding,
+          bottom: padding),
+      child: PageActionBottomLayout(
+          leftBottomActions: pageProperties.leftBottomActions,
+          rightBottomActions: pageProperties.rightBottomActions,
+          body: body),
+    );
+
+    if (bottom != null) {
+      if (title != null && heightLeft - toolbarHeight > 500.0) {
+        showTitle = true;
+        toolbarHeight = kToolbarHeight;
+        heightLeft -= toolbarHeight;
+      }
+    } else if (left != null ||
+        right != null ||
+        (title != null && heightLeft - toolbarHeight > 400)) {
       showTitle = true;
-      heightLeft -= titleHeight;
+      toolbarHeight = kToolbarHeight;
+      heightLeft -= toolbarHeight;
     }
 
     if (imageBuilder != null && heightLeft - imageHeight > 600.0) {
       showImage = true;
     }
 
+    final floatingActionButton =
+        fabProperties == null ? null : Fab(fabProperties: fabProperties!);
+
     return Scaffold(
       appBar: TitleImageAppBar(
-        title: showTitle ? null : title,
-        backgroundColor: theme.backgroundColor,
-        backgroundColorScrolledUnder: theme.colorScheme.onSurface,
-        leftActions: left,
-        rightActions: right,
-        titleHeight: titleHeight,
-        imageHeight: showImage ? 0.0 : imageHeight,
-        imageBuilder: showImage ? imageBuilder : null,
-        bottom: bottom,
-      ),
+          notificationPredicate: (ScrollNotification notification) =>
+              notification.depth == notificationDept,
+          title: showTitle ? title : null,
+          backgroundColor: theme.colorScheme.background,
+          backgroundColorScrolledUnder: theme.colorScheme.onSurface,
+          leftActions: left,
+          rightActions: right,
+          titleHeight: toolbarHeight,
+          imageHeight: showImage ? imageHeight : 0.0,
+          imageBuilder: showImage ? imageBuilder : null,
+          bottom: bottom,
+          bottomPositionImage: 42.0,
+          appBarBackgroundBuilder: (
+              {required BuildContext context,
+              required EdgeInsets padding,
+              required double safeTopPadding,
+              required bool scrolledUnder,
+              Widget? child}) {
+            final scrolledUnderColor = scrolledUnder
+                ? theme.colorScheme.surface
+                : theme.bottomAppBarColor;
+
+            return isPortrait
+                ? Material(
+                    color: scrolledUnderColor,
+                    child: child,
+                  )
+                : Material(
+                    color: scrolledUnderColor,
+                    shape: ShapeBorderLbRbRounded(
+                      topPadding: safeTopPadding,
+                      leftInsets: leftPaddingAppBar,
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                          left: leftPaddingAppBar + 6.0, right: 6.0),
+                      child: child,
+                    ));
+          }),
       body: body,
+      floatingActionButton: floatingActionButton,
     );
   }
 }

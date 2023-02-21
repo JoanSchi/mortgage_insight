@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 class PageActionItem {
   final IconData? icon;
   final String? image;
+  final String text;
   final VoidCallback voidCallback;
 
   PageActionItem({
+    this.text = '',
     this.icon,
     this.image,
     required this.voidCallback,
@@ -49,5 +51,18 @@ List<Widget> pageActionsToIconButton(
                 );
               }
             }()
+        ];
+}
+
+List<Widget> pageActionsToTextButton(
+    BuildContext context, List<PageActionItem> pageActions) {
+  return pageActions.isEmpty
+      ? []
+      : [
+          for (PageActionItem p in pageActions)
+            TextButton(
+              child: Text(p.text),
+              onPressed: p.voidCallback,
+            )
         ];
 }
