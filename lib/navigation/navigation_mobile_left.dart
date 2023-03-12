@@ -10,7 +10,6 @@ import 'package:ltrb_navigation_drawer/drawer_layout.dart';
 import 'package:ltrb_navigation_drawer/ltbr_drawer.dart';
 import 'package:ltrb_navigation_drawer/ltbr_drawer_model.dart';
 import 'package:ltrb_navigation_drawer/ltbr_drawer_widgets.dart';
-import 'package:mortgage_insight/model/nl/hypotheek_container/hypotheek_container.dart';
 import 'package:mortgage_insight/navigation/navigation_document_examples.dart';
 import 'package:mortgage_insight/navigation/navigation_login_button.dart';
 import 'package:mortgage_insight/utilities/device_info.dart';
@@ -31,7 +30,7 @@ class MobileDrawer extends ConsumerStatefulWidget {
   }) : super(key: key);
 
   @override
-  _DrawerState createState() => _DrawerState();
+  ConsumerState<MobileDrawer> createState() => _DrawerState();
 }
 
 const _kHeightPageItems = 56.0;
@@ -48,16 +47,18 @@ class _DrawerState extends ConsumerState<MobileDrawer> {
       LoginButton(onTap: () {}),
       IconButton(
         icon: const Icon(Icons.add),
-        onPressed: () => print("add"),
+        onPressed: () => debugPrint("add"),
       ),
       IconButton(
         icon: const ImageIcon(AssetImage('graphics/ic_open.png')),
-        onPressed: () => print("open"),
+        onPressed: () => debugPrint("open"),
       ),
       IconButton(
         icon: const Icon(Icons.save_alt),
         onPressed: () {
-          ref.read(hypotheekContainerProvider).saveHypotheekContainer();
+          // TODO:
+          debugPrint('ToDo');
+          // ref.read(removeHypotheekContainerProvider).saveHypotheekContainer();
         },
       ),
       IconButton(
@@ -69,7 +70,7 @@ class _DrawerState extends ConsumerState<MobileDrawer> {
     final actionGroupTwo = [
       IconButton(
         icon: const Icon(Icons.settings),
-        onPressed: () => print("save"),
+        onPressed: () => debugPrint("save"),
       ),
     ];
 
@@ -94,7 +95,7 @@ class _DrawerState extends ConsumerState<MobileDrawer> {
         crossAxisCount: 2,
         mainAxisSpacing: 0.0,
         crossAxisSpacing: 0.0,
-        pattern: [
+        pattern: const [
           MyQuiltedGridTile(1, 1),
           MyQuiltedGridTile(2, 1),
           MyQuiltedGridTile(1, 1),
@@ -274,7 +275,7 @@ class MobileLeftDrawer extends ConsumerStatefulWidget {
   }) : super(key: key);
 
   @override
-  _LeftDrawerState createState() => _LeftDrawerState();
+  ConsumerState<MobileLeftDrawer> createState() => _LeftDrawerState();
 }
 
 class _LeftDrawerState extends ConsumerState<MobileLeftDrawer> {
@@ -308,7 +309,7 @@ class _LeftDrawerState extends ConsumerState<MobileLeftDrawer> {
         crossAxisCount: 2,
         mainAxisSpacing: 0.0,
         crossAxisSpacing: 0.0,
-        pattern: [
+        pattern: const [
           MyQuiltedGridTile(1, 1),
           MyQuiltedGridTile(2, 1),
           MyQuiltedGridTile(1, 1),
@@ -533,7 +534,6 @@ class _LeftDrawerState extends ConsumerState<MobileLeftDrawer> {
         );
 
         return CustomPaint(
-          child: stack,
           painter: LtrbShapeDrawerPainter(
               drawerCorner: LtrbDrawerCorner.quadraticFlap,
               color: Colors.white,
@@ -545,6 +545,7 @@ class _LeftDrawerState extends ConsumerState<MobileLeftDrawer> {
               radial: 16.0,
               drawerPosition: DrawerPosition.left,
               padding: EdgeInsets.zero),
+          child: stack,
         );
       },
     );
@@ -660,15 +661,14 @@ class MyTile extends StatelessWidget {
       type:
           background == null ? MaterialType.transparency : MaterialType.canvas,
       color: background,
-      textStyle: theme.textTheme.bodyText2!.copyWith(
+      textStyle: theme.textTheme.bodyMedium!.copyWith(
           color: selected
               ? navigationStyle?.colorSelectedItem
               : navigationStyle?.colorItem,
           fontSize: 16.0),
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
-      child:
-          InkWell(child: Container(height: 56.0, child: child), onTap: onTap),
+      child: InkWell(onTap: onTap, child: SizedBox(height: 56.0, child: child)),
     );
   }
 }

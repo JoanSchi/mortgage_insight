@@ -8,7 +8,7 @@ class MatchPageProperties<T> {
 
   final T pageProperties;
 
-  MatchPageProperties({
+  const MatchPageProperties({
     this.types = const {},
     this.orientations = const {},
     required this.pageProperties,
@@ -25,7 +25,7 @@ class MatchPageProperties<T> {
       if (types.contains(type)) {
         points += 64;
       } else {
-        return -1;
+        return 0;
       }
     }
 
@@ -33,7 +33,7 @@ class MatchPageProperties<T> {
       if (orientations.contains(orientation)) {
         points += 32;
       } else {
-        return -1;
+        return 0;
       }
     }
     return points;
@@ -44,6 +44,9 @@ class MatchPageProperties<T> {
 
 class PageProperties {
   final bool hasNavigationBar;
+  final double leftPaddingWithNavigation;
+  final double leftPadding;
+  final double rightPadding;
   final List<PageActionItem> leftTopActions;
   final List<PageActionItem> rightTopActions;
   final List<PageActionItem> leftBottomActions;
@@ -51,6 +54,9 @@ class PageProperties {
 
   const PageProperties({
     this.hasNavigationBar = false,
+    this.leftPaddingWithNavigation = 56.0,
+    this.leftPadding = 8.0,
+    this.rightPadding = 8.0,
     this.leftTopActions = const [],
     this.rightTopActions = const [],
     this.leftBottomActions = const [],

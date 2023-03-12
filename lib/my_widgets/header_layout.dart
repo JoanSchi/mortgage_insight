@@ -21,7 +21,7 @@ class HeaderLayout extends MultiChildRenderObjectWidget {
   @override
   void updateRenderObject(
       BuildContext context, covariant RenderHeaderLayout renderObject) {
-    renderObject..space = space;
+    renderObject.space = space;
   }
 }
 
@@ -101,8 +101,9 @@ class RenderHeaderLayout extends RenderBox
 
   @override
   void setupParentData(RenderObject child) {
-    if (child.parentData is! HeaderLayoutParentData)
+    if (child.parentData is! HeaderLayoutParentData) {
       child.parentData = HeaderLayoutParentData();
+    }
   }
 
   @override
@@ -157,7 +158,7 @@ class RenderHeaderLayout extends RenderBox
       child = childParentData.nextSibling;
     }
 
-    final t = (leftWidth < rightWidth ? rightWidth : leftWidth);
+    final biggestWidthSide = (leftWidth < rightWidth ? rightWidth : leftWidth);
 
     child = firstChild;
 
@@ -170,7 +171,7 @@ class RenderHeaderLayout extends RenderBox
           {
             child.layout(
                 BoxConstraints(
-                  maxWidth: constraints.maxWidth - t * 2.0,
+                  maxWidth: constraints.maxWidth - biggestWidthSide * 2.0,
                 ),
                 parentUsesSize: true);
 

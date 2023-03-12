@@ -8,7 +8,6 @@ import 'package:ltrb_navigation_drawer/ltbr_drawer_model.dart';
 import 'package:ltrb_navigation_drawer/ltbr_drawer_widgets.dart';
 import 'package:ltrb_navigation_drawer/ltrb_scrollview_listener.dart';
 import '../route_widgets/start/background_sliver_element.dart';
-import '../model/nl/hypotheek_container/hypotheek_container.dart';
 import '../state_manager/routes/routes_app.dart';
 import '../state_manager/routes/routes_handle_app.dart';
 import 'navigation_page_items.dart';
@@ -21,7 +20,8 @@ import 'navigation_login_button.dart';
 class BottomMobileDrawer extends ConsumerStatefulWidget {
   final DrawerModel drawerModel;
 
-  BottomMobileDrawer({
+  const BottomMobileDrawer({
+    super.key,
     required this.drawerModel,
   });
 
@@ -41,18 +41,20 @@ class _BottomDrawerState extends ConsumerState<BottomMobileDrawer> {
       IconButton(
         iconSize: 36.0,
         icon: const Icon(Icons.add),
-        onPressed: () => print("add"),
+        onPressed: () => debugPrint("add"),
       ),
       IconButton(
         iconSize: 36.0,
         icon: const ImageIcon(AssetImage('graphics/ic_open.png')),
-        onPressed: () => print("open"),
+        onPressed: () => debugPrint("open"),
       ),
       IconButton(
         iconSize: 36.0,
         icon: const Icon(Icons.save_alt),
         onPressed: () {
-          ref.read(hypotheekContainerProvider).saveHypotheekContainer();
+          // TODO:
+          debugPrint("ToDo");
+          // ref.read(removeHypotheekContainerProvider).saveHypotheekContainer();
         },
       ),
       IconButton(
@@ -60,11 +62,11 @@ class _BottomDrawerState extends ConsumerState<BottomMobileDrawer> {
         icon: const Icon(Icons.import_export),
         onPressed: () {},
       ),
-      Expanded(child: SizedBox.expand()),
+      const Expanded(child: SizedBox.expand()),
       IconButton(
         iconSize: 36.0,
         icon: const Icon(Icons.settings),
-        onPressed: () => print("save"),
+        onPressed: () => debugPrint("save"),
       ),
     ]);
 
@@ -77,7 +79,7 @@ class _BottomDrawerState extends ConsumerState<BottomMobileDrawer> {
           start: true,
           end: false,
           color: navigationStyle?.secondBackground ??
-              deviceScreen.theme.backgroundColor,
+              deviceScreen.theme.colorScheme.background,
           child: Column(children: [
             SizedBox(
                 height: 96.0,
@@ -85,7 +87,7 @@ class _BottomDrawerState extends ConsumerState<BottomMobileDrawer> {
                   'graphics/mortgage_logo.png',
                   color: Colors.white,
                 )),
-            Divider(
+            const Divider(
               color: Colors.white,
               indent: 8.0,
               endIndent: 8.0,
@@ -121,24 +123,24 @@ class _BottomDrawerState extends ConsumerState<BottomMobileDrawer> {
     ));
 
     sliver.add(Theme(
-        child: pageListSliver,
-        data: deviceScreen.theme.copyWith(platform: TargetPlatform.android)));
+        data: deviceScreen.theme.copyWith(platform: TargetPlatform.android),
+        child: pageListSliver));
 
     sliver.add(SliverToBoxAdapter(
         child: SizedBox(
       height: 56.0,
       child: Row(
         children: [
-          Expanded(
+          const Expanded(
               child: Divider(
             indent: 8.0,
             endIndent: 8.0,
           )),
           TextButton(
-            child: Text('Documenten'),
+            child: const Text('Documenten'),
             onPressed: () => drawerModel.open(drawerStatus: DrawerStatus.end),
           ),
-          Expanded(
+          const Expanded(
               child: Divider(
             indent: 8.0,
             endIndent: 8.0,
@@ -192,7 +194,7 @@ class _BottomDrawerState extends ConsumerState<BottomMobileDrawer> {
           children: [
             // if (drawer != drawerModel.minimumSize)
             Positioned(
-              key: Key('actionGroup'),
+              key: const Key('actionGroup'),
               top: 12,
               bottom: 8.0,
               left: 8.0,
@@ -201,7 +203,7 @@ class _BottomDrawerState extends ConsumerState<BottomMobileDrawer> {
             ),
             // if (drawer != drawerModel.minimumSize)
             Positioned(
-              key: Key('sliver'),
+              key: const Key('sliver'),
               left: 72.0,
               top: 12,
               right: 12.0,

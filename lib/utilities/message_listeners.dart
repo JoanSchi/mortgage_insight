@@ -10,7 +10,7 @@ class AcceptCancelBackMessage extends Message {
   final AcceptCancelBack msg;
 
   AcceptCancelBackMessage({
-    this.msg: AcceptCancelBack.accept,
+    this.msg = AcceptCancelBack.accept,
   });
 }
 

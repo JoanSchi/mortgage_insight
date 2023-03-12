@@ -1,31 +1,31 @@
+import 'package:date_input_picker/date_input_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:mortgage_insight/utilities/MyNumberFormat.dart';
-import '../../../model/nl/schulden/remove_schulden.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mortgage_insight/my_widgets/selectable_widgets/selectable_group_themes.dart';
+import 'package:mortgage_insight/my_widgets/selectable_widgets/single_checkbox.dart';
+import 'package:mortgage_insight/pages/schulden/schuld_provider.dart';
+import 'package:mortgage_insight/utilities/my_number_format.dart';
+import 'package:selectable_group_widgets/selectable_group_widgets.dart';
 import '../../../model/nl/schulden/schulden.dart';
-import '../../../model/nl/schulden/remove_schulden_aflopend_krediet.dart';
-import '../../../utilities/Kalender.dart';
-import '../date_picker.dart';
+import '../../../utilities/kalender.dart';
 import '../../../my_widgets/simple_widgets.dart';
-import 'aflopend_krediet_model.dart';
+import 'abstract_aflopend_krediet_consumer_state.dart';
 
-class AflopendKredietOptiePanel extends StatefulWidget {
-  final AflopendKredietModel aflopendKredietModel;
-
-  AflopendKredietOptiePanel(this.aflopendKredietModel);
+class AflopendKredietOptiePanel extends ConsumerStatefulWidget {
+  const AflopendKredietOptiePanel();
 
   @override
-  State<StatefulWidget> createState() => AflopendKredietOptiePanelState();
+  ConsumerState<AflopendKredietOptiePanel> createState() =>
+      AflopendKredietOptiePanelState();
 }
 
-class AflopendKredietOptiePanelState extends State<AflopendKredietOptiePanel>
+class AflopendKredietOptiePanelState
+    extends AbstractAflopendKredietState<AflopendKredietOptiePanel>
     with SingleTickerProviderStateMixin {
-  late AflopendKredietModel aflopendKredietModel = aflopendKredietModel =
-      widget.aflopendKredietModel..aflopendKredietOptiePanelState = this;
-
-  late RemoveAflopendKrediet ak = aflopendKredietModel.ak;
-
-  late TextEditingController _textEditingController =
-      TextEditingController(text: ak.omschrijving);
+  late TextEditingController _textEditingController = TextEditingController(
+      text: toText(
+    (ak) => ak.omschrijving,
+  ));
 
   late FocusNode _fnOmschrijving = _fnOmschrijving = FocusNode()
     ..addListener(() {
@@ -36,46 +36,42 @@ class AflopendKredietOptiePanelState extends State<AflopendKredietOptiePanel>
 
   late AnimationController _gebrokenMaandAlleenRenteAnimationController =
       _gebrokenMaandAlleenRenteAnimationController = AnimationController(
-    value: ak.betaling == AKbetaling.per_eerst_volgende_maand ? 1.0 : 0.0,
+    value: ak?.betaling == AKbetaling.perEerstVolgendeMaand ? 1.0 : 0.0,
     vsync: this,
     duration: Duration(milliseconds: 300),
   );
-
-  bool looptijdVerschuiven = false;
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
 
   @override
   void dispose() {
     _gebrokenMaandAlleenRenteAnimationController.dispose();
     _textEditingController.dispose();
     _fnOmschrijving.dispose();
-    aflopendKredietModel.aflopendKredietOptiePanelState = null;
     super.dispose();
   }
 
-  void didUpdateWidget(AflopendKredietOptiePanel oldWidget) {
-    super.didUpdateWidget(oldWidget);
+  void changeAfterListen(SchuldBewerken? previous, SchuldBewerken next) {
+    final nextAK = akFrom(next);
+
+    if (nextAK == null) {
+      return;
+    }
+    final previousAK = akFrom(previous);
+
+    if (previousAK?.betaling != nextAK.betaling) {
+      if (nextAK.betaling == AKbetaling.perEerstVolgendeMaand) {
+        _gebrokenMaandAlleenRenteAnimationController.forward();
+      } else {
+        _gebrokenMaandAlleenRenteAnimationController.reverse();
+      }
+    }
   }
 
   @override
-  Widget build(BuildContext context) {
+  buildAflopendKrediet(context, AflopendKrediet ak) {
+    ref.listen(schuldProvider, changeAfterListen);
     final theme = Theme.of(context);
-
-    if (ak.berekend != StatusBerekening.berekend) {
-      ak.bereken();
-    }
-
-    final dateNow = DateTime.now();
-    final firstDate = DateTime(dateNow.year - 3, 1, 1);
+    final dateNow = DateUtils.dateOnly(DateTime.now());
+    final firstDate = DateTime(2014, 1, 1);
     final lastDate = DateTime(dateNow.year + 10, 12,
         Kalender.dagenPerMaand(jaar: dateNow.year + 10, maand: 12));
 
@@ -90,68 +86,63 @@ class AflopendKredietOptiePanelState extends State<AflopendKredietOptiePanel>
         );
 
     final children = <Widget>[
-      Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: OmschrijvingTextField(
-          focusNode: _fnOmschrijving,
-          textEditingController: _textEditingController,
-        ),
+      const SizedBox(
+        height: 6.0,
       ),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-        child: DateWidget(
-          useRootNavigator: true,
-          date: ak.beginDatum,
-          firstDate: firstDate,
-          lastDate: lastDate,
-          saveDate: _veranderingDatum,
-          changeDate: _veranderingDatum,
-        ),
+      OmschrijvingTextField(
+        focusNode: _fnOmschrijving,
+        textEditingController: _textEditingController,
       ),
-      Divider(),
-      Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Text('Annuïteit berekening:'),
+      DateInputPicker(
+        labelText: 'Datum',
+        date: ak.beginDatum,
+        firstDate: firstDate,
+        lastDate: lastDate,
+        saveDate: _veranderingDatum,
+        changeDate: _veranderingDatum,
       ),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Wrap(children: [
-          RadioSimpel<AKbetaling>(
-              title: 'Op ingangsdatum',
-              value: AKbetaling.per_periode,
+      const SizedBox(
+        height: 24.0,
+      ),
+      Text('Termijn betaling:'),
+      const SizedBox(
+        height: 8.0,
+      ),
+      UndefinedSelectableGroup(
+        groups: [
+          MyRadioGroup(
               groupValue: ak.betaling,
-              onChanged: _veranderingBetaling),
-          RadioSimpel<AKbetaling>(
-              title: 'Per maand',
-              value: AKbetaling.per_maand,
-              groupValue: ak.betaling,
-              onChanged: _veranderingBetaling),
-          RadioSimpel<AKbetaling>(
-              title: 'Vanaf eerste volledige maand',
-              value: AKbetaling.per_eerst_volgende_maand,
-              groupValue: ak.betaling,
-              onChanged: _veranderingBetaling),
-        ]),
+              list: [
+                RadioSelectable(
+                    text: 'op ingangsdatum', value: AKbetaling.ingangsdatum),
+                RadioSelectable(
+                    text: 'per maand', value: AKbetaling.perEerstVolgendeMaand)
+              ],
+              onChange: _veranderingBetaling)
+        ],
       ),
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 32.0),
         child: SizeTransition(
           sizeFactor: _gebrokenMaandAlleenRenteAnimationController,
-          child: RemoveCheckboxSimpel(
-              title: 'Gebroken maand alleen rente',
-              value: ak.renteGebrokenMaand,
-              onChanged: renteGebrokenMaand),
+          child: MyCheckbox(
+              text: 'Gebroken maand alleen rente',
+              value: ak.eersteGebrokenMaandAlleenRente,
+              onChanged: _veranderingEersteGebrokenMaandAlleenRente),
         ),
       ),
       Divider(),
-      Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Text(
-          'Termijnbedrag afronden op:',
-        ),
+      const SizedBox(
+        height: 12.0,
+      ),
+      Text(
+        'Termijnbedrag afronden op:',
+      ),
+      const SizedBox(
+        height: 8.0,
       ),
       Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
         child: Wrap(spacing: 8.0, children: [
           ChoiceChip(
             key: Key('euros'),
@@ -191,77 +182,44 @@ class AflopendKredietOptiePanelState extends State<AflopendKredietOptiePanel>
   }
 
   _veranderingDatum(DateTime? date) {
-    if (date == null) return;
-    aflopendKredietModel.veranderingDate(date);
+    notify.veranderingAflopendKrediet(beginDatum: date);
   }
 
   _veranderingOmschrijving(String? value) {
-    aflopendKredietModel.veranderingOmschrijving(value ?? '');
+    notify.veranderingOmschrijving(value ?? '');
   }
 
   _afronden(int afronding) {
-    aflopendKredietModel.veranderingAfronden(afronding);
+    notify.veranderingAflopendKrediet(decimalen: afronding);
   }
 
   _veranderingBetaling(AKbetaling? betaling) {
-    if (betaling == null) return;
-
-    aflopendKredietModel.veranderingBetaling(betaling);
+    notify.veranderingAflopendKrediet(betaling: betaling);
   }
 
-  showAlleenRenteCheckbox() {
-    if (ak.betaling == AKbetaling.per_eerst_volgende_maand) {
-      _gebrokenMaandAlleenRenteAnimationController.forward();
-    } else {
-      _gebrokenMaandAlleenRenteAnimationController.reverse();
-    }
-  }
-
-  renteGebrokenMaand(bool? value) {
-    if (value == null || ak.betaling != AKbetaling.per_eerst_volgende_maand)
-      return;
-
-    setState(() {
-      aflopendKredietModel.veranderingRenteGebrokenMaand(value);
-    });
-  }
-
-  setBetaling() {
-    setState(() {
-      showAlleenRenteCheckbox();
-    });
-  }
-
-  setAfronden() {
-    setState(() {});
+  _veranderingEersteGebrokenMaandAlleenRente(bool? value) {
+    notify.veranderingAflopendKrediet(eersteGebrokenMaandAlleenRente: value);
   }
 }
 
-class AflopendkredietInvulPanel extends StatefulWidget {
-  final AflopendKredietModel aflopendKredietModel;
-
-  AflopendkredietInvulPanel(this.aflopendKredietModel);
+class AflopendkredietInvulPanel extends ConsumerStatefulWidget {
+  const AflopendkredietInvulPanel();
 
   @override
-  State createState() => AflopendkredietInvulPanelState();
+  ConsumerState<AflopendkredietInvulPanel> createState() =>
+      AflopendkredietInvulPanelState();
 }
 
-class AflopendkredietInvulPanelState extends State<AflopendkredietInvulPanel> {
-  late AflopendKredietModel aflopendKredietModel = widget.aflopendKredietModel
-    ..aflopendkredietInvulPanelState = this;
-  late RemoveAflopendKrediet ak = aflopendKredietModel.ak;
-
-  late MyNumberFormat nf = MyNumberFormat(context);
-  late TextEditingController _tecLening = TextEditingController(
-      text: ak.lening == 0.0 ? '' : nf.parseDoubleToText(ak.lening));
-  late TextEditingController _tecRente = TextEditingController(
-      text: ak.rente == 0.0 ? '' : nf.parseDoubleToText(ak.rente));
-  late TextEditingController _tecMaanden = TextEditingController(
-      text: ak.maanden == 0.0 ? '' : nf.parseIntToText(ak.maanden));
-  late TextEditingController _tecTermijnbedrag = TextEditingController(
-      text: ak.termijnBedragMnd == 0.0
-          ? ''
-          : nf.parseDoubleToText(ak.termijnBedragMnd));
+class AflopendkredietInvulPanelState
+    extends AbstractAflopendKredietState<AflopendkredietInvulPanel> {
+  late TextEditingController _tecLening =
+      TextEditingController(text: doubleToText((ak) => ak.lening));
+  late TextEditingController _tecRente =
+      TextEditingController(text: doubleToText((ak) => ak.rente));
+  late TextEditingController _tecMaanden =
+      TextEditingController(text: intToText((ak) => ak.maanden));
+  late TextEditingController _tecTermijnbedrag =
+      TextEditingController(text: doubleToText((ak) => ak.termijnBedragMnd));
 
   late FocusNode _fnLening = FocusNode()
     ..addListener(() {
@@ -288,23 +246,6 @@ class AflopendkredietInvulPanelState extends State<AflopendkredietInvulPanel> {
       }
     });
 
-  bool isSliding = false;
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
-
-  @override
-  void didUpdateWidget(AflopendkredietInvulPanel oldWidget) {
-    super.didUpdateWidget(oldWidget);
-  }
-
   @override
   void dispose() {
     super.dispose();
@@ -317,28 +258,50 @@ class AflopendkredietInvulPanelState extends State<AflopendkredietInvulPanel> {
     _fnRente.dispose();
     _fnTermijnBedrag.dispose();
     _fnMaanden.dispose();
+  }
 
-    aflopendKredietModel.aflopendkredietInvulPanelState = null;
+  void changeAfterListening(SchuldBewerken? previous, SchuldBewerken next) {
+    final nextAK = akFrom(next);
+
+    if (nextAK == null) {
+      return;
+    }
+
+    //final previousAK = akFrom(previous);
+
+    if (nf.parsToDouble(_tecLening.text) != nextAK.lening) {
+      _tecLening.text = nf.parseDblToText(nextAK.lening);
+    }
+
+    if (nf.parsToDouble(_tecTermijnbedrag.text) != nextAK.termijnBedragMnd) {
+      _tecTermijnbedrag.text = nf.parseDblToText(nextAK.termijnBedragMnd);
+    }
+
+    if ((int.tryParse(_tecMaanden.text) ?? -1) != nextAK.maanden) {
+      _tecMaanden.text = nf.parseIntToText(nextAK.maanden);
+    }
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget buildAflopendKrediet(BuildContext context, AflopendKrediet ak) {
+    ref.listen(schuldProvider, changeAfterListening);
+
     return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              'Bedragen en rente:',
-            ),
+          const SizedBox(
+            height: 8.0,
+          ),
+          const Text(
+            'Bedragen en rente:',
           ),
           Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisSize: MainAxisSize.min,
               children: [
                 SizedBox(
-                  width: 24.0,
+                  width: 4.0,
                 ),
                 Flexible(
                   child: TextFormField(
@@ -367,7 +330,7 @@ class AflopendkredietInvulPanelState extends State<AflopendkredietInvulPanel> {
                       ],
                       textInputAction: TextInputAction.next),
                 ),
-                SizedBox(width: 32.0),
+                SizedBox(width: 16.0),
                 SizedBox(
                   width: 60.0,
                   child: TextFormField(
@@ -396,7 +359,7 @@ class AflopendkredietInvulPanelState extends State<AflopendkredietInvulPanel> {
                       ],
                       textInputAction: TextInputAction.next),
                 ),
-                SizedBox(width: 32.0),
+                SizedBox(width: 16.0),
                 SizedBox(
                   width: 80.0,
                   child: TextFormField(
@@ -427,134 +390,104 @@ class AflopendkredietInvulPanelState extends State<AflopendkredietInvulPanel> {
                       textInputAction: TextInputAction.next),
                 ),
                 SizedBox(
-                  width: 16.0,
+                  width: 4.0,
                 )
               ]),
-          Padding(
-            padding: const EdgeInsets.only(left: 24.0, top: 8.0),
-            child: Text(
-              'R.: Rente, T.b.: Termijnbedrag (mnd)',
-              // style: theme.textTheme.caption
-              //     .copyWith(fontStyle: FontStyle.italic)
-            ),
+          const Padding(
+            padding: const EdgeInsets.only(left: 8.0, top: 8.0),
+            child: Text('R.: Rente, T.b.: Termijnbedrag (mnd)',
+                style: TextStyle(fontStyle: FontStyle.italic)),
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0, top: 32.0),
-            child: Text(
-              'Looptijd',
-              // style: theme.textTheme.body1
-              //     .copyWith(fontStyle: FontStyle.italic),
-            ),
+          const SizedBox(
+            height: 16.0,
           ),
-          Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Flexible(
-                  child: Slider(
-                      min: ak.minMaanden.toDouble(),
-                      max: ak.maxMaanden.toDouble(),
-                      value: (ak.maanden < ak.minMaanden
-                              ? ak.minMaanden
-                              : ak.maanden > ak.maxMaanden
-                                  ? ak.maxMaanden
-                                  : ak.maanden)
-                          .toDouble(),
-                      divisions: ak.maxMaanden - ak.minMaanden + 1,
-                      onChanged: (value) {
-                        _veranderingLooptijdSlider(value.toInt());
-                      },
-                      onChangeStart: (value) {
-                        isSliding = true;
-                        // Provider.of<_StandaardLeningTabelNotifier>(context,
-                        //         listen: false)
-                        //     .showTableFunction(false);
-                      },
-                      onChangeEnd: (value) {
-                        isSliding = false;
-                        // delayChangeEnd();
-                      }),
-                ),
-                SizedBox(width: 8.0),
-                SizedBox(
-                  width: 50.0,
-                  child: TextFormField(
-                      controller: _tecMaanden,
-                      focusNode: _fnMaanden,
-                      key: Key('Maanden'),
-                      decoration: new InputDecoration(
-                          hintText: '1..120', labelText: 'Mnd'),
-                      validator: (String? text) {
-                        if (buitenPeriode(text) != 0) {
-                          return '*';
-                        }
-                        return null;
-                      },
-                      onSaved: (text) {
-                        if (_fnMaanden.hasFocus) {
-                          _veranderingLooptijdTextfield(text);
-                        }
-                      },
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [
-                        MyNumberFormat(context).numberInputFormat('0000')
-                      ]),
-                ),
-                SizedBox(width: 16.0),
-              ]),
-          // CheckValidator(
-          //     key: Key('Annlening'),
-          //     initialValue: looptijdInTekst(ak.maanden),
-          //     fontStyle: FontStyle.italic,
-          //     validator: (text) {
-          //       switch (buitenPeriode(_tecMaanden.text)) {
-          //         case -1:
-          //           {
-          //             return '* Minimaal ${ak.minMaanden} ${ak.minMaanden == 1 ? 'maand' : 'maanden'}';
-          //           }
-          //         case 1:
-          //           {
-          //             return '* Maximaal ${ak.maxMaanden} maanden (${nf.parseDoubleToText(ak.maxMaanden / 12, '0.#')} jaar)';
-          //           }
-          //         default:
-          //           {
-          //             return null;
-          //           }
-          //       }
-          //     })
+          const Text(
+            'Looptijd',
+          ),
+          Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+            Expanded(
+                child: Slider(
+              min: ak.minMaanden.toDouble(),
+              max: ak.maxMaanden.toDouble(),
+              value: (ak.maanden < ak.minMaanden
+                      ? ak.minMaanden
+                      : ak.maanden > ak.maxMaanden
+                          ? ak.maxMaanden
+                          : ak.maanden)
+                  .toDouble(),
+              divisions: ak.maxMaanden - ak.minMaanden + 1,
+              onChanged: (value) {
+                _veranderingLooptijdSlider(value.toInt());
+              },
+            )),
+            // SizedBox(width: 8.0),
+            SizedBox(
+              width: 50.0,
+              child: TextFormField(
+                  controller: _tecMaanden,
+                  focusNode: _fnMaanden,
+                  key: Key('Maanden'),
+                  decoration:
+                      new InputDecoration(hintText: '1..120', labelText: 'Mnd'),
+                  validator: (String? text) {
+                    if (buitenPeriode(ak, text) != 0) {
+                      return '*';
+                    }
+                    return null;
+                  },
+                  onSaved: (text) {
+                    if (_fnMaanden.hasFocus) {
+                      _veranderingLooptijdTextfield(text);
+                    }
+                  },
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [
+                    MyNumberFormat(context).numberInputFormat('0000')
+                  ]),
+            ),
+            SizedBox(width: 4.0),
+          ]),
+          CheckValidator(
+              key: Key('Annlening'),
+              initialValue: Kalender.looptijdInTekst(ak.maanden),
+              validator: (text) {
+                switch (buitenPeriode(ak, _tecMaanden.text)) {
+                  case -1:
+                    {
+                      return '* Minimaal ${ak.minMaanden} ${ak.minMaanden == 1 ? 'maand' : 'maanden'}';
+                    }
+                  case 1:
+                    {
+                      return '* Maximaal ${ak.maxMaanden} maanden (${nf.parseDoubleToText(ak.maxMaanden / 12, '0.#')} jaar)';
+                    }
+                  default:
+                    {
+                      return null;
+                    }
+                }
+              })
         ]);
   }
 
   _veranderingLening(String? text) {
-    final double lening =
-        (text == null || text.isEmpty) ? 0.0 : nf.parsToDouble(text);
-
-    aflopendKredietModel.veranderingLening(lening);
+    notify.veranderingAflopendKrediet(lening: nf.parsToDouble(text));
   }
 
   _veranderingRente(String? text) {
-    final double rente =
-        (text == null || text.isEmpty) ? 0.0 : nf.parsToDouble(text);
-
-    aflopendKredietModel.veranderingRente(rente);
+    notify.veranderingAflopendKrediet(rente: nf.parsToDouble(text));
   }
 
   _veranderingTermijnBedrag(String? text) {
-    final double termijnBedrag =
-        (text == null || text.isEmpty) ? 0.0 : nf.parsToDouble(text);
-
-    aflopendKredietModel.veranderingTermijnBedrag(termijnBedrag);
+    notify.veranderingAflopendKrediet(termijnBedragMnd: nf.parsToDouble(text));
   }
 
   _veranderingLooptijdTextfield(String? text) {
     final int maanden = (text == null || text.isEmpty) ? 0 : nf.parsToInt(text);
 
-    if (maanden != ak.maanden) {
-      aflopendKredietModel.veranderingLooptijd(maanden);
-    }
+    notify.veranderingAflopendKrediet(maanden: maanden);
   }
 
-  int buitenPeriode(String? text) {
+  int buitenPeriode(AflopendKrediet ak, String? text) {
     final m = text == null || text.isEmpty ? 0 : int.parse(text);
 
     return m < ak.minMaanden
@@ -565,118 +498,48 @@ class AflopendkredietInvulPanelState extends State<AflopendkredietInvulPanel> {
   }
 
   _veranderingLooptijdSlider(int looptijdMnd) {
-    aflopendKredietModel.veranderingLooptijd(looptijdMnd);
-  }
-
-  setLening(double value) {
-    _tecLening.text = nf.parseDblToText(value);
-  }
-
-  setRente(double value) {
-    _tecRente.text = nf.parseDblToText(value);
-  }
-
-  setTermijnBedrag(double value) {
-    _tecTermijnbedrag.text = nf.parseDblToText(value);
-  }
-
-  setMaanden(int value) {
-    setState(() {
-      //SetState for slider
-      _tecMaanden.text = nf.parseIntToText(value);
-    });
+    notify.veranderingAflopendKrediet(maanden: looptijdMnd);
   }
 }
 
-class AflopendKredietErrorWidget extends StatefulWidget {
-  final AflopendKredietModel aflopendKredietModel;
-
-  AflopendKredietErrorWidget({Key? key, required this.aflopendKredietModel})
-      : super(key: key);
+class AflopendKredietErrorWidget extends ConsumerStatefulWidget {
+  const AflopendKredietErrorWidget({
+    Key? key,
+  }) : super(key: key);
 
   @override
-  State<AflopendKredietErrorWidget> createState() =>
+  ConsumerState<AflopendKredietErrorWidget> createState() =>
       _AflopendKredietErrorWidgetState();
 }
 
 class _AflopendKredietErrorWidgetState
-    extends State<AflopendKredietErrorWidget> {
-  late AflopendKredietModel aflopendKredietModel;
-
+    extends AbstractAflopendKredietState<AflopendKredietErrorWidget> {
   @override
-  void initState() {
-    aflopendKredietModel = widget.aflopendKredietModel..addListener(notify);
-    super.initState();
-  }
-
-  @override
-  void didChangeDependencies() {
-    if (aflopendKredietModel != widget.aflopendKredietModel) {
-      aflopendKredietModel.removeListener(notify);
-      aflopendKredietModel = widget.aflopendKredietModel..addListener(notify);
-    }
-    super.didChangeDependencies();
-  }
-
-  void notify() {
-    setState(() {});
-  }
-
-  @override
-  void dispose() {
-    aflopendKredietModel.removeListener(notify);
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final ak = aflopendKredietModel.ak;
-
-    return SliverToBoxAdapter(child: LayoutBuilder(
+  Widget buildAflopendKrediet(BuildContext context, AflopendKrediet ak) {
+    return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
       final maxIconSize = constraints.maxWidth - 2.0 * 16.0;
 
       double size = maxIconSize < 300.0 ? maxIconSize : 300.0;
 
-      switch (ak.error) {
-        case RemoveSchuld.unknownError:
-          {
-            return Column(children: [
-              Icon(
-                Icons.warning_amber,
-                color: Colors.amberAccent,
-                size: size,
-              ),
-              Text(
-                'Een onbekende fout is tijdens het berekenen opgetreden.',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyText2
-                    ?.copyWith(color: Colors.red),
-              )
-            ]);
-          }
-        case RemoveAflopendKrediet.termijnBedragTelaagError:
-          {
-            return Column(children: [
-              Icon(
-                Icons.warning_amber,
-                color: Colors.amberAccent,
-                size: size,
-              ),
-              Text(
-                  'Het termijnbedrag moet minimaal ${ak.minTermijnBedragMnd} zijn.',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyText2
-                      ?.copyWith(color: Colors.red))
-            ]);
-          }
-        default:
-          {
-            return SizedBox.shrink();
-          }
+      if (ak.error.isNotEmpty) {
+        return Column(children: [
+          Icon(
+            Icons.warning_amber,
+            color: Colors.amberAccent,
+            size: size,
+          ),
+          Text(
+            ak.error,
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium
+                ?.copyWith(color: Colors.red),
+          )
+        ]);
+      } else {
+        return SizedBox.shrink();
       }
-    }));
+    });
   }
 }

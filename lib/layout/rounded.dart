@@ -6,7 +6,7 @@ class ExdendedBar extends CustomPainter {
   final double maxHeight;
   final double paddingBottom;
   final Color color;
-  final _paint;
+  final Paint _paint;
   final pi = math.pi;
 
   ExdendedBar(
@@ -51,7 +51,7 @@ class RoundHeaderCard extends CustomPainter {
   final double radial;
   final double padding;
   final Color color;
-  final _paint;
+  final Paint _paint;
   final pi = math.pi;
 
   RoundHeaderCard({this.radial = 8.0, this.padding = 4.0, required this.color})
@@ -98,7 +98,7 @@ class RoundHeaderBar extends CustomPainter {
   final double leftInsets;
   final double rightInsets;
   final Color color;
-  final _paint;
+  final Paint _paint;
   final pi = math.pi;
 
   RoundHeaderBar(
@@ -128,9 +128,9 @@ class RoundHeaderBar extends CustomPainter {
         final leftTop =
             Rect.fromLTWH(leftInsets - length, statusBarHeight, length, length);
 
-        path..arcTo(leftTop, -0.5 * pi, pi * 0.5, false);
+        path.arcTo(leftTop, -0.5 * pi, pi * 0.5, false);
       } else {
-        path..lineTo(leftInsets, statusBarHeight);
+        path.lineTo(leftInsets, statusBarHeight);
       }
     }
 
@@ -138,9 +138,9 @@ class RoundHeaderBar extends CustomPainter {
       final length = leftBottomRadial * 2.0;
       final leftBottom =
           Rect.fromLTWH(leftInsets, height - length, length, length);
-      path..arcTo(leftBottom, pi, -0.5 * pi, false);
+      path.arcTo(leftBottom, pi, -0.5 * pi, false);
     } else {
-      path..lineTo(leftInsets, height);
+      path.lineTo(leftInsets, height);
     }
 
     if (rightBottomRadial != 0.0) {
@@ -148,9 +148,9 @@ class RoundHeaderBar extends CustomPainter {
       final rightBottom = Rect.fromLTWH(
           width - rightInsets - length, height - length, length, length);
 
-      path..arcTo(rightBottom, 0.5 * pi, -pi * 0.5, false);
+      path.arcTo(rightBottom, 0.5 * pi, -pi * 0.5, false);
     } else {
-      path..lineTo(width - rightInsets, height);
+      path.lineTo(width - rightInsets, height);
     }
 
     if (rightInsets != 0.0) {
@@ -165,8 +165,9 @@ class RoundHeaderBar extends CustomPainter {
       }
     }
 
-    path..lineTo(width, 0.0);
-    path.close();
+    path
+      ..lineTo(width, 0.0)
+      ..close();
 
     //   ..lineTo(0.0, radial)
     //   ..arcTo(leftBottom, -pi, pi * 0.5, false)
@@ -238,7 +239,7 @@ class ShapeBorderHeader extends ShapeBorder {
   final double rightInsets;
   final pi = math.pi;
 
-  ShapeBorderHeader({
+  const ShapeBorderHeader({
     this.heightToFlat = 28.0,
     this.leftTopRadial = 16.0,
     this.rightTopRadial = 16.0,
@@ -275,14 +276,14 @@ class ShapeBorderHeader extends ShapeBorder {
     bool equalToStatusBar = rect.height <= minLeftHeight;
 
     if (equalToStatusBar) {
-      path..lineTo(width, minLeftHeight);
-      path..lineTo(width, 0.0);
+      path.lineTo(width, minLeftHeight);
+      path.lineTo(width, 0.0);
       path.close();
       return path;
     }
 
     final availibleLeftSpace = rect.height - minLeftHeight;
-    final curveFactor = 0.5;
+    const curveFactor = 0.5;
 
     /* Left
      *
@@ -312,7 +313,7 @@ class ShapeBorderHeader extends ShapeBorder {
           minLeftHeight + leftTopRadial * leftFactor,
         );
       } else {
-        path..lineTo(leftInsets, minRightHeight);
+        path.lineTo(leftInsets, minRightHeight);
       }
     }
 
@@ -359,7 +360,7 @@ class ShapeBorderHeader extends ShapeBorder {
             width - rightInsets,
             height - rightBottomRadial * rightFactor);
     } else {
-      path..lineTo(width - rightInsets, height);
+      path.lineTo(width - rightInsets, height);
     }
 
     if (rightInsets != 0.0) {
@@ -379,8 +380,8 @@ class ShapeBorderHeader extends ShapeBorder {
       }
     }
 
-    path..lineTo(width, minRightHeight);
-    path..lineTo(width, 0.0);
+    path.lineTo(width, minRightHeight);
+    path.lineTo(width, 0.0);
     path.close();
     return path;
   }

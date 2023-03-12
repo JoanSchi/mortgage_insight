@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:mortgage_insight/model/nl/schulden/schulden.dart';
 
-import '../../../utilities/Kalender.dart';
+import '../../../utilities/kalender.dart';
 
 class DoorlopendKredietVerwerken {
   static DateTime eindDatum(DoorlopendKrediet dk) =>
@@ -15,25 +15,25 @@ class DoorlopendKredietVerwerken {
       bool? heeftEindDatum,
       DateTime? eindDatumGebruiker,
       double? bedrag}) {
-    final bool _heeftEindDatum = heeftEindDatum ?? dk.heeftEindDatum;
-    final DateTime _beginDatum = beginDatum ?? dk.beginDatum;
-    final DateTime _eindDatumGebruiker = eindDatumInbeReik(
-        _beginDatum, eindDatumGebruiker ?? dk.eindDatumGebruiker);
-    final double _bedrag = bedrag ?? dk.bedrag;
+    final bool lHeeftEindDatum = heeftEindDatum ?? dk.heeftEindDatum;
+    final DateTime lBeginDatum = beginDatum ?? dk.beginDatum;
+    final DateTime lEindDatumGebruiker = eindDatumInbeReik(
+        lBeginDatum, eindDatumGebruiker ?? dk.eindDatumGebruiker);
+    final double lBedrag = bedrag ?? dk.bedrag;
 
     final StatusBerekening statusBerekening =
-        ((_heeftEindDatum && _eindDatumGebruiker == DateTime(0)) ||
-                DateUtils.monthDelta(_beginDatum, _eindDatumGebruiker) < 1 ||
-                _bedrag == 0.0)
+        ((lHeeftEindDatum && lEindDatumGebruiker == DateTime(0)) ||
+                DateUtils.monthDelta(lBeginDatum, lEindDatumGebruiker) < 1 ||
+                lBedrag == 0.0)
             ? StatusBerekening.nietBerekend
             : StatusBerekening.berekend;
 
     return dk.copyWith(
         statusBerekening: statusBerekening,
-        beginDatum: _beginDatum,
-        heeftEindDatum: _heeftEindDatum,
-        eindDatumGebruiker: _eindDatumGebruiker,
-        bedrag: _bedrag);
+        beginDatum: lBeginDatum,
+        heeftEindDatum: lHeeftEindDatum,
+        eindDatumGebruiker: lEindDatumGebruiker,
+        bedrag: lBedrag);
   }
 
   static double fictieveKredietlast(DateTime datum) {

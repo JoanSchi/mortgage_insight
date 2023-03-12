@@ -1,5 +1,5 @@
 import 'package:mortgage_insight/model/nl/schulden/schulden.dart';
-import '../../../utilities/Kalender.dart';
+import '../../../utilities/kalender.dart';
 
 class LeaseAutoVerwerken {
   static datumVanafRegistratie(LeaseAuto leaseAuto,
@@ -61,22 +61,22 @@ class LeaseAutoVerwerken {
       Kalender.voegPeriodeToe(leaseAuto.beginDatum,
           jaren: leaseAuto.jaren,
           maanden: leaseAuto.maanden,
-          periodeOpties: PeriodeOpties.TOT);
+          periodeOpties: PeriodeOpties.tot);
 
   static LeaseAuto verandering(LeaseAuto leaseAuto,
       {DateTime? datum, double? bedrag, int? jaren, int? maanden}) {
-    final DateTime _datum = datum ?? leaseAuto.beginDatum;
-    final double _bedrag = bedrag ?? leaseAuto.mndBedrag;
-    final int _jaren = jaren ?? leaseAuto.jaren;
-    final int _maanden = maanden ?? leaseAuto.maanden;
+    final DateTime lDatum = datum ?? leaseAuto.beginDatum;
+    final double lBedrag = bedrag ?? leaseAuto.mndBedrag;
+    final int lJaren = jaren ?? leaseAuto.jaren;
+    final int lMaanden = maanden ?? leaseAuto.maanden;
 
     return leaseAuto.copyWith(
-        beginDatum: _datum,
-        mndBedrag: _bedrag,
-        jaren: _jaren,
-        maanden: _maanden,
+        beginDatum: lDatum,
+        mndBedrag: lBedrag,
+        jaren: lJaren,
+        maanden: lMaanden,
         statusBerekening:
-            isBerekend(mndBedrag: _bedrag, jaren: _jaren, maanden: _maanden));
+            isBerekend(mndBedrag: lBedrag, jaren: lJaren, maanden: lMaanden));
   }
 
   static StatusBerekening isBerekend(

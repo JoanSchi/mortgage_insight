@@ -3,15 +3,15 @@ import 'package:mortgage_insight/model/nl/hypotheek/financierings_norm/norm_woni
 import 'package:mortgage_insight/model/nl/hypotheek/hypotheek.dart';
 import 'package:mortgage_insight/model/nl/hypotheek/parallel_leningen.dart';
 import '../inkomen/inkomen.dart';
-import '../schulden/remove_schulden.dart';
+import '../schulden/schulden.dart';
 import 'financierings_norm/norm_inkomen.dart';
 import 'hypotheek_iterator.dart';
 
 class DoorBerekenen {
-  HypotheekProfiel profiel;
+  RemoveHypotheekProfiel profiel;
   List<Inkomen> inkomenLijst;
   List<Inkomen> inkomenPartnerLijst;
-  List<RemoveSchuld> schuldenLijst;
+  List<Schuld> schuldenLijst;
 
   DoorBerekenen({
     required this.profiel,
@@ -20,7 +20,7 @@ class DoorBerekenen {
     required this.schuldenLijst,
   });
 
-  doorbereken({Hypotheek? tm, Hypotheek? vanaf}) {
+  doorbereken({RemoveHypotheek? tm, RemoveHypotheek? vanaf}) {
     final parallelHypotheken = HypotheekIterator(
             eersteHypotheken: profiel.eersteHypotheken,
             hypotheken: profiel.hypotheken)
@@ -29,7 +29,7 @@ class DoorBerekenen {
     for (HypotheekIterateItem iItem in parallelHypotheken) {
       final hypotheek = iItem.hypotheek;
 
-      iItem.hypotheek.parallelLeningen = ParallelLeningen.from(
+      iItem.hypotheek.parallelLeningen = RemoveParallelLeningen.from(
           parallelHypotheken: iItem.parallelHypotheken,
           hypotheek: iItem.hypotheek);
 

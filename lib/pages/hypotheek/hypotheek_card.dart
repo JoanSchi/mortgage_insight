@@ -1,40 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mortgage_insight/model/nl/hypotheek_container/hypotheek_container.dart';
-import '../../model/nl/hypotheek/hypotheek.dart';
+import '../../model/nl/hypotheek/gegevens/hypotheek/hypotheek.dart';
 import '../../my_widgets/custom_fitted_box.dart';
 import '../../my_widgets/mortgage_card.dart';
-import '../../utilities/MyNumberFormat.dart';
+import '../../utilities/my_number_format.dart';
 import 'package:intl/intl.dart';
 import '../../utilities/date.dart';
 
-class HypotheekCard extends ConsumerStatefulWidget {
+class HypotheekCard extends StatelessWidget {
   final Hypotheek hypotheek;
+  final VoidCallback verwijderen;
+  final VoidCallback bewerken;
 
-  HypotheekCard({
-    Key? key,
+  const HypotheekCard({
+    super.key,
     required this.hypotheek,
-  }) : super(key: key);
-
-  @override
-  ConsumerState<HypotheekCard> createState() => _HypotheekCardState();
-}
-
-class _HypotheekCardState extends ConsumerState<HypotheekCard> {
-  late final nf = MyNumberFormat(context);
+    required this.verwijderen,
+    required this.bewerken,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final h = widget.hypotheek;
+    late final nf = MyNumberFormat(context);
 
     final startDatum =
-        DateFormat.yMMMMd(localeToString(context)).format(h.startDatum);
+        DateFormat.yMMMMd(localeToString(context)).format(hypotheek.startDatum);
 
     final bottom = Text(
-        'Aflostermijn: ${h.aflosTermijnInMaanden ~/ 12} J ; RentePeriode: ${h.aflosTermijnInMaanden ~/ 12} (J) ; Rente: ${h.rente} %');
+        'Aflostermijn: ${hypotheek.aflosTermijnInMaanden ~/ 12} J ; RentePeriode: ${hypotheek.aflosTermijnInMaanden ~/ 12} (J) ; Rente: ${hypotheek.rente} %');
 
     return MoCard(
-      color: Color(0xFFe6f5fa),
+      color: const Color(0xFFe6f5fa),
       top: SizedBox(
         height: 56.0,
         child: Stack(children: [
@@ -62,11 +57,11 @@ class _HypotheekCardState extends ConsumerState<HypotheekCard> {
             right: 0.0,
             bottom: 44.0,
             child: CustomFittedBox(
-                customApplyBoxFit: defaultIncomeFit,
+                customApplyBoxFit: _defaultBoxFit,
                 child: ConstrainedBox(
-                    constraints: BoxConstraints(minWidth: 80.0),
+                    constraints: const BoxConstraints(minWidth: 80.0),
                     child: Text(
-                      nf.parseDoubleToText(h.lening),
+                      nf.parseDoubleToText(hypotheek.lening),
                       textAlign: TextAlign.center,
                     ))),
           ),
@@ -76,36 +71,19 @@ class _HypotheekCardState extends ConsumerState<HypotheekCard> {
     );
   }
 
-  void edit() {
-    final hypotheekContainer = ref.read(hypotheekContainerProvider);
-    // TODO:
-    // ref.read(routeEditPageProvider.notifier).editState = EditRouteState(
-    //     route: routeMortgageEdit,
-    //     object: HypotheekViewModel(
-    //         inkomenLijst: hypotheekContainer.inkomenLijst(),
-    //         inkomenLijstPartner: hypotheekContainer.inkomenLijst(partner: true),
-    //         profiel:
-    //             hypotheekContainer.huidigeHypotheekProfielContainer!.profiel,
-    //         schuldenLijst: hypotheekContainer.schuldenContainer.list,
-    //         id: widget.hypotheek.id));
-  }
-
   void onSelected(String selected) {
     switch (selected) {
       case 'edit':
-        edit();
+        bewerken();
         break;
       case 'delete':
-        ref
-            .read(hypotheekContainerProvider.notifier)
-            .removeHypotheek(widget.hypotheek);
-
+        verwijderen();
         break;
     }
   }
 }
 
-FittedSizes defaultIncomeFit(_fit, Size inputSize, Size outputSize) {
+FittedSizes _defaultBoxFit(BoxFit fit, Size inputSize, Size outputSize) {
   if (inputSize.height <= 0.0 ||
       inputSize.width <= 0.0 ||
       outputSize.height <= 0.0 ||

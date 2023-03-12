@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ltrb_navigation_drawer/drawer_layout.dart';
 import '../my_widgets/summary_pie_chart/pie_chart.dart';
-import '../utilities/MyNumberFormat.dart';
+import '../utilities/my_number_format.dart';
 
 class Document {
   final String naam;
@@ -52,7 +52,7 @@ class MobileDocumentCard extends StatelessWidget {
   final int length;
   final double? minOverflowWidth;
 
-  MobileDocumentCard(
+  const MobileDocumentCard(
       {Key? key,
       required this.document,
       required this.index,
@@ -69,28 +69,31 @@ class MobileDocumentCard extends StatelessWidget {
 
     Widget center = Column(children: [
       Text(document.naam),
-      Divider(),
+      const Divider(),
       Row(children: [
-        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: const [
           Text('Lening'),
           Text('Rente'),
           Text('Afgelost'),
           Text('Totaal')
         ]),
-        Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [Text(' : '), Text(' : '), Text(' : '), Text(' : ')]),
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: const [
+          Text(' : '),
+          Text(' : '),
+          Text(' : '),
+          Text(' : ')
+        ]),
         Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
           Text(nf.parseDblToText(lening)),
           Text(nf.parseDblToText(rente)),
           Text(nf.parseDblToText(0.0)),
           Text(nf.parseDblToText(totaal))
         ]),
-        SizedBox(
+        const SizedBox(
           width: 8.0,
         ),
         Expanded(
-          child: Container(
+          child: SizedBox(
             height: 150,
             child: PieChart(
               pieces: [
@@ -115,7 +118,7 @@ class MobileDocumentCard extends StatelessWidget {
         Card(
           elevation: 0.5,
           margin: EdgeInsets.zero,
-          color: index % 2 == 0 ? Color(0xFFd7eef4) : Colors.white,
+          color: index % 2 == 0 ? const Color(0xFFd7eef4) : Colors.white,
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(16.0))),
           child: Padding(

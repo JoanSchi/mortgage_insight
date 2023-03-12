@@ -118,8 +118,9 @@ class RenderSummaryPieLayout extends RenderBox
 
   @override
   void setupParentData(RenderObject child) {
-    if (child.parentData is! SummaryPieParentData)
+    if (child.parentData is! SummaryPieParentData) {
       child.parentData = SummaryPieParentData();
+    }
   }
 
   @override
@@ -323,7 +324,7 @@ class LegendWrap {
 
   List<LegendRowItem> list;
 
-  LegendWrap({this.width: 0.0, this.height: 0.0, LegendRowItem? item})
+  LegendWrap({this.width = 0.0, this.height = 0.0, LegendRowItem? item})
       : list = item == null ? [] : [item];
 
   getX(int i, double start, LegendAxis axis) {
@@ -375,8 +376,8 @@ class LegendRange {
   int count;
 
   LegendRange({
-    Size size: Size.zero,
-    this.count: 0,
+    Size size = Size.zero,
+    this.count = 0,
   })  : width = size.width,
         height = size.height;
 

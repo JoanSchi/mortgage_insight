@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-
+import '../../../model/nl/hypotheek/gegevens/combi_rest_schuld/combi_rest_schuld.dart';
+import '../../../model/nl/hypotheek/gegevens/hypotheek/hypotheek.dart';
+import '../../../model/nl/hypotheek/gegevens/hypotheek_profiel/hypotheek_profiel.dart';
 import '../../../model/nl/hypotheek/hypotheek.dart';
 import '../../../my_widgets/custom_fitted_box.dart';
 import '../../../my_widgets/summary_pie_chart/pie_chart.dart';
-import '../../../utilities/MyNumberFormat.dart';
+import '../../../utilities/my_number_format.dart';
 import '../../../utilities/date.dart';
 import 'package:intl/intl.dart';
-
-import 'hypotheek_model.dart';
 
 // Color.fromARGB(255, 253, 251, 247)
 
@@ -30,7 +30,7 @@ class VerlengCard extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
 
     if (hypotheek.termijnen.isEmpty) {
-      return Card(
+      return const Card(
           color: Colors.red, child: Text('Termijnen niet berekend! :('));
     }
 
@@ -40,18 +40,21 @@ class VerlengCard extends StatelessWidget {
       PiePiece(
           value: laatsteTermijn.leningNaAflossen,
           name: 'Schuld',
-          color:
-              selected == hypotheek.id ? Color(0xFFFAC213) : Color(0xFFDEB6AB)),
+          color: selected == hypotheek.id
+              ? const Color(0xFFFAC213)
+              : const Color(0xFFDEB6AB)),
       PiePiece(
           value: laatsteTermijn.aflossenTotaal,
           name: 'Afl.',
-          color:
-              selected == hypotheek.id ? Color(0xFFF77E21) : Color(0xFFAC7D88)),
+          color: selected == hypotheek.id
+              ? const Color(0xFFF77E21)
+              : const Color(0xFFAC7D88)),
       PiePiece(
           value: laatsteTermijn.renteTotaal,
           name: 'R',
-          color:
-              selected == hypotheek.id ? Color(0xFFD61C4E) : Color(0xFF85586F)),
+          color: selected == hypotheek.id
+              ? const Color(0xFFD61C4E)
+              : const Color(0xFF85586F)),
     ];
 
     double totaal = laatsteTermijn.leningNaAflossen +
@@ -59,24 +62,24 @@ class VerlengCard extends StatelessWidget {
         laatsteTermijn.renteTotaal;
 
     final pieChart = PieChart(
+      useLine: true,
+      pieces: piePieces,
+      total: totaal,
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: CustomFittedBox(
           customApplyBoxFit: defaultPieApplyBoxFit,
           child: ConstrainedBox(
-            constraints: BoxConstraints(minWidth: 40.0),
+            constraints: const BoxConstraints(minWidth: 40.0),
             child: Text(
               nf.parseDoubleToText(laatsteTermijn.leningNaAflossen, '#0'),
               textAlign: TextAlign.center,
-              style: theme.textTheme.bodyText2
-                  ?.copyWith(color: Color.fromARGB(255, 6, 74, 129)),
+              style: theme.textTheme.bodyMedium
+                  ?.copyWith(color: const Color.fromARGB(255, 6, 74, 129)),
             ),
           ),
         ),
       ),
-      useLine: true,
-      pieces: piePieces,
-      total: totaal,
     );
 
     final legend = [
@@ -86,7 +89,7 @@ class VerlengCard extends StatelessWidget {
       ),
       LegendItem(
         item: piePieces[1],
-        valueToText: (double v) => '${nf.parseDoubleToText(v, '#0')}',
+        valueToText: (double v) => nf.parseDoubleToText(v, '#0'),
       ),
       LegendItem(
         item: piePieces[2],
@@ -98,7 +101,7 @@ class VerlengCard extends StatelessWidget {
     return Card(
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32.0)),
-      color: Color.fromARGB(255, 246, 251, 253),
+      color: const Color.fromARGB(255, 246, 251, 253),
       child: InkWell(
         splashColor: const Color.fromARGB(137, 170, 212, 229),
         highlightColor: const Color.fromARGB(150, 255, 248, 225),
@@ -124,14 +127,16 @@ class VerlengCard extends StatelessWidget {
                   bottom: 0.0,
                   child: Center(
                       child: Text(
-                    '${hypotheek.omschrijving == '' ? hypotheek.id : hypotheek.omschrijving}',
+                    hypotheek.omschrijving == ''
+                        ? hypotheek.id
+                        : hypotheek.omschrijving,
                     textAlign: TextAlign.center,
                     textScaleFactor: 1.2,
                   )),
                 ),
               ]),
             ),
-            Divider(indent: 8.0, endIndent: 8.0, height: 2.0),
+            const Divider(indent: 8.0, endIndent: 8.0, height: 2.0),
             Expanded(
               child: Stack(
                 children: [
@@ -152,7 +157,7 @@ class VerlengCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Expanded(child: pieChart),
-                        SizedBox(
+                        const SizedBox(
                           height: 4.0,
                         ),
                         Padding(
@@ -162,7 +167,7 @@ class VerlengCard extends StatelessWidget {
                             alignment: WrapAlignment.center,
                             children: [
                               ...legend,
-                              Text(' ; '),
+                              const Text(' ; '),
                               Text(
                                   'L: ${nf.parseDblToText(hypotheek.gewensteLening, format: '#0')}')
                             ],
@@ -180,7 +185,7 @@ class VerlengCard extends StatelessWidget {
 }
 
 class RestSchuldCard extends StatelessWidget {
-  final RestSchuld restSchuld;
+  final CombiRestSchuld restSchuld;
   final DateTime? selected;
   final ValueChanged<DateTime?> changed;
 
@@ -197,17 +202,17 @@ class RestSchuldCard extends StatelessWidget {
     final nf = MyNumberFormat(context);
     final theme = Theme.of(context);
 
-    final textStyleDatum = theme.textTheme.bodyText2
-        ?.copyWith(color: Color.fromARGB(255, 4, 37, 87), fontSize: 16.0);
+    final textStyleDatum = theme.textTheme.bodyMedium
+        ?.copyWith(color: const Color.fromARGB(255, 4, 37, 87), fontSize: 16.0);
 
-    final textStyleSchuld = theme.textTheme.bodyText2
-        ?.copyWith(color: Color.fromARGB(255, 4, 37, 87), fontSize: 24.0);
+    final textStyleSchuld = theme.textTheme.bodyMedium
+        ?.copyWith(color: const Color.fromARGB(255, 4, 37, 87), fontSize: 24.0);
 
     return Card(
         clipBehavior: Clip.antiAlias,
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(32.0)),
-        color: Color.fromARGB(255, 246, 251, 253),
+        color: const Color.fromARGB(255, 246, 251, 253),
         child: Stack(
           children: [
             Positioned(
@@ -224,7 +229,7 @@ class RestSchuldCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(df.format(restSchuld.datum), style: textStyleDatum),
-                      SizedBox(
+                      const SizedBox(
                         height: 4.0,
                       ),
                       Text(nf.parseDoubleToText(restSchuld.restSchuld, '#0'),

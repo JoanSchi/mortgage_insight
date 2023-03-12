@@ -6,7 +6,7 @@ import 'package:custom_sliver_appbar/title_image_sliver_appbar/properties.dart';
 import 'package:custom_sliver_appbar/title_image_sliver_appbar/title_image_sliver_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:mortgage_insight/platform_page_format/default_page.dart';
-import 'package:mortgage_insight/platform_page_format/fabProperties.dart';
+import 'package:mortgage_insight/platform_page_format/fab_properties.dart';
 import '../utilities/device_info.dart';
 import 'page_actions.dart';
 import 'page_bottom_actions_layout.dart';
@@ -33,10 +33,10 @@ class PhonePageSliverAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final deviceScreen = DeviceScreen3.of(context);
-    final height = deviceScreen.mediaQuery.size.height;
+
     final theme = deviceScreen.theme;
     final isPortrait = deviceScreen.orientation == Orientation.portrait;
-    final bottomHeight = bottom?.preferredSize.height ?? 0.0;
+    // final bottomHeight = bottom?.preferredSize.height ?? 0.0;
 
     final left = buildActionRow(
       context: context,
@@ -51,28 +51,29 @@ class PhonePageSliverAppBar extends StatelessWidget {
       action: pageActionsToIconButton(context, pageProperties.rightTopActions),
     );
 
-    Widget body = bodyBuilder(context: context, nested: false);
+    Widget body = bodyBuilder(
+        context: context, nested: false, topPadding: 8.0, bottomPadding: 8.0);
 
-    final padding = 8.0;
+    body = PageActionBottomLayout(
+        leftBottomActions: pageProperties.leftBottomActions,
+        rightBottomActions: pageProperties.rightBottomActions,
+        body: body);
 
-    double leftPaddingAppBar =
-        !isPortrait && pageProperties.hasNavigationBar ? 56.0 : 0.0;
+    double leftPaddingAppBar;
+    double leftPadding;
+    if ((!isPortrait && pageProperties.hasNavigationBar)) {
+      leftPadding =
+          leftPaddingAppBar = pageProperties.leftPaddingWithNavigation;
+    } else {
+      leftPadding = pageProperties.leftPadding;
+      leftPaddingAppBar = 0.0;
+    }
 
     body = Padding(
       padding: EdgeInsets.only(
-          left: !isPortrait && pageProperties.hasNavigationBar ? 56.0 : padding,
-          top: padding,
-          right: padding,
-          bottom: padding),
-      child: PageActionBottomLayout(
-          leftBottomActions: pageProperties.leftBottomActions,
-          rightBottomActions: pageProperties.rightBottomActions,
-          body: body),
+          left: leftPadding, right: pageProperties.rightPadding),
+      child: body,
     );
-
-    // return AppBar(
-    //   actions: pageActionsToIconButton(context, pageProperties.rightTopActions),
-    // );
 
     final floatingActionButton =
         fabProperties == null ? null : Fab(fabProperties: fabProperties!);
@@ -144,7 +145,7 @@ class PhonePageSliverAppBar extends StatelessWidget {
                           Widget? child}) {
                         final scrolledUnderColor = scrolledUnder
                             ? theme.colorScheme.surface
-                            : theme.bottomAppBarColor;
+                            : theme.bottomAppBarTheme.color;
 
                         return isPortrait
                             ? Material(

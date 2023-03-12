@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'dart:math' as math;
 
 typedef CustomApplyBoxFit = FittedSizes Function(
-    BoxFit _fit, Size inputSize, Size outputSize);
+    BoxFit fit, Size inputSize, Size outputSize);
 
 class CustomFittedBox extends SingleChildRenderObjectWidget {
   /// Creates a widget that scales and positions its child within itself according to [fit].
@@ -75,7 +75,7 @@ class CustomFittedBox extends SingleChildRenderObjectWidget {
   }
 }
 
-FittedSizes defaultPieApplyBoxFit(_fit, Size inputSize, Size outputSize) {
+FittedSizes defaultPieApplyBoxFit(BoxFit fit, Size inputSize, Size outputSize) {
   if (inputSize.height <= 0.0 ||
       inputSize.width <= 0.0 ||
       outputSize.height <= 0.0 ||
@@ -110,7 +110,7 @@ class CustomRenderFittedBox extends RenderProxyBox {
         _clipBehavior = clipBehavior,
         super(child);
 
-  CustomApplyBoxFit? _customApplyBoxFit;
+  final CustomApplyBoxFit? _customApplyBoxFit;
 
   CustomApplyBoxFit? get customApplyBoxFit => _customApplyBoxFit;
 
@@ -312,7 +312,7 @@ class CustomRenderFittedBox extends RenderProxyBox {
     }
   }
 
-  FittedSizes _applyBoxFit(_fit, Size inputSize, Size outputSize) {
+  FittedSizes _applyBoxFit(BoxFit fit, Size inputSize, Size outputSize) {
     if (customApplyBoxFit != null) {
       return customApplyBoxFit!(_fit, inputSize, outputSize);
     }
@@ -335,13 +335,14 @@ class CustomRenderFittedBox extends RenderProxyBox {
       case BoxFit.contain:
         sourceSize = inputSize;
         if (outputSize.width / outputSize.height >
-            sourceSize.width / sourceSize.height)
+            sourceSize.width / sourceSize.height) {
           destinationSize = Size(
               sourceSize.width * outputSize.height / sourceSize.height,
               outputSize.height);
-        else
+        } else {
           destinationSize = Size(outputSize.width,
               sourceSize.height * outputSize.width / sourceSize.width);
+        }
         break;
       case BoxFit.cover:
         if (outputSize.width / outputSize.height >
@@ -378,12 +379,14 @@ class CustomRenderFittedBox extends RenderProxyBox {
         sourceSize = inputSize;
         destinationSize = inputSize;
         final double aspectRatio = inputSize.width / inputSize.height;
-        if (destinationSize.height > outputSize.height)
+        if (destinationSize.height > outputSize.height) {
           destinationSize =
               Size(outputSize.height * aspectRatio, outputSize.height);
-        if (destinationSize.width > outputSize.width)
+        }
+        if (destinationSize.width > outputSize.width) {
           destinationSize =
               Size(outputSize.width, outputSize.width / aspectRatio);
+        }
         break;
     }
     return FittedSizes(sourceSize, destinationSize);
@@ -392,7 +395,7 @@ class CustomRenderFittedBox extends RenderProxyBox {
   TransformLayer? _paintChildWithTransform(
       PaintingContext context, Offset offset) {
     final Offset? childOffset = MatrixUtils.getAsTranslation(_transform!);
-    if (childOffset == null)
+    if (childOffset == null) {
       return context.pushTransform(
         needsCompositing,
         offset,
@@ -400,8 +403,9 @@ class CustomRenderFittedBox extends RenderProxyBox {
         super.paint,
         oldLayer: layer is TransformLayer ? layer! as TransformLayer : null,
       );
-    else
+    } else {
       super.paint(context, offset + childOffset);
+    }
     return null;
   }
 
@@ -447,8 +451,8 @@ class CustomRenderFittedBox extends RenderProxyBox {
     }
   }
 
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-  }
+  // @override
+  // void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  //   super.debugFillProperties(properties);
+  // }
 }

@@ -8,14 +8,23 @@ part of 'inkomen.dart';
 
 _$_InkomensOverzicht _$$_InkomensOverzichtFromJson(Map<String, dynamic> json) =>
     _$_InkomensOverzicht(
-      lijst: IList<Inkomen>.fromJson(json['lijst'],
-          (value) => Inkomen.fromJson(value as Map<String, dynamic>)),
+      inkomen: json['inkomen'] == null
+          ? const IListConst([])
+          : IList<Inkomen>.fromJson(json['inkomen'],
+              (value) => Inkomen.fromJson(value as Map<String, dynamic>)),
+      inkomenPartner: json['inkomenPartner'] == null
+          ? const IListConst([])
+          : IList<Inkomen>.fromJson(json['inkomenPartner'],
+              (value) => Inkomen.fromJson(value as Map<String, dynamic>)),
     );
 
 Map<String, dynamic> _$$_InkomensOverzichtToJson(
         _$_InkomensOverzicht instance) =>
     <String, dynamic>{
-      'lijst': instance.lijst.toJson(
+      'inkomen': instance.inkomen.toJson(
+        (value) => value,
+      ),
+      'inkomenPartner': instance.inkomenPartner.toJson(
         (value) => value,
       ),
     };

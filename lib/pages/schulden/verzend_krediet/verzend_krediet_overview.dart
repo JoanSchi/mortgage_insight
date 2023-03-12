@@ -1,84 +1,58 @@
 import 'package:flutter/material.dart';
-import 'package:mortgage_insight/pages/schulden/verzend_krediet/verzend_krediet_model.dart';
-import 'package:mortgage_insight/model/nl/schulden/remove_schulden.dart';
-import 'package:mortgage_insight/model/nl/schulden/remove_schulden_verzend_krediet.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mortgage_insight/my_widgets/oh_no.dart';
+import 'package:mortgage_insight/pages/schulden/schuld_provider.dart';
 import '../../../model/nl/schulden/schulden.dart';
-import '../../../utilities/MyNumberFormat.dart';
+import '../../../utilities/my_number_format.dart';
 import '../../../utilities/value_to_width.dart';
 
-class OverzichtVerzendHuisKrediet extends StatefulWidget {
-  final VerzendhuisKredietModel? verzendhuisKredietModel;
-
-  OverzichtVerzendHuisKrediet({Key? key, required this.verzendhuisKredietModel})
-      : super(key: key);
+class OverzichtVerzendHuisKrediet extends ConsumerStatefulWidget {
+  const OverzichtVerzendHuisKrediet({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => OverzichtVerzendHuisKredietState();
+  ConsumerState<OverzichtVerzendHuisKrediet> createState() =>
+      OverzichtVerzendHuisKredietState();
 }
 
 class OverzichtVerzendHuisKredietState
-    extends State<OverzichtVerzendHuisKrediet> {
+    extends ConsumerState<OverzichtVerzendHuisKrediet> {
   late MyNumberFormat nf = MyNumberFormat(context);
-  final columnWidthSummaryValues = ValueToWidth<int>(value: 0);
   final widthLegend = ValueToWidth<String>(value: '');
-  VerzendhuisKredietModel? verzendHuisKredietModel;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (verzendHuisKredietModel != widget.verzendhuisKredietModel) {
-      verzendHuisKredietModel?.removeListener(notify);
-      verzendHuisKredietModel = widget.verzendhuisKredietModel
-        ?..addListener(notify);
-    }
   }
 
   @override
   void didUpdateWidget(covariant OverzichtVerzendHuisKrediet oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (verzendHuisKredietModel != widget.verzendhuisKredietModel) {
-      verzendHuisKredietModel?.removeListener(notify);
-      verzendHuisKredietModel = widget.verzendhuisKredietModel
-        ?..addListener(notify);
-    }
   }
 
   @override
   void dispose() {
-    verzendHuisKredietModel?.removeListener(notify);
     super.dispose();
-  }
-
-  notify() {
-    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget widget;
-
-    if (verzendHuisKredietModel == null ||
-        verzendHuisKredietModel!.vk.berekend != StatusBerekening.berekend) {
-      widget = SizedBox(
-        height: 1.0,
-      );
-    } else {
-      widget = buildSummary(context);
-    }
-
-    return SliverToBoxAdapter(
-      child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 200), child: widget),
-    );
+    return ref.watch(schuldProvider).schuld?.mapOrNull(
+            verzendKrediet: (VerzendKrediet vk) => _build(context, vk)) ??
+        OhNo(text: 'Verzendkrediet not found!');
   }
 
-  Widget buildSummary(BuildContext context) {
-    RemoveVerzendhuisKrediet vk = verzendHuisKredietModel!.vk;
+  Widget _build(BuildContext context, VerzendKrediet vk) {
+    return AnimatedSwitcher(
+        duration: const Duration(milliseconds: 200),
+        child: vk.statusBerekening != StatusBerekening.berekend
+            ? const SizedBox.shrink()
+            : buildSummary(context, vk));
+  }
 
+  Widget buildSummary(BuildContext context, VerzendKrediet vk) {
     final ThemeData theme = Theme.of(context);
-    double textScaleFactor = MediaQuery.of(context).textScaleFactor;
 
-    Widget textPadding(String text, {textAlign: TextAlign.left}) {
+    Widget textPadding(String text, {textAlign = TextAlign.left}) {
       return Padding(
           padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
           child: Text(text, textAlign: textAlign));
@@ -139,19 +113,14 @@ class OverzichtVerzendHuisKredietState
     // ]);
 
     TextStyle textStyleTable =
-        theme.textTheme.bodyText2!.copyWith(fontSize: 16.0);
+        theme.textTheme.bodyMedium!.copyWith(fontSize: 16.0);
 
     final Widget tableOverzicht = DefaultTextStyle(
       style: textStyleTable,
-      child: Table(columnWidths: {
+      child: Table(columnWidths: const {
         0: IntrinsicColumnWidth(),
         1: IntrinsicColumnWidth(),
-        2: FixedColumnWidth(calculateWidthFromNumber(
-                valueToWidth: columnWidthSummaryValues,
-                value: vk.totaalBedrag,
-                textStyle: textStyleTable,
-                textScaleFactor: textScaleFactor)
-            .width)
+        2: IntrinsicColumnWidth(),
       }, children: tableRows),
     );
 
@@ -174,45 +143,45 @@ class OverzichtVerzendHuisKredietState
     //     textStyle: textStyleTable,
     //     textScaleFactor: textScaleFactor);
 
-    bool hasRente = false;
+    // bool hasRente = false;
     Widget center;
-    if (hasRente) {
-      // center = SummaryPieLayout(
-      //   children: [
-      //     SummaryPieDataWidget(child: tableOverzicht, id: SummaryPieID.summary),
-      //     SummaryPieDataWidget(
-      //         child: Container(
-      //             width: 250,
-      //             height: 250,
-      //             child: PieChart(
-      //               pieces: pieces,
-      //             )),
-      //         id: SummaryPieID.pie),
-      //     ...pieces
-      //         .map((PiePiece e) => SummaryPieDataWidget(
-      //             id: SummaryPieID.legendItem,
-      //             child: LegendItem(
-      //               minValue: widthLegend.width,
-      //               valueToText: valueToText,
-      //               item: e,
-      //             )))
-      //         .toList()
-      //   ],
-      // );
-    } else {
-      center = tableOverzicht;
-    }
+    // if (hasRente) {
+    // center = SummaryPieLayout(
+    //   children: [
+    //     SummaryPieDataWidget(child: tableOverzicht, id: SummaryPieID.summary),
+    //     SummaryPieDataWidget(
+    //         child: Container(
+    //             width: 250,
+    //             height: 250,
+    //             child: PieChart(
+    //               pieces: pieces,
+    //             )),
+    //         id: SummaryPieID.pie),
+    //     ...pieces
+    //         .map((PiePiece e) => SummaryPieDataWidget(
+    //             id: SummaryPieID.legendItem,
+    //             child: LegendItem(
+    //               minValue: widthLegend.width,
+    //               valueToText: valueToText,
+    //               item: e,
+    //             )))
+    //         .toList()
+    //   ],
+    // );
+    // } else {
+    center = tableOverzicht;
+    // }
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-        Divider(height: 24.0),
-        Text(
+        const Divider(height: 24.0),
+        const Text(
           'Overzicht',
         ),
-        SizedBox(height: 16.0),
+        const SizedBox(height: 16.0),
         center,
-        SizedBox(height: 8.0),
+        const SizedBox(height: 8.0),
       ]),
     );
   }

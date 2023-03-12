@@ -97,12 +97,13 @@ class __$$_SchuldenOverzichtCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$_SchuldenOverzicht implements _SchuldenOverzicht {
-  const _$_SchuldenOverzicht({required this.lijst});
+  const _$_SchuldenOverzicht({this.lijst = const IListConst([])});
 
   factory _$_SchuldenOverzicht.fromJson(Map<String, dynamic> json) =>
       _$$_SchuldenOverzichtFromJson(json);
 
   @override
+  @JsonKey()
   final IList<Schuld> lijst;
 
   @override
@@ -139,7 +140,7 @@ class _$_SchuldenOverzicht implements _SchuldenOverzicht {
 }
 
 abstract class _SchuldenOverzicht implements SchuldenOverzicht {
-  const factory _SchuldenOverzicht({required final IList<Schuld> lijst}) =
+  const factory _SchuldenOverzicht({final IList<Schuld> lijst}) =
       _$_SchuldenOverzicht;
 
   factory _SchuldenOverzicht.fromJson(Map<String, dynamic> json) =
@@ -204,7 +205,7 @@ mixin _$Schuld {
             int maanden,
             int minMaanden,
             int maxMaanden,
-            bool isTotalbedrag,
+            VKbedrag vkBedrag,
             bool heeftSlotTermijn,
             int decimalen)
         verzendKrediet,
@@ -240,9 +241,9 @@ mixin _$Schuld {
             double somInterest,
             double somAnn,
             double slotTermijn,
-            AflosTabelOpties aflosTabelOpties,
+            TableMonthOptions tableMonthOptions,
             int decimalen,
-            bool renteGebrokenMaand,
+            bool eersteGebrokenMaandAlleenRente,
             AKbetaling betaling)
         aflopendKrediet,
   }) =>
@@ -273,7 +274,7 @@ mixin _$Schuld {
             int maanden,
             int minMaanden,
             int maxMaanden,
-            bool isTotalbedrag,
+            VKbedrag vkBedrag,
             bool heeftSlotTermijn,
             int decimalen)?
         verzendKrediet,
@@ -309,9 +310,9 @@ mixin _$Schuld {
             double somInterest,
             double somAnn,
             double slotTermijn,
-            AflosTabelOpties aflosTabelOpties,
+            TableMonthOptions tableMonthOptions,
             int decimalen,
-            bool renteGebrokenMaand,
+            bool eersteGebrokenMaandAlleenRente,
             AKbetaling betaling)?
         aflopendKrediet,
   }) =>
@@ -342,7 +343,7 @@ mixin _$Schuld {
             int maanden,
             int minMaanden,
             int maxMaanden,
-            bool isTotalbedrag,
+            VKbedrag vkBedrag,
             bool heeftSlotTermijn,
             int decimalen)?
         verzendKrediet,
@@ -378,9 +379,9 @@ mixin _$Schuld {
             double somInterest,
             double somAnn,
             double slotTermijn,
-            AflosTabelOpties aflosTabelOpties,
+            TableMonthOptions tableMonthOptions,
             int decimalen,
-            bool renteGebrokenMaand,
+            bool eersteGebrokenMaandAlleenRente,
             AKbetaling betaling)?
         aflopendKrediet,
     required TResult orElse(),
@@ -667,7 +668,7 @@ class _$LeaseAuto extends LeaseAuto {
             int maanden,
             int minMaanden,
             int maxMaanden,
-            bool isTotalbedrag,
+            VKbedrag vkBedrag,
             bool heeftSlotTermijn,
             int decimalen)
         verzendKrediet,
@@ -703,9 +704,9 @@ class _$LeaseAuto extends LeaseAuto {
             double somInterest,
             double somAnn,
             double slotTermijn,
-            AflosTabelOpties aflosTabelOpties,
+            TableMonthOptions tableMonthOptions,
             int decimalen,
-            bool renteGebrokenMaand,
+            bool eersteGebrokenMaandAlleenRente,
             AKbetaling betaling)
         aflopendKrediet,
   }) {
@@ -740,7 +741,7 @@ class _$LeaseAuto extends LeaseAuto {
             int maanden,
             int minMaanden,
             int maxMaanden,
-            bool isTotalbedrag,
+            VKbedrag vkBedrag,
             bool heeftSlotTermijn,
             int decimalen)?
         verzendKrediet,
@@ -776,9 +777,9 @@ class _$LeaseAuto extends LeaseAuto {
             double somInterest,
             double somAnn,
             double slotTermijn,
-            AflosTabelOpties aflosTabelOpties,
+            TableMonthOptions tableMonthOptions,
             int decimalen,
-            bool renteGebrokenMaand,
+            bool eersteGebrokenMaandAlleenRente,
             AKbetaling betaling)?
         aflopendKrediet,
   }) {
@@ -813,7 +814,7 @@ class _$LeaseAuto extends LeaseAuto {
             int maanden,
             int minMaanden,
             int maxMaanden,
-            bool isTotalbedrag,
+            VKbedrag vkBedrag,
             bool heeftSlotTermijn,
             int decimalen)?
         verzendKrediet,
@@ -849,9 +850,9 @@ class _$LeaseAuto extends LeaseAuto {
             double somInterest,
             double somAnn,
             double slotTermijn,
-            AflosTabelOpties aflosTabelOpties,
+            TableMonthOptions tableMonthOptions,
             int decimalen,
-            bool renteGebrokenMaand,
+            bool eersteGebrokenMaandAlleenRente,
             AKbetaling betaling)?
         aflopendKrediet,
     required TResult orElse(),
@@ -965,7 +966,7 @@ abstract class _$$VerzendKredietCopyWith<$Res>
       int maanden,
       int minMaanden,
       int maxMaanden,
-      bool isTotalbedrag,
+      VKbedrag vkBedrag,
       bool heeftSlotTermijn,
       int decimalen});
 }
@@ -993,7 +994,7 @@ class __$$VerzendKredietCopyWithImpl<$Res>
     Object? maanden = null,
     Object? minMaanden = null,
     Object? maxMaanden = null,
-    Object? isTotalbedrag = null,
+    Object? vkBedrag = null,
     Object? heeftSlotTermijn = null,
     Object? decimalen = null,
   }) {
@@ -1046,10 +1047,10 @@ class __$$VerzendKredietCopyWithImpl<$Res>
           ? _value.maxMaanden
           : maxMaanden // ignore: cast_nullable_to_non_nullable
               as int,
-      isTotalbedrag: null == isTotalbedrag
-          ? _value.isTotalbedrag
-          : isTotalbedrag // ignore: cast_nullable_to_non_nullable
-              as bool,
+      vkBedrag: null == vkBedrag
+          ? _value.vkBedrag
+          : vkBedrag // ignore: cast_nullable_to_non_nullable
+              as VKbedrag,
       heeftSlotTermijn: null == heeftSlotTermijn
           ? _value.heeftSlotTermijn
           : heeftSlotTermijn // ignore: cast_nullable_to_non_nullable
@@ -1078,7 +1079,7 @@ class _$VerzendKrediet extends VerzendKrediet {
       required this.maanden,
       required this.minMaanden,
       required this.maxMaanden,
-      required this.isTotalbedrag,
+      required this.vkBedrag,
       required this.heeftSlotTermijn,
       required this.decimalen,
       final String? $type})
@@ -1114,7 +1115,7 @@ class _$VerzendKrediet extends VerzendKrediet {
   @override
   final int maxMaanden;
   @override
-  final bool isTotalbedrag;
+  final VKbedrag vkBedrag;
   @override
   final bool heeftSlotTermijn;
   @override
@@ -1125,7 +1126,7 @@ class _$VerzendKrediet extends VerzendKrediet {
 
   @override
   String toString() {
-    return 'Schuld.verzendKrediet(id: $id, categorie: $categorie, omschrijving: $omschrijving, beginDatum: $beginDatum, statusBerekening: $statusBerekening, error: $error, totaalBedrag: $totaalBedrag, mndBedrag: $mndBedrag, slotTermijn: $slotTermijn, maanden: $maanden, minMaanden: $minMaanden, maxMaanden: $maxMaanden, isTotalbedrag: $isTotalbedrag, heeftSlotTermijn: $heeftSlotTermijn, decimalen: $decimalen)';
+    return 'Schuld.verzendKrediet(id: $id, categorie: $categorie, omschrijving: $omschrijving, beginDatum: $beginDatum, statusBerekening: $statusBerekening, error: $error, totaalBedrag: $totaalBedrag, mndBedrag: $mndBedrag, slotTermijn: $slotTermijn, maanden: $maanden, minMaanden: $minMaanden, maxMaanden: $maxMaanden, vkBedrag: $vkBedrag, heeftSlotTermijn: $heeftSlotTermijn, decimalen: $decimalen)';
   }
 
   @override
@@ -1154,8 +1155,8 @@ class _$VerzendKrediet extends VerzendKrediet {
                 other.minMaanden == minMaanden) &&
             (identical(other.maxMaanden, maxMaanden) ||
                 other.maxMaanden == maxMaanden) &&
-            (identical(other.isTotalbedrag, isTotalbedrag) ||
-                other.isTotalbedrag == isTotalbedrag) &&
+            (identical(other.vkBedrag, vkBedrag) ||
+                other.vkBedrag == vkBedrag) &&
             (identical(other.heeftSlotTermijn, heeftSlotTermijn) ||
                 other.heeftSlotTermijn == heeftSlotTermijn) &&
             (identical(other.decimalen, decimalen) ||
@@ -1178,7 +1179,7 @@ class _$VerzendKrediet extends VerzendKrediet {
       maanden,
       minMaanden,
       maxMaanden,
-      isTotalbedrag,
+      vkBedrag,
       heeftSlotTermijn,
       decimalen);
 
@@ -1215,7 +1216,7 @@ class _$VerzendKrediet extends VerzendKrediet {
             int maanden,
             int minMaanden,
             int maxMaanden,
-            bool isTotalbedrag,
+            VKbedrag vkBedrag,
             bool heeftSlotTermijn,
             int decimalen)
         verzendKrediet,
@@ -1251,9 +1252,9 @@ class _$VerzendKrediet extends VerzendKrediet {
             double somInterest,
             double somAnn,
             double slotTermijn,
-            AflosTabelOpties aflosTabelOpties,
+            TableMonthOptions tableMonthOptions,
             int decimalen,
-            bool renteGebrokenMaand,
+            bool eersteGebrokenMaandAlleenRente,
             AKbetaling betaling)
         aflopendKrediet,
   }) {
@@ -1270,7 +1271,7 @@ class _$VerzendKrediet extends VerzendKrediet {
         maanden,
         minMaanden,
         maxMaanden,
-        isTotalbedrag,
+        vkBedrag,
         heeftSlotTermijn,
         decimalen);
   }
@@ -1302,7 +1303,7 @@ class _$VerzendKrediet extends VerzendKrediet {
             int maanden,
             int minMaanden,
             int maxMaanden,
-            bool isTotalbedrag,
+            VKbedrag vkBedrag,
             bool heeftSlotTermijn,
             int decimalen)?
         verzendKrediet,
@@ -1338,9 +1339,9 @@ class _$VerzendKrediet extends VerzendKrediet {
             double somInterest,
             double somAnn,
             double slotTermijn,
-            AflosTabelOpties aflosTabelOpties,
+            TableMonthOptions tableMonthOptions,
             int decimalen,
-            bool renteGebrokenMaand,
+            bool eersteGebrokenMaandAlleenRente,
             AKbetaling betaling)?
         aflopendKrediet,
   }) {
@@ -1357,7 +1358,7 @@ class _$VerzendKrediet extends VerzendKrediet {
         maanden,
         minMaanden,
         maxMaanden,
-        isTotalbedrag,
+        vkBedrag,
         heeftSlotTermijn,
         decimalen);
   }
@@ -1389,7 +1390,7 @@ class _$VerzendKrediet extends VerzendKrediet {
             int maanden,
             int minMaanden,
             int maxMaanden,
-            bool isTotalbedrag,
+            VKbedrag vkBedrag,
             bool heeftSlotTermijn,
             int decimalen)?
         verzendKrediet,
@@ -1425,9 +1426,9 @@ class _$VerzendKrediet extends VerzendKrediet {
             double somInterest,
             double somAnn,
             double slotTermijn,
-            AflosTabelOpties aflosTabelOpties,
+            TableMonthOptions tableMonthOptions,
             int decimalen,
-            bool renteGebrokenMaand,
+            bool eersteGebrokenMaandAlleenRente,
             AKbetaling betaling)?
         aflopendKrediet,
     required TResult orElse(),
@@ -1446,7 +1447,7 @@ class _$VerzendKrediet extends VerzendKrediet {
           maanden,
           minMaanden,
           maxMaanden,
-          isTotalbedrag,
+          vkBedrag,
           heeftSlotTermijn,
           decimalen);
     }
@@ -1512,7 +1513,7 @@ abstract class VerzendKrediet extends Schuld {
       required final int maanden,
       required final int minMaanden,
       required final int maxMaanden,
-      required final bool isTotalbedrag,
+      required final VKbedrag vkBedrag,
       required final bool heeftSlotTermijn,
       required final int decimalen}) = _$VerzendKrediet;
   const VerzendKrediet._() : super._();
@@ -1538,7 +1539,7 @@ abstract class VerzendKrediet extends Schuld {
   int get maanden;
   int get minMaanden;
   int get maxMaanden;
-  bool get isTotalbedrag;
+  VKbedrag get vkBedrag;
   bool get heeftSlotTermijn;
   int get decimalen;
   @override
@@ -1746,7 +1747,7 @@ class _$DoorlopendKrediet extends DoorlopendKrediet {
             int maanden,
             int minMaanden,
             int maxMaanden,
-            bool isTotalbedrag,
+            VKbedrag vkBedrag,
             bool heeftSlotTermijn,
             int decimalen)
         verzendKrediet,
@@ -1782,9 +1783,9 @@ class _$DoorlopendKrediet extends DoorlopendKrediet {
             double somInterest,
             double somAnn,
             double slotTermijn,
-            AflosTabelOpties aflosTabelOpties,
+            TableMonthOptions tableMonthOptions,
             int decimalen,
-            bool renteGebrokenMaand,
+            bool eersteGebrokenMaandAlleenRente,
             AKbetaling betaling)
         aflopendKrediet,
   }) {
@@ -1819,7 +1820,7 @@ class _$DoorlopendKrediet extends DoorlopendKrediet {
             int maanden,
             int minMaanden,
             int maxMaanden,
-            bool isTotalbedrag,
+            VKbedrag vkBedrag,
             bool heeftSlotTermijn,
             int decimalen)?
         verzendKrediet,
@@ -1855,9 +1856,9 @@ class _$DoorlopendKrediet extends DoorlopendKrediet {
             double somInterest,
             double somAnn,
             double slotTermijn,
-            AflosTabelOpties aflosTabelOpties,
+            TableMonthOptions tableMonthOptions,
             int decimalen,
-            bool renteGebrokenMaand,
+            bool eersteGebrokenMaandAlleenRente,
             AKbetaling betaling)?
         aflopendKrediet,
   }) {
@@ -1892,7 +1893,7 @@ class _$DoorlopendKrediet extends DoorlopendKrediet {
             int maanden,
             int minMaanden,
             int maxMaanden,
-            bool isTotalbedrag,
+            VKbedrag vkBedrag,
             bool heeftSlotTermijn,
             int decimalen)?
         verzendKrediet,
@@ -1928,9 +1929,9 @@ class _$DoorlopendKrediet extends DoorlopendKrediet {
             double somInterest,
             double somAnn,
             double slotTermijn,
-            AflosTabelOpties aflosTabelOpties,
+            TableMonthOptions tableMonthOptions,
             int decimalen,
-            bool renteGebrokenMaand,
+            bool eersteGebrokenMaandAlleenRente,
             AKbetaling betaling)?
         aflopendKrediet,
     required TResult orElse(),
@@ -2053,10 +2054,12 @@ abstract class _$$AflopendKredietCopyWith<$Res>
       double somInterest,
       double somAnn,
       double slotTermijn,
-      AflosTabelOpties aflosTabelOpties,
+      TableMonthOptions tableMonthOptions,
       int decimalen,
-      bool renteGebrokenMaand,
+      bool eersteGebrokenMaandAlleenRente,
       AKbetaling betaling});
+
+  $TableMonthOptionsCopyWith<$Res> get tableMonthOptions;
 }
 
 /// @nodoc
@@ -2090,9 +2093,9 @@ class __$$AflopendKredietCopyWithImpl<$Res>
     Object? somInterest = null,
     Object? somAnn = null,
     Object? slotTermijn = null,
-    Object? aflosTabelOpties = null,
+    Object? tableMonthOptions = null,
     Object? decimalen = null,
-    Object? renteGebrokenMaand = null,
+    Object? eersteGebrokenMaandAlleenRente = null,
     Object? betaling = null,
   }) {
     return _then(_$AflopendKrediet(
@@ -2176,23 +2179,31 @@ class __$$AflopendKredietCopyWithImpl<$Res>
           ? _value.slotTermijn
           : slotTermijn // ignore: cast_nullable_to_non_nullable
               as double,
-      aflosTabelOpties: null == aflosTabelOpties
-          ? _value.aflosTabelOpties
-          : aflosTabelOpties // ignore: cast_nullable_to_non_nullable
-              as AflosTabelOpties,
+      tableMonthOptions: null == tableMonthOptions
+          ? _value.tableMonthOptions
+          : tableMonthOptions // ignore: cast_nullable_to_non_nullable
+              as TableMonthOptions,
       decimalen: null == decimalen
           ? _value.decimalen
           : decimalen // ignore: cast_nullable_to_non_nullable
               as int,
-      renteGebrokenMaand: null == renteGebrokenMaand
-          ? _value.renteGebrokenMaand
-          : renteGebrokenMaand // ignore: cast_nullable_to_non_nullable
+      eersteGebrokenMaandAlleenRente: null == eersteGebrokenMaandAlleenRente
+          ? _value.eersteGebrokenMaandAlleenRente
+          : eersteGebrokenMaandAlleenRente // ignore: cast_nullable_to_non_nullable
               as bool,
       betaling: null == betaling
           ? _value.betaling
           : betaling // ignore: cast_nullable_to_non_nullable
               as AKbetaling,
     ));
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $TableMonthOptionsCopyWith<$Res> get tableMonthOptions {
+    return $TableMonthOptionsCopyWith<$Res>(_value.tableMonthOptions, (value) {
+      return _then(_value.copyWith(tableMonthOptions: value));
+    });
   }
 }
 
@@ -2220,9 +2231,9 @@ class _$AflopendKrediet extends AflopendKrediet {
       required this.somInterest,
       required this.somAnn,
       required this.slotTermijn,
-      required this.aflosTabelOpties,
+      required this.tableMonthOptions,
       required this.decimalen,
-      required this.renteGebrokenMaand,
+      required this.eersteGebrokenMaandAlleenRente,
       required this.betaling,
       final String? $type})
       : $type = $type ?? 'aflopendKrediet',
@@ -2273,11 +2284,11 @@ class _$AflopendKrediet extends AflopendKrediet {
   @override
   final double slotTermijn;
   @override
-  final AflosTabelOpties aflosTabelOpties;
+  final TableMonthOptions tableMonthOptions;
   @override
   final int decimalen;
   @override
-  final bool renteGebrokenMaand;
+  final bool eersteGebrokenMaandAlleenRente;
   @override
   final AKbetaling betaling;
 
@@ -2286,7 +2297,7 @@ class _$AflopendKrediet extends AflopendKrediet {
 
   @override
   String toString() {
-    return 'Schuld.aflopendKrediet(id: $id, categorie: $categorie, omschrijving: $omschrijving, beginDatum: $beginDatum, statusBerekening: $statusBerekening, error: $error, lening: $lening, rente: $rente, termijnBedragMnd: $termijnBedragMnd, minTermijnBedragMnd: $minTermijnBedragMnd, maanden: $maanden, minMaanden: $minMaanden, maxMaanden: $maxMaanden, minAflossenPerMaand: $minAflossenPerMaand, maxAflossenPerMaand: $maxAflossenPerMaand, defaultAflossenPerMaand: $defaultAflossenPerMaand, termijnen: $termijnen, somInterest: $somInterest, somAnn: $somAnn, slotTermijn: $slotTermijn, aflosTabelOpties: $aflosTabelOpties, decimalen: $decimalen, renteGebrokenMaand: $renteGebrokenMaand, betaling: $betaling)';
+    return 'Schuld.aflopendKrediet(id: $id, categorie: $categorie, omschrijving: $omschrijving, beginDatum: $beginDatum, statusBerekening: $statusBerekening, error: $error, lening: $lening, rente: $rente, termijnBedragMnd: $termijnBedragMnd, minTermijnBedragMnd: $minTermijnBedragMnd, maanden: $maanden, minMaanden: $minMaanden, maxMaanden: $maxMaanden, minAflossenPerMaand: $minAflossenPerMaand, maxAflossenPerMaand: $maxAflossenPerMaand, defaultAflossenPerMaand: $defaultAflossenPerMaand, termijnen: $termijnen, somInterest: $somInterest, somAnn: $somAnn, slotTermijn: $slotTermijn, tableMonthOptions: $tableMonthOptions, decimalen: $decimalen, eersteGebrokenMaandAlleenRente: $eersteGebrokenMaandAlleenRente, betaling: $betaling)';
   }
 
   @override
@@ -2328,12 +2339,14 @@ class _$AflopendKrediet extends AflopendKrediet {
             (identical(other.somAnn, somAnn) || other.somAnn == somAnn) &&
             (identical(other.slotTermijn, slotTermijn) ||
                 other.slotTermijn == slotTermijn) &&
-            (identical(other.aflosTabelOpties, aflosTabelOpties) ||
-                other.aflosTabelOpties == aflosTabelOpties) &&
+            (identical(other.tableMonthOptions, tableMonthOptions) ||
+                other.tableMonthOptions == tableMonthOptions) &&
             (identical(other.decimalen, decimalen) ||
                 other.decimalen == decimalen) &&
-            (identical(other.renteGebrokenMaand, renteGebrokenMaand) ||
-                other.renteGebrokenMaand == renteGebrokenMaand) &&
+            (identical(other.eersteGebrokenMaandAlleenRente,
+                    eersteGebrokenMaandAlleenRente) ||
+                other.eersteGebrokenMaandAlleenRente ==
+                    eersteGebrokenMaandAlleenRente) &&
             (identical(other.betaling, betaling) ||
                 other.betaling == betaling));
   }
@@ -2362,9 +2375,9 @@ class _$AflopendKrediet extends AflopendKrediet {
         somInterest,
         somAnn,
         slotTermijn,
-        aflosTabelOpties,
+        tableMonthOptions,
         decimalen,
-        renteGebrokenMaand,
+        eersteGebrokenMaandAlleenRente,
         betaling
       ]);
 
@@ -2401,7 +2414,7 @@ class _$AflopendKrediet extends AflopendKrediet {
             int maanden,
             int minMaanden,
             int maxMaanden,
-            bool isTotalbedrag,
+            VKbedrag vkBedrag,
             bool heeftSlotTermijn,
             int decimalen)
         verzendKrediet,
@@ -2437,9 +2450,9 @@ class _$AflopendKrediet extends AflopendKrediet {
             double somInterest,
             double somAnn,
             double slotTermijn,
-            AflosTabelOpties aflosTabelOpties,
+            TableMonthOptions tableMonthOptions,
             int decimalen,
-            bool renteGebrokenMaand,
+            bool eersteGebrokenMaandAlleenRente,
             AKbetaling betaling)
         aflopendKrediet,
   }) {
@@ -2464,9 +2477,9 @@ class _$AflopendKrediet extends AflopendKrediet {
         somInterest,
         somAnn,
         slotTermijn,
-        aflosTabelOpties,
+        tableMonthOptions,
         decimalen,
-        renteGebrokenMaand,
+        eersteGebrokenMaandAlleenRente,
         betaling);
   }
 
@@ -2497,7 +2510,7 @@ class _$AflopendKrediet extends AflopendKrediet {
             int maanden,
             int minMaanden,
             int maxMaanden,
-            bool isTotalbedrag,
+            VKbedrag vkBedrag,
             bool heeftSlotTermijn,
             int decimalen)?
         verzendKrediet,
@@ -2533,9 +2546,9 @@ class _$AflopendKrediet extends AflopendKrediet {
             double somInterest,
             double somAnn,
             double slotTermijn,
-            AflosTabelOpties aflosTabelOpties,
+            TableMonthOptions tableMonthOptions,
             int decimalen,
-            bool renteGebrokenMaand,
+            bool eersteGebrokenMaandAlleenRente,
             AKbetaling betaling)?
         aflopendKrediet,
   }) {
@@ -2560,9 +2573,9 @@ class _$AflopendKrediet extends AflopendKrediet {
         somInterest,
         somAnn,
         slotTermijn,
-        aflosTabelOpties,
+        tableMonthOptions,
         decimalen,
-        renteGebrokenMaand,
+        eersteGebrokenMaandAlleenRente,
         betaling);
   }
 
@@ -2593,7 +2606,7 @@ class _$AflopendKrediet extends AflopendKrediet {
             int maanden,
             int minMaanden,
             int maxMaanden,
-            bool isTotalbedrag,
+            VKbedrag vkBedrag,
             bool heeftSlotTermijn,
             int decimalen)?
         verzendKrediet,
@@ -2629,9 +2642,9 @@ class _$AflopendKrediet extends AflopendKrediet {
             double somInterest,
             double somAnn,
             double slotTermijn,
-            AflosTabelOpties aflosTabelOpties,
+            TableMonthOptions tableMonthOptions,
             int decimalen,
-            bool renteGebrokenMaand,
+            bool eersteGebrokenMaandAlleenRente,
             AKbetaling betaling)?
         aflopendKrediet,
     required TResult orElse(),
@@ -2658,9 +2671,9 @@ class _$AflopendKrediet extends AflopendKrediet {
           somInterest,
           somAnn,
           slotTermijn,
-          aflosTabelOpties,
+          tableMonthOptions,
           decimalen,
-          renteGebrokenMaand,
+          eersteGebrokenMaandAlleenRente,
           betaling);
     }
     return orElse();
@@ -2733,9 +2746,9 @@ abstract class AflopendKrediet extends Schuld {
       required final double somInterest,
       required final double somAnn,
       required final double slotTermijn,
-      required final AflosTabelOpties aflosTabelOpties,
+      required final TableMonthOptions tableMonthOptions,
       required final int decimalen,
-      required final bool renteGebrokenMaand,
+      required final bool eersteGebrokenMaandAlleenRente,
       required final AKbetaling betaling}) = _$AflopendKrediet;
   const AflopendKrediet._() : super._();
 
@@ -2768,9 +2781,9 @@ abstract class AflopendKrediet extends Schuld {
   double get somInterest;
   double get somAnn;
   double get slotTermijn;
-  AflosTabelOpties get aflosTabelOpties;
+  TableMonthOptions get tableMonthOptions;
   int get decimalen;
-  bool get renteGebrokenMaand;
+  bool get eersteGebrokenMaandAlleenRente;
   AKbetaling get betaling;
   @override
   @JsonKey(ignore: true)

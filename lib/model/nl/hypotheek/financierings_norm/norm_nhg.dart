@@ -4,9 +4,9 @@ import '../hypotheek.dart';
 
 class BerekenNormNhg {
   DefaultNorm norm;
-  Hypotheek hypotheek;
-  HypotheekProfiel profiel;
-  List<Hypotheek> parallelHypotheken;
+  RemoveHypotheek hypotheek;
+  RemoveHypotheekProfiel profiel;
+  List<RemoveHypotheek> parallelHypotheken;
 
   BerekenNormNhg({
     required this.hypotheek,
@@ -21,7 +21,7 @@ class BerekenNormNhg {
   }
 
   bereken() {
-    final maxNHG = 355000.0;
+    const maxNHG = 355000.0;
 
     double lening = hypotheek.woningLeningKosten.woningWaarde;
     double lenenVoorVerduurzamen = 0.0;

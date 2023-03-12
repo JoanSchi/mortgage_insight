@@ -2,9 +2,9 @@ import 'package:mortgage_insight/model/nl/hypotheek/financierings_norm/norm.dart
 import '../hypotheek.dart';
 
 class BerekenNormWoningWaarde {
-  Hypotheek hypotheek;
-  HypotheekProfiel profiel;
-  List<Hypotheek> parallelHypotheken;
+  RemoveHypotheek hypotheek;
+  RemoveHypotheekProfiel profiel;
+  List<RemoveHypotheek> parallelHypotheken;
   DefaultNorm norm;
 
   BerekenNormWoningWaarde({

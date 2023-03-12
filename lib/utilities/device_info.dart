@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-enum FormFactorType { SmallPhone, LargePhone, Tablet, Monitor, Unknown }
+enum FormFactorType { smallPhone, largePhone, tablet, monitor, unknown }
 
 class DeviceOS {
   // Syntax sugar, proxy the UniversalPlatform methods so our views can reference a single class
@@ -25,23 +25,23 @@ class DeviceScreen {
   // Otherwise we will use the screen size to determine which class we fall into.
   static FormFactorType of(BuildContext context) {
     double shortestSide = MediaQuery.of(context).size.shortestSide;
-    if (shortestSide <= 300) return FormFactorType.SmallPhone;
-    if (shortestSide <= 600) return FormFactorType.LargePhone;
-    if (shortestSide <= 900) return FormFactorType.Tablet;
-    return FormFactorType.Monitor;
+    if (shortestSide <= 300) return FormFactorType.smallPhone;
+    if (shortestSide <= 600) return FormFactorType.largePhone;
+    if (shortestSide <= 900) return FormFactorType.tablet;
+    return FormFactorType.monitor;
   }
 
   // Shortcuts for various mobile device types
   static bool isPhone(BuildContext context) =>
       isSmallPhone(context) || isLargePhone(context);
   static bool isTablet(BuildContext context) =>
-      of(context) == FormFactorType.Tablet;
+      of(context) == FormFactorType.tablet;
   static bool isMonitor(BuildContext context) =>
-      of(context) == FormFactorType.Monitor;
+      of(context) == FormFactorType.monitor;
   static bool isSmallPhone(BuildContext context) =>
-      of(context) == FormFactorType.SmallPhone;
+      of(context) == FormFactorType.smallPhone;
   static bool isLargePhone(BuildContext context) =>
-      of(context) == FormFactorType.LargePhone;
+      of(context) == FormFactorType.largePhone;
 }
 
 class DeviceScreen3 {
@@ -94,21 +94,21 @@ class DeviceScreen3 {
       case TargetPlatform.linux:
       case TargetPlatform.windows:
         if (size.width > 1200.0 && size.height > 600.0) {
-          return FormFactorType.Monitor;
+          return FormFactorType.monitor;
         } else if (size.width > 500 && size.height > 500) {
-          return FormFactorType.Tablet;
+          return FormFactorType.tablet;
         } else {
-          return FormFactorType.LargePhone;
+          return FormFactorType.largePhone;
         }
     }
   }
 
   FormFactorType get formFactorTypeByShortestSide {
     double shortestSide = size.shortestSide;
-    if (shortestSide <= 300) return FormFactorType.SmallPhone;
-    if (shortestSide <= 600) return FormFactorType.LargePhone;
-    if (shortestSide <= 900) return FormFactorType.Tablet;
-    return FormFactorType.Monitor;
+    if (shortestSide <= 300) return FormFactorType.smallPhone;
+    if (shortestSide <= 600) return FormFactorType.largePhone;
+    if (shortestSide <= 900) return FormFactorType.tablet;
+    return FormFactorType.monitor;
   }
 
   Orientation get orientation =>

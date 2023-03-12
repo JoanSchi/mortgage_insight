@@ -5,11 +5,11 @@ import 'package:mortgage_insight/my_widgets/oh_no.dart';
 import 'package:mortgage_insight/pages/schulden/schuld_provider.dart';
 import '../../../model/nl/schulden/doorlopendkrediet_verwerken.dart';
 import '../../../model/nl/schulden/schulden.dart';
-import '../../../utilities/MyNumberFormat.dart';
+import '../../../utilities/my_number_format.dart';
 import '../../../utilities/date.dart';
 
 class OverzichtDoorlopendKrediet extends ConsumerStatefulWidget {
-  OverzichtDoorlopendKrediet({
+  const OverzichtDoorlopendKrediet({
     Key? key,
   }) : super(key: key);
 
@@ -36,13 +36,11 @@ class OverzichtDoorlopendKredietState
   }
 
   Widget _build(BuildContext context, DoorlopendKrediet dk) {
-    return SliverToBoxAdapter(
-      child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 200),
-          child: (dk.statusBerekening != StatusBerekening.berekend)
-              ? SizedBox.shrink()
-              : buildSummary(context, dk)),
-    );
+    return AnimatedSwitcher(
+        duration: const Duration(milliseconds: 200),
+        child: (dk.statusBerekening != StatusBerekening.berekend)
+            ? const SizedBox.shrink()
+            : buildSummary(context, dk));
   }
 
   Widget buildSummary(BuildContext context, DoorlopendKrediet dk) {
@@ -65,7 +63,7 @@ class OverzichtDoorlopendKredietState
             map['fout'],
             style: Theme.of(context)
                 .textTheme
-                .bodyText2
+                .bodyMedium
                 ?.copyWith(color: Colors.red),
           )
         ]);
@@ -80,7 +78,7 @@ class OverzichtDoorlopendKredietState
       maandlast
       */
 
-      Widget textPadding(String text, {textAlign: TextAlign.left}) {
+      Widget textPadding(String text, {textAlign = TextAlign.left}) {
         return Padding(
             padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
             child: Text(text, textAlign: textAlign));
@@ -126,28 +124,21 @@ class OverzichtDoorlopendKredietState
 
       final Widget tableOverzicht = DefaultTextStyle(
         style: textStyleTable,
-        child: Table(columnWidths: {
+        child: Table(columnWidths: const {
           0: IntrinsicColumnWidth(),
           1: IntrinsicColumnWidth(),
           2: IntrinsicColumnWidth(),
-          // FixedColumnWidth(calculateWidthFromNumber(
-          //         valueToWidth: columnWidthSummaryValues,
-          //         value: map['registratieBedrag'],
-          //         textStyle: textStyleTable,
-          //         textScaleFactor: textScaleFactor)
-          //     .width
-          // )
         }, children: tableRows),
       );
 
       return Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-        SizedBox(height: 24.0),
-        Text(
+        const SizedBox(height: 24.0),
+        const Text(
           'Overzicht',
         ),
-        SizedBox(height: 16.0),
+        const SizedBox(height: 16.0),
         tableOverzicht,
-        SizedBox(height: 8.0),
+        const SizedBox(height: 8.0),
       ]);
     }
   }

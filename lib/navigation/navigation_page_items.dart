@@ -24,9 +24,10 @@ const routeGraph = 'routeGraph_Page';
 
 //Edit Page
 const routeIncomeEdit = 'routeIncomeEdit';
+const routeDebtsAdd = 'routeDebtsAdd';
 const routeDebtsEdit = 'routeDebtsEdit';
 const routeMortgageEdit = 'routeMortgageEdit';
-const routeNieweHypotheekProfielEdit = 'routeNieweHypotheekProfielEdit';
+const routeNieuweHypotheekProfielEdit = 'routeNieweHypotheekProfielEdit';
 
 class MortgageItems {
   final String imageName;

@@ -11,13 +11,19 @@ part 'inkomen.g.dart';
 
 enum PeriodeInkomen { maand, jaar }
 
-@Freezed(makeCollectionsUnmodifiable: false)
+@freezed
 class InkomensOverzicht with _$InkomensOverzicht {
-  const factory InkomensOverzicht({required IList<Inkomen> lijst}) =
+  const InkomensOverzicht._();
+
+  const factory InkomensOverzicht(
+          {@Default(const IListConst([])) IList<Inkomen> inkomen,
+          @Default(const IListConst([])) IList<Inkomen> inkomenPartner}) =
       _InkomensOverzicht;
 
   factory InkomensOverzicht.fromJson(Map<String, Object?> json) =>
       _$InkomensOverzichtFromJson(json);
+
+  IList<Inkomen> lijst({required bool partner}) => partner ? inkomenPartner : inkomen;
 }
 
 @freezed

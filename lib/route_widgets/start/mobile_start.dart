@@ -1,16 +1,16 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../model/nl/hypotheek_container/hypotheek_container.dart';
+import 'package:mortgage_insight/model/nl/hypotheek_document/provider/hypotheek_document_provider.dart';
 import 'dart:math' as math;
 
 import '../../state_manager/routes/routes_handle_app.dart';
 
 class Home extends ConsumerStatefulWidget {
-  Home({Key? key}) : super(key: key);
+  const Home({super.key});
 
   @override
-  _HomeState createState() => _HomeState();
+  ConsumerState<Home> createState() => _HomeState();
 }
 
 const documents = [
@@ -82,21 +82,23 @@ class _HomeState extends ConsumerState<Home> {
                               top: 16.0,
                               right: 16.0,
                               child: IconButton(
-                                  onPressed: () => resetHypotheekInzicht(ref),
-                                  icon: Icon(Icons.rotate_left)),
+                                  onPressed: () => ref
+                                      .read(hypotheekDocumentProvider.notifier)
+                                      .reset(),
+                                  icon: const Icon(Icons.rotate_left)),
                             )
                           ],
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 8.0,
                       ),
-                      Text(
+                      const Text(
                         'Hypotheek Inzicht',
                         textScaleFactor: 2.0,
                         style: TextStyle(color: Colors.white),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 16.0,
                       ),
                     ],
@@ -104,9 +106,9 @@ class _HomeState extends ConsumerState<Home> {
                 ),
 
                 // New Document
-                SliverToBoxAdapter(child: NewDocument()),
+                const SliverToBoxAdapter(child: NewDocument()),
 
-                SliverToBoxAdapter(
+                const SliverToBoxAdapter(
                     child: SizedBox(
                   height: 16.0,
                 )),
@@ -115,14 +117,14 @@ class _HomeState extends ConsumerState<Home> {
                     child: Container(
                   padding: const EdgeInsets.only(
                       left: 8.0, top: 16.0, right: 8.0, bottom: 8.0),
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(20),
                           topRight: Radius.circular(20))),
                   child: Column(
                     children: [
-                      Text(
+                      const Text(
                         'Documenten',
                         textScaleFactor: 1.5,
                       ),
@@ -175,7 +177,7 @@ class _HomeState extends ConsumerState<Home> {
                 SliverToBoxAdapter(
                     child: Container(
                   height: 20.0,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.only(
                           bottomLeft: Radius.circular(20),
@@ -183,7 +185,7 @@ class _HomeState extends ConsumerState<Home> {
                 )),
 
                 //End
-                SliverToBoxAdapter(
+                const SliverToBoxAdapter(
                     child: SizedBox(
                   height: 16.0,
                 ))
@@ -207,7 +209,7 @@ enum NewDocumentOptions { pay_off, mortgage, custom }
 
 class _NewDocumentState extends ConsumerState<NewDocument>
     with SingleTickerProviderStateMixin {
-  late TextEditingController _nameController =
+  late final TextEditingController _nameController =
       TextEditingController(text: 'Mijn Hypotheek Inzicht');
 
   final customOptionList = [
@@ -219,15 +221,15 @@ class _NewDocumentState extends ConsumerState<NewDocument>
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
+      padding: const EdgeInsets.all(16.0),
+      decoration: const BoxDecoration(
           color: Colors.white,
-          borderRadius: const BorderRadius.all(Radius.circular(20))),
+          borderRadius: BorderRadius.all(Radius.circular(20))),
       child: Column(
         // crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
+          const Padding(
+            padding: EdgeInsets.all(8.0),
             child: Text(
               'Nieuw Document',
               textScaleFactor: 1.5,
@@ -240,8 +242,8 @@ class _NewDocumentState extends ConsumerState<NewDocument>
               children: [
                 TextField(
                     controller: _nameController,
-                    decoration: InputDecoration(labelText: 'Naam')),
-                SizedBox(
+                    decoration: const InputDecoration(labelText: 'Naam')),
+                const SizedBox(
                   height: 16.0,
                 ),
                 Align(
@@ -250,7 +252,7 @@ class _NewDocumentState extends ConsumerState<NewDocument>
                         child: TextButton(
                             onPressed: () =>
                                 HandleRoutes.setMainRoute(ref, 'document'),
-                            child: Text('Creëer')))),
+                            child: const Text('Creëer')))),
               ],
             ),
           ),
@@ -325,10 +327,10 @@ class Enabled {
 class GroupButton extends StatefulWidget {
   final List<Enabled> list;
 
-  GroupButton({Key? key, required this.list}) : super(key: key);
+  const GroupButton({super.key, required this.list});
 
   @override
-  _GroupButtonState createState() => _GroupButtonState();
+  State<GroupButton> createState() => _GroupButtonState();
 }
 
 class _GroupButtonState extends State<GroupButton> {
@@ -376,7 +378,7 @@ class SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return new SizedBox.expand(
+    return SizedBox.expand(
         child: buildHeader(
             minExtent: minExtent,
             maxExtent: maxExtent,

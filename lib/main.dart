@@ -6,12 +6,11 @@ import 'package:go_router/go_router.dart';
 import 'package:mortgage_insight/my_widgets/oh_no.dart';
 import 'package:mortgage_insight/state_manager/routes/routes_app.dart';
 import 'package:mortgage_insight/theme/theme.dart';
-import 'dart:math' as math;
 
 import 'package:mortgage_insight/utilities/device_info.dart';
 
 void main() {
-  runApp(ProviderScope(child: MyApp()));
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -20,18 +19,20 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: AppBackground(),
+      home: const AppBackground(),
       theme: buildTheme(),
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
-      supportedLocales: [
-        const Locale('en', 'US'),
-        const Locale('nl', 'NL'),
+      supportedLocales: const [
+        Locale('en', 'US'),
+        Locale('nl', 'NL'),
       ],
     );
   }
 }
 
 class AppBackground extends ConsumerStatefulWidget {
+  const AppBackground({super.key});
+
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => AppBackgroundState();
 }
@@ -62,7 +63,7 @@ class AppBackgroundState extends ConsumerState<AppBackground> {
   @override
   Widget build(BuildContext context) {
     if (route == null) {
-      return OhNo(
+      return const OhNo(
         text: 'Main route not found',
       );
     }
@@ -99,7 +100,7 @@ class AppBackgroundState extends ConsumerState<AppBackground> {
 }
 
 setOverlayStyle() {
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarBrightness: Brightness.light,
       statusBarIconBrightness: Brightness.dark,

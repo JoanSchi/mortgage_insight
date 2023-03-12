@@ -1,21 +1,19 @@
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:flutter/foundation.dart';
+import 'package:mortgage_insight/model/nl/schulden/aflopend_krediet_verwerken.dart';
 import 'package:mortgage_insight/model/nl/schulden/autolease_verwerken.dart';
 import 'package:mortgage_insight/model/nl/schulden/doorlopendkrediet_verwerken.dart';
+import 'package:mortgage_insight/model/settings/table_month_options.dart';
 
-import '../../../utilities/Kalender.dart';
-import 'remove_schulden_aflopend_krediet.dart';
 import 'verzendkrediet_verwerken.dart';
 
 part 'schulden.freezed.dart';
 part 'schulden.g.dart';
 
 enum AKbetaling {
-  per_periode,
-  per_maand,
-  per_eerst_volgende_maand,
+  ingangsdatum,
+  perEerstVolgendeMaand,
 }
 
 enum DateStatus {
@@ -25,17 +23,23 @@ enum DateStatus {
 }
 
 enum SchuldenCategorie {
-  aflopend_krediet,
-  doorlopend_krediet,
+  aflopendKrediet,
+  doorlopendKrediet,
   verzendhuiskrediet,
-  operationele_autolease
+  autolease
+}
+
+enum VKbedrag {
+  totaal,
+  mnd,
 }
 
 enum StatusBerekening { berekend, nietBerekend, fout }
 
 @freezed
 class SchuldenOverzicht with _$SchuldenOverzicht {
-  const factory SchuldenOverzicht({required IList<Schuld> lijst}) =
+  const factory SchuldenOverzicht(
+          {@Default(const IListConst([])) IList<Schuld> lijst}) =
       _SchuldenOverzicht;
 
   factory SchuldenOverzicht.fromJson(Map<String, Object?> json) =>
@@ -73,7 +77,7 @@ class Schuld with _$Schuld {
     required int maanden,
     required int minMaanden,
     required int maxMaanden,
-    required bool isTotalbedrag,
+    required VKbedrag vkBedrag,
     required bool heeftSlotTermijn,
     required int decimalen,
   }) = VerzendKrediet;
@@ -113,9 +117,9 @@ class Schuld with _$Schuld {
       required double somInterest,
       required double somAnn,
       required double slotTermijn,
-      required AflosTabelOpties aflosTabelOpties,
+      required TableMonthOptions tableMonthOptions,
       required int decimalen,
-      required bool renteGebrokenMaand,
+      required bool eersteGebrokenMaandAlleenRente,
       required AKbetaling betaling}) = AflopendKrediet;
 
   factory Schuld.fromJson(Map<String, Object?> json) => _$SchuldFromJson(json);
@@ -137,7 +141,7 @@ class Schuld with _$Schuld {
     return map(leaseAuto: (LeaseAuto leaseAuto) {
       return LeaseAutoVerwerken.eindDatum(leaseAuto);
     }, aflopendKrediet: (AflopendKrediet ak) {
-      return DateTime(0);
+      return AflopendKredietVerwerken.eindDatum(ak);
     }, verzendKrediet: (VerzendKrediet vk) {
       return VerzendKredietVerwerken.eindDatum(vk);
     }, doorlopendKrediet: (DoorlopendKrediet dk) {

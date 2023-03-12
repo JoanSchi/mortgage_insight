@@ -17,8 +17,8 @@ class LoginButton extends StatelessWidget {
       color: navigationStyle?.headerColorPrimair,
       child: InkWell(
         onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
+        child: const Padding(
+          padding: EdgeInsets.all(8.0),
           child: Icon(
             Icons.person_outline,
             size: 36.0,

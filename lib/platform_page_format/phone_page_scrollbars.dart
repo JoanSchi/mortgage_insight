@@ -1,9 +1,8 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:custom_sliver_appbar/shapeborder_appbar/shapeborder_lb_rb_rounded.dart';
 import 'package:custom_sliver_appbar/title_image_appbar/title_image_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:mortgage_insight/platform_page_format/default_page.dart';
-import 'package:mortgage_insight/platform_page_format/fabProperties.dart';
+import 'package:mortgage_insight/platform_page_format/fab_properties.dart';
 import 'package:mortgage_insight/utilities/device_info.dart';
 import 'page_actions.dart';
 import 'page_bottom_actions_layout.dart';
@@ -39,7 +38,7 @@ class PhonePageScrollBars extends StatelessWidget {
     final height = deviceScreen.size.height;
 
     double toolbarHeight = 0.0;
-    final imageHeight = 100.0;
+    const imageHeight = 100.0;
     final bottomHeight = bottom?.preferredSize.height ?? 0.0;
 
     bool showTitle = false;
@@ -57,23 +56,29 @@ class PhonePageScrollBars extends StatelessWidget {
       action: pageActionsToIconButton(context, pageProperties.rightTopActions),
     );
 
-    Widget body = bodyBuilder(context: context, nested: false);
+    Widget body = bodyBuilder(
+        context: context, nested: false, topPadding: 8.0, bottomPadding: 8.0);
 
-    final padding = 8.0;
+    body = PageActionBottomLayout(
+        leftBottomActions: pageProperties.leftBottomActions,
+        rightBottomActions: pageProperties.rightBottomActions,
+        body: body);
 
-    double leftPaddingAppBar =
-        !isPortrait && pageProperties.hasNavigationBar ? 56.0 : 0.0;
+    double leftPaddingAppBar;
+    double leftPadding;
+
+    if ((!isPortrait && pageProperties.hasNavigationBar)) {
+      leftPadding =
+          leftPaddingAppBar = pageProperties.leftPaddingWithNavigation;
+    } else {
+      leftPadding = pageProperties.leftPadding;
+      leftPaddingAppBar = 0.0;
+    }
 
     body = Padding(
       padding: EdgeInsets.only(
-          left: !isPortrait && pageProperties.hasNavigationBar ? 56.0 : padding,
-          top: padding,
-          right: padding,
-          bottom: padding),
-      child: PageActionBottomLayout(
-          leftBottomActions: pageProperties.leftBottomActions,
-          rightBottomActions: pageProperties.rightBottomActions,
-          body: body),
+          left: leftPadding, right: pageProperties.rightPadding),
+      child: body,
     );
 
     if (bottom != null) {
@@ -119,7 +124,7 @@ class PhonePageScrollBars extends StatelessWidget {
               Widget? child}) {
             final scrolledUnderColor = scrolledUnder
                 ? theme.colorScheme.surface
-                : theme.bottomAppBarColor;
+                : theme.bottomAppBarTheme.color;
 
             return isPortrait
                 ? Material(

@@ -1,90 +1,50 @@
-import 'dart:async';
 import 'package:date_input_picker/date_input_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mortgage_insight/model/nl/schulden/doorlopendkrediet_verwerken.dart';
 import 'package:mortgage_insight/model/nl/schulden/schulden.dart';
 import 'package:mortgage_insight/my_widgets/oh_no.dart';
-import 'package:go_router/go_router.dart';
-import '../../../model/nl/hypotheek_container/hypotheek_container.dart';
 import '../../../my_widgets/selectable_widgets/single_checkbox.dart';
 import '../../../my_widgets/simple_widgets.dart';
-import '../../../utilities/message_listeners.dart';
-import '../../../utilities/Kalender.dart';
-import '../../../utilities/MyNumberFormat.dart';
+import '../../../utilities/kalender.dart';
+import '../../../utilities/my_number_format.dart';
 import '../schuld_provider.dart';
 import 'doorlopend_krediet_overzicht.dart';
 
-class DoorlopendKredietPanel extends ConsumerStatefulWidget {
-  final MessageListener<AcceptCancelBackMessage> messageListener;
+class DoorlopendKredietPanel extends StatelessWidget {
+  final double topPadding;
+  final double bottomPadding;
 
-  const DoorlopendKredietPanel({Key? key, required this.messageListener})
-      : super(key: key);
-
-  @override
-  ConsumerState<DoorlopendKredietPanel> createState() =>
-      _DoorlopendKredietPanelState();
-}
-
-class _DoorlopendKredietPanelState
-    extends ConsumerState<DoorlopendKredietPanel> {
-  final _formKey = GlobalKey<FormState>();
+  const DoorlopendKredietPanel({
+    Key? key,
+    required this.topPadding,
+    required this.bottomPadding,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final scrollView = CustomScrollView(slivers: [
+    return CustomScrollView(slivers: [
       SliverList(
           delegate: SliverChildListDelegate.fixed([
-        DoorlopendKredietInvulPanel(formKey: _formKey),
+        SizedBox(height: topPadding),
+        DoorlopendKredietInvulPanel(),
+        OverzichtDoorlopendKrediet(),
+        SizedBox(
+          height: bottomPadding,
+        ),
       ])),
-      OverzichtDoorlopendKrediet()
     ]);
-
-    return MessageListenerWidget<AcceptCancelBackMessage>(
-        listener: widget.messageListener,
-        onMessage: (AcceptCancelBackMessage message) {
-          switch (message.msg) {
-            case AcceptCancelBack.accept:
-              FocusScope.of(context).unfocus();
-
-              scheduleMicrotask(() {
-                if ((_formKey.currentState?.validate() ?? false)) {
-                  Schuld? schuld = ref.read(schuldProvider).schuld;
-
-                  if (schuld != null) {
-                    ref
-                        .read(hypotheekContainerProvider.notifier)
-                        .addSchuld(schuld);
-                  }
-
-                  scheduleMicrotask(() {
-                    //didpop sets editState of routeEditPageProvider.notifier to null;
-                    context.pop();
-                  });
-                }
-              });
-
-              break;
-            case AcceptCancelBack.cancel:
-              //didpop sets editState of routeEditPageProvider.notifier to null;
-              context.pop();
-              break;
-            default:
-              break;
-          }
-        },
-        child: scrollView);
   }
 }
 
 class DoorlopendKredietInvulPanel extends ConsumerStatefulWidget {
-  final GlobalKey<FormState> formKey;
-
-  DoorlopendKredietInvulPanel({required this.formKey});
+  DoorlopendKredietInvulPanel({
+    Key? key,
+  }) : super(key: key);
 
   @override
   ConsumerState<DoorlopendKredietInvulPanel> createState() {
-    return new DoorlopendKredietInvulPanelState();
+    return DoorlopendKredietInvulPanelState();
   }
 }
 
@@ -115,7 +75,7 @@ class DoorlopendKredietInvulPanelState
 
   late MyNumberFormat nf = MyNumberFormat(context);
 
-  SchuldNotifier get notifier => ref.read(schuldProvider.notifier);
+  SchuldBewerkNotifier get notifier => ref.read(schuldProvider.notifier);
 
   DoorlopendKrediet? get dk =>
       ref.read(schuldProvider).schuld?.mapOrNull<DoorlopendKrediet?>(
@@ -212,9 +172,9 @@ class DoorlopendKredietInvulPanelState
           child: TextFormField(
               controller: _tecBedrag,
               focusNode: _fnBedrag,
-              key: Key('DK_krediet'),
-              decoration:
-                  new InputDecoration(hintText: 'limiet', labelText: 'Krediet'),
+              key: const Key('DK_krediet'),
+              decoration: const InputDecoration(
+                  hintText: 'limiet', labelText: 'Krediet'),
               validator: (String? text) {
                 if (nf.parsToDouble(text ?? '') <= 0) {
                   return '.. > 0';
@@ -224,7 +184,7 @@ class DoorlopendKredietInvulPanelState
               onSaved: (String? text) {
                 _veranderingBedrag(text);
               },
-              keyboardType: TextInputType.numberWithOptions(
+              keyboardType: const TextInputType.numberWithOptions(
                 signed: true,
                 decimal: true,
               ),
@@ -232,7 +192,7 @@ class DoorlopendKredietInvulPanelState
                 MyNumberFormat(context).numberInputFormat('#.00')
               ]),
         ),
-        SizedBox(
+        const SizedBox(
           width: 16.0,
         ),
         SizeTransition(
@@ -258,10 +218,7 @@ class DoorlopendKredietInvulPanelState
       ])
     ];
 
-    return Form(
-        key: widget.formKey,
-        child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start, children: list));
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: list);
   }
 
   _veranderingBegindatum(DateTime? date) {

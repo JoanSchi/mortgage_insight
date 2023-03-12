@@ -3,11 +3,9 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 
-enum Situatie { starter, koopwoning, geenKoopwoning }
+import 'gegevens/extra_of_kosten_lening/extra_of_kosten_lening.dart';
 
-enum Eenheid { percentageWoningWaarde, percentageLening, bedrag }
-
-class Waarde {
+class RemoveWaarde {
   String id;
   int index;
   String name;
@@ -17,7 +15,7 @@ class Waarde {
   bool aftrekbaar;
   bool verduurzamen;
 
-  Waarde({
+  RemoveWaarde({
     required this.id,
     required this.index,
     required this.name,
@@ -30,7 +28,7 @@ class Waarde {
 
   String get key => '${id}_$index';
 
-  Waarde copyWith({
+  RemoveWaarde copyWith({
     String? id,
     int? index,
     String? name,
@@ -40,7 +38,7 @@ class Waarde {
     bool? aftrekbaar,
     bool? verduurzamen,
   }) {
-    return Waarde(
+    return RemoveWaarde(
       id: id ?? this.id,
       index: index ?? this.index,
       name: name ?? this.name,
@@ -92,8 +90,8 @@ class Waarde {
     };
   }
 
-  factory Waarde.fromMap(Map<String, dynamic> map) {
-    return Waarde(
+  factory RemoveWaarde.fromMap(Map<String, dynamic> map) {
+    return RemoveWaarde(
       id: map['id'],
       index: map['index'],
       name: map['name'],
@@ -107,13 +105,14 @@ class Waarde {
 
   String toJson() => json.encode(toMap());
 
-  factory Waarde.fromJson(String source) => Waarde.fromMap(json.decode(source));
+  factory RemoveWaarde.fromJson(String source) =>
+      RemoveWaarde.fromMap(json.decode(source));
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is Waarde &&
+    return other is RemoveWaarde &&
         other.name == name &&
         other.value == value &&
         other.eenheid == eenheid &&
@@ -143,7 +142,7 @@ class Waarde {
 //     aftrekbaar: false,
 //     verduurzamen: true);
 
-final Waarde leegKostenVerduurzamen = Waarde(
+final RemoveWaarde leegKostenVerduurzamen = RemoveWaarde(
     id: 'eigen',
     index: 1000,
     name: '',
@@ -153,7 +152,7 @@ final Waarde leegKostenVerduurzamen = Waarde(
     aftrekbaar: false,
     verduurzamen: true);
 
-final Waarde leegKosten = Waarde(
+final RemoveWaarde leegKosten = RemoveWaarde(
     id: 'eigen',
     index: 1000,
     name: '',
@@ -163,7 +162,7 @@ final Waarde leegKosten = Waarde(
     aftrekbaar: false,
     verduurzamen: false);
 
-class EigenReserveWoning {
+class RemoveEigenReserveWoning {
   bool erwToepassing;
   bool erwBerekenen;
   double erw;
@@ -171,7 +170,7 @@ class EigenReserveWoning {
 
   bool get woningGegevens => erwToepassing && erwBerekenen;
 
-  EigenReserveWoning({
+  RemoveEigenReserveWoning({
     this.erwToepassing: false,
     this.erwBerekenen: false,
     this.erw: 0.0,
@@ -187,8 +186,8 @@ class EigenReserveWoning {
     };
   }
 
-  factory EigenReserveWoning.fromMap(Map<String, dynamic> map) {
-    return EigenReserveWoning(
+  factory RemoveEigenReserveWoning.fromMap(Map<String, dynamic> map) {
+    return RemoveEigenReserveWoning(
       erwToepassing: map['erwToepassing'],
       erwBerekenen: map['erwBerekenen'],
       erw: map['erw']?.toDouble(),
@@ -198,16 +197,16 @@ class EigenReserveWoning {
 
   String toJson() => json.encode(toMap());
 
-  factory EigenReserveWoning.fromJson(String source) =>
-      EigenReserveWoning.fromMap(json.decode(source));
+  factory RemoveEigenReserveWoning.fromJson(String source) =>
+      RemoveEigenReserveWoning.fromMap(json.decode(source));
 
-  EigenReserveWoning copyWith({
+  RemoveEigenReserveWoning copyWith({
     bool? erwToepassing,
     bool? erwBerekenen,
     double? erw,
     double? oorspronkelijkeLening,
   }) {
-    return EigenReserveWoning(
+    return RemoveEigenReserveWoning(
       erwToepassing: erwToepassing ?? this.erwToepassing,
       erwBerekenen: erwBerekenen ?? this.erwBerekenen,
       erw: erw ?? this.erw,
@@ -220,27 +219,29 @@ class EigenReserveWoning {
 class WoningLeningKostenGegevens {
   double woningWaarde;
   double lening;
-  List<Waarde> kosten;
+  List<RemoveWaarde> kosten;
 
   WoningLeningKostenGegevens({
     this.woningWaarde = 0.0,
     this.lening = 0.0,
-    List<Waarde>? kosten,
-  }) : kosten = kosten ?? <Waarde>[];
+    List<RemoveWaarde>? kosten,
+  }) : kosten = kosten ?? <RemoveWaarde>[];
 
   WoningLeningKostenGegevens copyWith({
     double? woningWaarde,
     double? initieleLening,
-    List<Waarde>? kosten,
+    List<RemoveWaarde>? kosten,
   }) {
     return WoningLeningKostenGegevens(
       woningWaarde: woningWaarde ?? this.woningWaarde,
       lening: initieleLening ?? this.lening,
-      kosten: kosten ?? this.kosten.map((Waarde e) => e.copyWith()).toList(),
+      kosten:
+          kosten ?? this.kosten.map((RemoveWaarde e) => e.copyWith()).toList(),
     );
   }
 
-  double get totaleKosten => kosten.fold(0.0, (double previous, Waarde w) {
+  double get totaleKosten =>
+      kosten.fold(0.0, (double previous, RemoveWaarde w) {
         double value;
         switch (w.eenheid) {
           case Eenheid.percentageWoningWaarde:
@@ -269,7 +270,8 @@ class WoningLeningKostenGegevens {
   factory WoningLeningKostenGegevens.fromMap(Map<String, dynamic> map) {
     return WoningLeningKostenGegevens(
       lening: map['lening']?.toDouble(),
-      kosten: List<Waarde>.from(map['kosten'].map((x) => Waarde.fromMap(x))),
+      kosten: List<RemoveWaarde>.from(
+          map['kosten'].map((x) => RemoveWaarde.fromMap(x))),
       woningWaarde: map['woningWaarde']?.toDouble(),
     );
   }
@@ -279,7 +281,7 @@ class WoningLeningKostenGegevens {
   factory WoningLeningKostenGegevens.fromJson(String source) =>
       WoningLeningKostenGegevens.fromMap(json.decode(source));
 
-  static final borgNHG = Waarde(
+  static final borgNHG = RemoveWaarde(
     id: 'borgNHG',
     index: 5,
     name: 'Borg NHG',
@@ -287,13 +289,13 @@ class WoningLeningKostenGegevens {
     eenheid: Eenheid.percentageLening,
   );
 
-  static List<Waarde> suggestieKosten({
+  static List<RemoveWaarde> suggestieKosten({
     required bool overdrachtBelasting,
     required bool nhg,
   }) =>
       [
         if (overdrachtBelasting)
-          Waarde(
+          RemoveWaarde(
               id: 'overdrachtBelasting',
               index: 0,
               name: 'Overdracht Belasting',
@@ -301,35 +303,35 @@ class WoningLeningKostenGegevens {
               eenheid: Eenheid.percentageWoningWaarde,
               standaard: true,
               aftrekbaar: false),
-        Waarde(
+        RemoveWaarde(
             id: 'bouwkundigRapport',
             index: 3,
             name: 'Bouwkundig Rapport',
             value: 500.0,
             eenheid: Eenheid.bedrag,
             aftrekbaar: true),
-        Waarde(
+        RemoveWaarde(
             id: 'bankgarantie',
             index: 4,
             name: 'Bankgarantie',
             value: 250.0,
             eenheid: Eenheid.bedrag,
             aftrekbaar: true),
-        Waarde(
+        RemoveWaarde(
             id: 'adviesBemiddeling',
             index: 6,
             name: 'Advies bemiddeling',
             value: 2000.0,
             eenheid: Eenheid.bedrag,
             aftrekbaar: true),
-        Waarde(
+        RemoveWaarde(
             id: 'aankoopmakelaar',
             index: 7,
             name: 'Aankoopmakelaar',
             value: 3000.0,
             eenheid: Eenheid.bedrag,
             aftrekbaar: true),
-        Waarde(
+        RemoveWaarde(
             id: 'taxatie',
             index: 1,
             name: 'Taxatie',
@@ -337,7 +339,7 @@ class WoningLeningKostenGegevens {
             eenheid: Eenheid.bedrag,
             standaard: true,
             aftrekbaar: true),
-        Waarde(
+        RemoveWaarde(
             id: 'notaris',
             index: 2,
             name: 'Notaris',
@@ -348,22 +350,22 @@ class WoningLeningKostenGegevens {
         if (nhg) WoningLeningKostenGegevens.borgNHG,
       ];
 
-  static List<Waarde> suggestieKostenVorigeWoning() => [
-        Waarde(
+  static List<RemoveWaarde> suggestieKostenVorigeWoning() => [
+        RemoveWaarde(
             id: 'makelaar',
             index: 0,
             name: 'makelaar',
             value: 3000.0,
             eenheid: Eenheid.bedrag,
             standaard: true),
-        Waarde(
+        RemoveWaarde(
             id: 'energielabel',
             index: 1,
             name: 'energielabel',
             value: 200.0,
             eenheid: Eenheid.bedrag,
             standaard: true),
-        Waarde(
+        RemoveWaarde(
             id: 'advertentie',
             index: 2,
             name: 'advertentie',
@@ -388,18 +390,19 @@ class WoningLeningKostenGegevens {
 
 class VerbouwVerduurzaamKosten {
   bool toepassen;
-  List<Waarde> kosten;
+  List<RemoveWaarde> kosten;
   double taxatie;
   String energieClassificering;
 
   VerbouwVerduurzaamKosten({
-    List<Waarde>? kosten,
+    List<RemoveWaarde>? kosten,
     this.energieClassificering = '',
     this.toepassen = false,
     this.taxatie = 0.0,
-  }) : kosten = kosten ?? <Waarde>[];
+  }) : kosten = kosten ?? <RemoveWaarde>[];
 
-  double get totaleKosten => kosten.fold(0.0, (double previous, Waarde w) {
+  double get totaleKosten =>
+      kosten.fold(0.0, (double previous, RemoveWaarde w) {
         double value;
         switch (w.eenheid) {
           case Eenheid.percentageWoningWaarde:
@@ -420,7 +423,7 @@ class VerbouwVerduurzaamKosten {
   double get totaleVerduurzaamKosten => _totaleKostenUitsplitsen(true);
 
   double _totaleKostenUitsplitsen(bool verduurzamen) =>
-      kosten.fold(0.0, (double previous, Waarde w) {
+      kosten.fold(0.0, (double previous, RemoveWaarde w) {
         if (w.verduurzamen != verduurzamen) {
           return previous;
         } else {
@@ -441,7 +444,7 @@ class VerbouwVerduurzaamKosten {
       });
 
   forEachUitsplitsenVerduurzamen(Function(double kost, bool verduurzamen) t) {
-    for (Waarde w in kosten) {
+    for (RemoveWaarde w in kosten) {
       switch (w.eenheid) {
         case Eenheid.percentageWoningWaarde:
           t(taxatie / 100.0 * w.value, w.verduurzamen);
@@ -455,8 +458,8 @@ class VerbouwVerduurzaamKosten {
     }
   }
 
-  static List<Waarde> leegVerduurzamen = [
-    Waarde(
+  static List<RemoveWaarde> leegVerduurzamen = [
+    RemoveWaarde(
         id: 'Eigen Isolatie',
         index: 1000,
         name: 'Isolatie: ....',
@@ -464,7 +467,7 @@ class VerbouwVerduurzaamKosten {
         eenheid: Eenheid.bedrag,
         standaard: true,
         verduurzamen: true),
-    Waarde(
+    RemoveWaarde(
         id: 'Eigen Warmteterugwinning',
         index: 1001,
         name: 'Warmteterugwinning: ...',
@@ -472,7 +475,7 @@ class VerbouwVerduurzaamKosten {
         eenheid: Eenheid.bedrag,
         standaard: true,
         verduurzamen: true),
-    Waarde(
+    RemoveWaarde(
         id: 'Overige',
         index: 1002,
         name: '',
@@ -482,8 +485,8 @@ class VerbouwVerduurzaamKosten {
         verduurzamen: true),
   ];
 
-  static List<Waarde> suggestieVerduurzamen = [
-    Waarde(
+  static List<RemoveWaarde> suggestieVerduurzamen = [
+    RemoveWaarde(
         id: 'Isolatie 1',
         index: 1,
         name: 'Isolatie van dak/vloer/gevel',
@@ -491,7 +494,7 @@ class VerbouwVerduurzaamKosten {
         eenheid: Eenheid.bedrag,
         standaard: true,
         verduurzamen: true),
-    Waarde(
+    RemoveWaarde(
         id: 'HRplusplus',
         index: 2,
         name: 'HR++',
@@ -499,7 +502,7 @@ class VerbouwVerduurzaamKosten {
         eenheid: Eenheid.bedrag,
         standaard: true,
         verduurzamen: true),
-    Waarde(
+    RemoveWaarde(
         id: 'Warmtepomp',
         index: 3,
         name: 'Warmtepomp',
@@ -507,7 +510,7 @@ class VerbouwVerduurzaamKosten {
         eenheid: Eenheid.bedrag,
         standaard: true,
         verduurzamen: true),
-    Waarde(
+    RemoveWaarde(
         id: 'zonnepanelen',
         index: 4,
         name: 'Zonnepanelen',
@@ -515,7 +518,7 @@ class VerbouwVerduurzaamKosten {
         eenheid: Eenheid.bedrag,
         standaard: true,
         verduurzamen: true),
-    Waarde(
+    RemoveWaarde(
         id: 'Energiezuinige ventilatie',
         index: 5,
         name: 'Energiezuinige ventilatie',
@@ -523,7 +526,7 @@ class VerbouwVerduurzaamKosten {
         eenheid: Eenheid.bedrag,
         standaard: true,
         verduurzamen: true),
-    Waarde(
+    RemoveWaarde(
         id: 'warmteterugwinning 1',
         index: 6,
         name: 'Douche met warmteterugwinning',
@@ -545,9 +548,9 @@ class VerbouwVerduurzaamKosten {
   factory VerbouwVerduurzaamKosten.fromMap(Map<String, dynamic> map) {
     return VerbouwVerduurzaamKosten(
       toepassen: map['toepassen'] as bool,
-      kosten: List<Waarde>.from(
-        (map['kosten'] as List<int>).map<Waarde>(
-          (x) => Waarde.fromMap(x as Map<String, dynamic>),
+      kosten: List<RemoveWaarde>.from(
+        (map['kosten'] as List<int>).map<RemoveWaarde>(
+          (x) => RemoveWaarde.fromMap(x as Map<String, dynamic>),
         ),
       ),
       taxatie: map['taxatie'] as double,
@@ -563,7 +566,7 @@ class VerbouwVerduurzaamKosten {
 
   VerbouwVerduurzaamKosten copyWith({
     bool? toepassen,
-    List<Waarde>? kosten,
+    List<RemoveWaarde>? kosten,
     double? taxatie,
     String? energieClassificering,
   }) {

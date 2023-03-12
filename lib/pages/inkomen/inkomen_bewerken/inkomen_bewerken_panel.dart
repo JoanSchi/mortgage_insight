@@ -5,15 +5,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:mortgage_insight/model/nl/hypotheek_document/provider/hypotheek_document_provider.dart';
 import 'package:selectable_group_widgets/selectable_group_widgets.dart';
-
 import 'package:mortgage_insight/layout/transition/scale_size_transition.dart';
-import 'package:mortgage_insight/model/nl/hypotheek_container/hypotheek_container.dart';
 import 'package:mortgage_insight/platform_page_format/page_actions.dart';
-import 'package:mortgage_insight/utilities/MyNumberFormat.dart';
+import 'package:mortgage_insight/utilities/my_number_format.dart';
 import 'package:mortgage_insight/utilities/date.dart';
 import 'package:mortgage_insight/utilities/message_listeners.dart';
-
 import '../../../model/nl/inkomen/inkomen.dart';
 import '../../../my_widgets/selectable_widgets/selectable_group_themes.dart';
 import '../../../my_widgets/selectable_widgets/single_checkbox.dart';
@@ -54,16 +52,6 @@ class IncomeEditState extends ConsumerState<IncomeEdit> {
       MessageListener<AcceptCancelBackMessage>();
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
-
-  @override
   Widget build(BuildContext context) {
     bool partner = ref.watch(
         inkomenBewerkenProvider.select((value) => value.inkomen.partner));
@@ -82,40 +70,49 @@ class IncomeEditState extends ConsumerState<IncomeEdit> {
             .invoke(AcceptCancelBackMessage(msg: AcceptCancelBack.cancel)));
 
     return DefaultPage(
-        title: 'Inkomen',
-        imageBuilder: (_) => Image(
-            image: AssetImage(
-              partner ? 'graphics/persons.png' : 'graphics/person.png',
-            ),
-            color: theme.colorScheme.onSurface),
-        matchPageProperties: [
-          MatchPageProperties(
-              pageProperties:
-                  PageProperties(rightBottomActions: [cancel, save])),
-          MatchPageProperties(
-            types: {FormFactorType.SmallPhone, FormFactorType.LargePhone},
-            orientations: {Orientation.landscape},
-            pageProperties: PageProperties(
-                leftTopActions: [cancel], rightTopActions: [save]),
-          )
-        ],
-        bodyBuilder: ({required BuildContext context, required bool nested}) =>
-            IncomeFieldForm(
-              messageListeners: _messageListeners,
-              nested: nested,
-            ));
+      title: 'Inkomen',
+      imageBuilder: (_) => Image(
+          image: AssetImage(
+            partner ? 'graphics/persons.png' : 'graphics/person.png',
+          ),
+          color: theme.colorScheme.onSurface),
+      matchPageProperties: [
+        MatchPageProperties(
+            pageProperties: PageProperties(rightBottomActions: [cancel, save])),
+        MatchPageProperties(
+          types: {FormFactorType.smallPhone, FormFactorType.largePhone},
+          orientations: {Orientation.landscape},
+          pageProperties:
+              PageProperties(leftTopActions: [cancel], rightTopActions: [save]),
+        )
+      ],
+      bodyBuilder: (
+              {required BuildContext context,
+              required bool nested,
+              required double topPadding,
+              required double bottomPadding}) =>
+          IncomeFieldForm(
+        messageListeners: _messageListeners,
+        nested: nested,
+        topPadding: topPadding,
+        bottomPadding: bottomPadding,
+      ),
+    );
   }
 }
 
 class IncomeFieldForm extends ConsumerStatefulWidget {
   final MessageListener<AcceptCancelBackMessage> messageListeners;
-
   final bool nested;
+  final double topPadding;
+  final double bottomPadding;
 
-  IncomeFieldForm({
+  const IncomeFieldForm({
     Key? key,
     required this.messageListeners,
     required this.nested,
+    required this.topPadding,
+    required this.bottomPadding,
   }) : super(key: key);
 
   @override
@@ -127,7 +124,7 @@ DateTime lastSelectableDate = DateTime(2070, 12);
 
 class IncomeFieldFormState extends ConsumerState<IncomeFieldForm> {
   final _formKey = GlobalKey<FormState>();
-  late TextEditingController _brutoInkomenController =
+  late final TextEditingController _brutoInkomenController =
       TextEditingController(text: firstTextInkomen());
 
   late final nf = MyNumberFormat(context);
@@ -137,7 +134,7 @@ class IncomeFieldFormState extends ConsumerState<IncomeFieldForm> {
 
   InkomenBewerken get _read => ref.read(inkomenBewerkenProvider);
 
-  InkomenNotifier get _notifier {
+  InkomenBewerkenNotifier get _notifier {
     return ref.read(inkomenBewerkenProvider.notifier);
   }
 
@@ -201,6 +198,9 @@ class IncomeFieldFormState extends ConsumerState<IncomeFieldForm> {
     String monthFormat = 'M-y';
 
     List<Widget> children = [
+      SizedBox(
+        height: widget.topPadding,
+      ),
       DateInputPicker(
           additionalDividers: const ['/', '.', '-'],
           formatWithUnfocus: formatWithUnfocus,
@@ -226,18 +226,18 @@ class IncomeFieldFormState extends ConsumerState<IncomeFieldForm> {
           : Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(
+                const SizedBox(
                   width: 4.0,
                 ),
                 Text(tekstPensioenBlok(),
                     style: const TextStyle(fontStyle: FontStyle.italic))
               ],
             ),
-      SizedBox(
+      const SizedBox(
         height: 16.0,
       ),
-      Text('Bruto pensioen jaarinkomen:'),
-      SizedBox(
+      const Text('Bruto pensioen jaarinkomen:'),
+      const SizedBox(
         height: 8.0,
       ),
       UndefinedSelectableGroup(
@@ -268,9 +268,9 @@ class IncomeFieldFormState extends ConsumerState<IncomeFieldForm> {
         height: 8.0,
       ),
       AnimatedSwitcher(
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         child: bewerken.inkomen.pensioen
-            ? SizedBox.shrink()
+            ? const SizedBox.shrink()
             : UndefinedSelectableGroup(groups: [
                 MyCheckGroup<String>(
                   list: [
@@ -309,11 +309,14 @@ class IncomeFieldFormState extends ConsumerState<IncomeFieldForm> {
         },
         transitionBuilder: (Widget child, Animation<double> animation) {
           return ScaleResizedTransition(
-            child: child,
             scale: animation,
+            child: child,
           );
         },
-      )
+      ),
+      SizedBox(
+        height: widget.bottomPadding,
+      ),
     ];
 
     final formField = Form(
@@ -327,12 +330,7 @@ class IncomeFieldFormState extends ConsumerState<IncomeFieldForm> {
                 handle:
                     NestedScrollView.sliverOverlapAbsorberHandleFor(context),
               ),
-            SliverList(
-              delegate:
-                  SliverChildBuilderDelegate((BuildContext context, int index) {
-                return children[index];
-              }, childCount: children.length),
-            )
+            SliverList(delegate: SliverChildListDelegate.fixed(children))
           ],
         ));
 
@@ -392,7 +390,7 @@ class IncomeFieldFormState extends ConsumerState<IncomeFieldForm> {
     if (_formKey.currentState?.validate() ?? false) {
       _formKey.currentState!.save();
 
-      ref.read(hypotheekContainerProvider).addInkomen(
+      ref.read(hypotheekDocumentProvider.notifier).inkomenToevoegen(
             oldDate: _read.origineleDatum,
             newItem: _read.inkomen,
           );

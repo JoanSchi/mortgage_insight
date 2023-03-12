@@ -1,27 +1,28 @@
 import 'dart:convert';
+import 'gegevens/hypotheek/hypotheek.dart';
 import 'hypotheek.dart';
 
-class ParallelLeningen {
-  List<StatusLening> list;
+class RemoveParallelLeningen {
+  List<RemoveStatusLening> list;
   double somLeningen;
   double somVerduurzaamKosten;
   double somVerbouwKosten;
 
-  ParallelLeningen(
-      {List<StatusLening>? list,
+  RemoveParallelLeningen(
+      {List<RemoveStatusLening>? list,
       this.somLeningen = 0.0,
       this.somVerbouwKosten = 0.0,
       this.somVerduurzaamKosten = 0.0})
       : list = [];
 
-  ParallelLeningen.from({
-    required List<Hypotheek> parallelHypotheken,
-    required Hypotheek hypotheek,
+  RemoveParallelLeningen.from({
+    required List<RemoveHypotheek> parallelHypotheken,
+    required RemoveHypotheek hypotheek,
   })  : list = [],
         somLeningen = 0.0,
         somVerbouwKosten = 0.0,
         somVerduurzaamKosten = 0.0 {
-    for (Hypotheek h in parallelHypotheken) {
+    for (RemoveHypotheek h in parallelHypotheken) {
       Termijn? termijn;
 
       for (Termijn t in h.termijnen) {
@@ -33,7 +34,7 @@ class ParallelLeningen {
       }
 
       if (termijn != null) {
-        final statusLening = StatusLening(
+        final statusLening = RemoveStatusLening(
             id: h.id,
             lening: termijn.lening,
             periode: termijn.periode,
@@ -69,11 +70,11 @@ class ParallelLeningen {
     };
   }
 
-  factory ParallelLeningen.fromMap(Map<String, dynamic> map) {
-    return ParallelLeningen(
-      list: List<StatusLening>.from(
-        (map['list'] as List<int>).map<StatusLening>(
-          (x) => StatusLening.fromMap(x as Map<String, dynamic>),
+  factory RemoveParallelLeningen.fromMap(Map<String, dynamic> map) {
+    return RemoveParallelLeningen(
+      list: List<RemoveStatusLening>.from(
+        (map['list'] as List<int>).map<RemoveStatusLening>(
+          (x) => RemoveStatusLening.fromMap(x as Map<String, dynamic>),
         ),
       ),
       somLeningen: map['somLeningen'] as double,
@@ -82,21 +83,22 @@ class ParallelLeningen {
 
   String toJson() => json.encode(toMap());
 
-  factory ParallelLeningen.fromJson(String source) =>
-      ParallelLeningen.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory RemoveParallelLeningen.fromJson(String source) =>
+      RemoveParallelLeningen.fromMap(
+          json.decode(source) as Map<String, dynamic>);
 
-  ParallelLeningen copyWith({
-    List<StatusLening>? list,
+  RemoveParallelLeningen copyWith({
+    List<RemoveStatusLening>? list,
     double? somLeningen,
   }) {
-    return ParallelLeningen(
+    return RemoveParallelLeningen(
       list: list ?? this.list,
       somLeningen: somLeningen ?? this.somLeningen,
     );
   }
 }
 
-class StatusLening {
+class RemoveStatusLening {
   String id;
   int periode;
   double lening;
@@ -104,7 +106,7 @@ class StatusLening {
   int aflosTermijnInMaanden;
   HypotheekVorm hypotheekVorm;
 
-  StatusLening({
+  RemoveStatusLening({
     required this.id,
     required this.lening,
     required this.periode,
@@ -113,9 +115,9 @@ class StatusLening {
     required this.hypotheekVorm,
   });
 
-  static StatusLening from(
-      {required Hypotheek hypotheek, required int periode}) {
-    return StatusLening(
+  static RemoveStatusLening from(
+      {required RemoveHypotheek hypotheek, required int periode}) {
+    return RemoveStatusLening(
         id: hypotheek.id,
         lening: 0.0,
         periode: periode,
@@ -135,8 +137,8 @@ class StatusLening {
     };
   }
 
-  factory StatusLening.fromMap(Map<String, dynamic> map) {
-    return StatusLening(
+  factory RemoveStatusLening.fromMap(Map<String, dynamic> map) {
+    return RemoveStatusLening(
       id: map['id'],
       hypotheekVorm: HypotheekVorm.values[map['hypotheekVorm']],
       lening: map['lening']?.toDouble(),
@@ -148,14 +150,14 @@ class StatusLening {
 
   String toJson() => json.encode(toMap());
 
-  factory StatusLening.fromJson(String source) =>
-      StatusLening.fromMap(json.decode(source));
+  factory RemoveStatusLening.fromJson(String source) =>
+      RemoveStatusLening.fromMap(json.decode(source));
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is StatusLening &&
+    return other is RemoveStatusLening &&
         other.id == id &&
         other.periode == periode &&
         other.lening == lening &&
@@ -172,7 +174,7 @@ class StatusLening {
         hypotheekVorm.hashCode;
   }
 
-  StatusLening copyWith({
+  RemoveStatusLening copyWith({
     String? id,
     int? periode,
     double? lening,
@@ -182,7 +184,7 @@ class StatusLening {
     HypotheekVorm? hypotheekVorm,
     double? annuiteitMnd,
   }) {
-    return StatusLening(
+    return RemoveStatusLening(
       id: id ?? this.id,
       periode: periode ?? this.periode,
       lening: lening ?? this.lening,

@@ -20,8 +20,8 @@ Widget? buildActionRow(
   final Widget? row = action.isEmpty
       ? null
       : Row(
-          children: action,
           mainAxisSize: MainAxisSize.min,
+          children: action,
         );
 
   return row;
@@ -46,7 +46,7 @@ List<Widget> pageActionsToIconButton(
                 );
               } else {
                 return IconButton(
-                  icon: Icon(Icons.question_mark),
+                  icon: const Icon(Icons.question_mark),
                   onPressed: p.voidCallback,
                 );
               }
@@ -57,12 +57,12 @@ List<Widget> pageActionsToIconButton(
 List<Widget> pageActionsToTextButton(
     BuildContext context, List<PageActionItem> pageActions) {
   return pageActions.isEmpty
-      ? []
+      ? const []
       : [
           for (PageActionItem p in pageActions)
             TextButton(
-              child: Text(p.text),
               onPressed: p.voidCallback,
+              child: Text(p.text),
             )
         ];
 }

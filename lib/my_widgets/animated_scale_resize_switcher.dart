@@ -3,7 +3,8 @@ import '../layout/transition/scale_size_transition.dart';
 
 class AnimatedScaleResizeSwitcher extends StatelessWidget {
   final Widget child;
-  final duration;
+  final Duration duration;
+
   const AnimatedScaleResizeSwitcher(
       {Key? key,
       required this.child,

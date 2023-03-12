@@ -20,7 +20,8 @@ InkomensOverzicht _$InkomensOverzichtFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$InkomensOverzicht {
-  IList<Inkomen> get lijst => throw _privateConstructorUsedError;
+  IList<Inkomen> get inkomen => throw _privateConstructorUsedError;
+  IList<Inkomen> get inkomenPartner => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -34,7 +35,7 @@ abstract class $InkomensOverzichtCopyWith<$Res> {
           InkomensOverzicht value, $Res Function(InkomensOverzicht) then) =
       _$InkomensOverzichtCopyWithImpl<$Res, InkomensOverzicht>;
   @useResult
-  $Res call({IList<Inkomen> lijst});
+  $Res call({IList<Inkomen> inkomen, IList<Inkomen> inkomenPartner});
 }
 
 /// @nodoc
@@ -50,12 +51,17 @@ class _$InkomensOverzichtCopyWithImpl<$Res, $Val extends InkomensOverzicht>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? lijst = null,
+    Object? inkomen = null,
+    Object? inkomenPartner = null,
   }) {
     return _then(_value.copyWith(
-      lijst: null == lijst
-          ? _value.lijst
-          : lijst // ignore: cast_nullable_to_non_nullable
+      inkomen: null == inkomen
+          ? _value.inkomen
+          : inkomen // ignore: cast_nullable_to_non_nullable
+              as IList<Inkomen>,
+      inkomenPartner: null == inkomenPartner
+          ? _value.inkomenPartner
+          : inkomenPartner // ignore: cast_nullable_to_non_nullable
               as IList<Inkomen>,
     ) as $Val);
   }
@@ -69,7 +75,7 @@ abstract class _$$_InkomensOverzichtCopyWith<$Res>
       __$$_InkomensOverzichtCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({IList<Inkomen> lijst});
+  $Res call({IList<Inkomen> inkomen, IList<Inkomen> inkomenPartner});
 }
 
 /// @nodoc
@@ -83,12 +89,17 @@ class __$$_InkomensOverzichtCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? lijst = null,
+    Object? inkomen = null,
+    Object? inkomenPartner = null,
   }) {
     return _then(_$_InkomensOverzicht(
-      lijst: null == lijst
-          ? _value.lijst
-          : lijst // ignore: cast_nullable_to_non_nullable
+      inkomen: null == inkomen
+          ? _value.inkomen
+          : inkomen // ignore: cast_nullable_to_non_nullable
+              as IList<Inkomen>,
+      inkomenPartner: null == inkomenPartner
+          ? _value.inkomenPartner
+          : inkomenPartner // ignore: cast_nullable_to_non_nullable
               as IList<Inkomen>,
     ));
   }
@@ -96,20 +107,26 @@ class __$$_InkomensOverzichtCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_InkomensOverzicht
-    with DiagnosticableTreeMixin
-    implements _InkomensOverzicht {
-  const _$_InkomensOverzicht({required this.lijst});
+class _$_InkomensOverzicht extends _InkomensOverzicht
+    with DiagnosticableTreeMixin {
+  const _$_InkomensOverzicht(
+      {this.inkomen = const IListConst([]),
+      this.inkomenPartner = const IListConst([])})
+      : super._();
 
   factory _$_InkomensOverzicht.fromJson(Map<String, dynamic> json) =>
       _$$_InkomensOverzichtFromJson(json);
 
   @override
-  final IList<Inkomen> lijst;
+  @JsonKey()
+  final IList<Inkomen> inkomen;
+  @override
+  @JsonKey()
+  final IList<Inkomen> inkomenPartner;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'InkomensOverzicht(lijst: $lijst)';
+    return 'InkomensOverzicht(inkomen: $inkomen, inkomenPartner: $inkomenPartner)';
   }
 
   @override
@@ -117,7 +134,8 @@ class _$_InkomensOverzicht
     super.debugFillProperties(properties);
     properties
       ..add(DiagnosticsProperty('type', 'InkomensOverzicht'))
-      ..add(DiagnosticsProperty('lijst', lijst));
+      ..add(DiagnosticsProperty('inkomen', inkomen))
+      ..add(DiagnosticsProperty('inkomenPartner', inkomenPartner));
   }
 
   @override
@@ -125,13 +143,17 @@ class _$_InkomensOverzicht
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$_InkomensOverzicht &&
-            const DeepCollectionEquality().equals(other.lijst, lijst));
+            const DeepCollectionEquality().equals(other.inkomen, inkomen) &&
+            const DeepCollectionEquality()
+                .equals(other.inkomenPartner, inkomenPartner));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, const DeepCollectionEquality().hash(lijst));
+  int get hashCode => Object.hash(
+      runtimeType,
+      const DeepCollectionEquality().hash(inkomen),
+      const DeepCollectionEquality().hash(inkomenPartner));
 
   @JsonKey(ignore: true)
   @override
@@ -148,15 +170,19 @@ class _$_InkomensOverzicht
   }
 }
 
-abstract class _InkomensOverzicht implements InkomensOverzicht {
-  const factory _InkomensOverzicht({required final IList<Inkomen> lijst}) =
-      _$_InkomensOverzicht;
+abstract class _InkomensOverzicht extends InkomensOverzicht {
+  const factory _InkomensOverzicht(
+      {final IList<Inkomen> inkomen,
+      final IList<Inkomen> inkomenPartner}) = _$_InkomensOverzicht;
+  const _InkomensOverzicht._() : super._();
 
   factory _InkomensOverzicht.fromJson(Map<String, dynamic> json) =
       _$_InkomensOverzicht.fromJson;
 
   @override
-  IList<Inkomen> get lijst;
+  IList<Inkomen> get inkomen;
+  @override
+  IList<Inkomen> get inkomenPartner;
   @override
   @JsonKey(ignore: true)
   _$$_InkomensOverzichtCopyWith<_$_InkomensOverzicht> get copyWith =>

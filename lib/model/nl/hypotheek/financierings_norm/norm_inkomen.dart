@@ -2,21 +2,22 @@ import 'dart:convert';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:mortgage_insight/model/nl/hypotheek/financierings_norm/norm.dart';
-import 'package:mortgage_insight/utilities/Kalender.dart';
+import 'package:mortgage_insight/utilities/kalender.dart';
 import '../../inkomen/inkomen.dart';
-import '../../schulden/remove_schulden.dart';
+import '../../schulden/schulden.dart';
+import '../gegevens/hypotheek/hypotheek.dart';
 import '../parallel_leningen.dart';
 import 'financierings_last_tabel.dart';
 import '../hypotheek.dart';
 
 class BerekenNormInkomen {
   NormInkomen norm;
-  Hypotheek hypotheek;
-  HypotheekProfiel profiel;
-  List<Hypotheek> parallelHypotheken;
+  RemoveHypotheek hypotheek;
+  RemoveHypotheekProfiel profiel;
+  List<RemoveHypotheek> parallelHypotheken;
   List<Inkomen> inkomenLijst;
   List<Inkomen> inkomenLijstPartner;
-  List<RemoveSchuld> schuldenLijst;
+  List<Schuld> schuldenLijst;
 
   BerekenNormInkomen({
     required this.hypotheek,
@@ -49,10 +50,10 @@ class BerekenNormInkomen {
         );
       }).toList();
 
-      norm.gegevens.forEach((GegevensNormInkomen gegevensNormInkomen) {
+      for (var gegevensNormInkomen in norm.gegevens) {
         BerekenMaximaleLening(
             gegevens: gegevensNormInkomen, hypotheek: hypotheek);
-      });
+      }
 
       norm.vindMaximumLening();
     }
@@ -71,19 +72,19 @@ class BerekenNormInkomen {
 
     void inkomenToevoegen(
         {DateTime? datum, required Inkomen inkomen, bool partner = false}) {
-      final DateTime _datum = datum ?? inkomen.datum;
+      final DateTime lDatum = datum ?? inkomen.datum;
       InkomensOpDatum? iod = map[datum];
 
       if (iod != null) {
         iod.inkomenToevoegen(inkomen: inkomen, partner: partner);
       } else {
-        map[_datum] = InkomensOpDatum.individueel(
-            datum: _datum, inkomen: inkomen, partner: partner);
+        map[lDatum] = InkomensOpDatum.individueel(
+            datum: lDatum, inkomen: inkomen, partner: partner);
       }
     }
 
     void iteratieInkomenLijst(
-        {required List<Inkomen> lijst, bool partner: false}) {
+        {required List<Inkomen> lijst, bool partner = false}) {
       Inkomen? gk;
 
       int index = 0;
@@ -174,7 +175,7 @@ class BerekenNormInkomen {
 
   double somSchuld() => schuldenLijst.fold(
       0.0,
-      (double previousValue, RemoveSchuld schuld) =>
+      (double previousValue, Schuld schuld) =>
           previousValue + schuld.maandLast(hypotheek.startDatum));
 }
 
@@ -229,21 +230,21 @@ class InkomensOpDatum {
       (partner ? inkomenPartner : inkomen) != null;
 
   Iterable<Inkomen> toIterable() sync* {
-    final _inkomen = inkomen;
-    final _inkomenPartner = inkomenPartner;
+    final lInkomen = inkomen;
+    final lInkomenPartner = inkomenPartner;
 
-    if (_inkomen != null && _inkomenPartner != null) {
-      if (_inkomen.pensioen && !_inkomenPartner.pensioen) {
-        yield _inkomenPartner;
-        yield _inkomen;
+    if (lInkomen != null && lInkomenPartner != null) {
+      if (lInkomen.pensioen && !lInkomenPartner.pensioen) {
+        yield lInkomenPartner;
+        yield lInkomen;
       } else {
-        yield _inkomen;
-        yield _inkomenPartner;
+        yield lInkomen;
+        yield lInkomenPartner;
       }
-    } else if (_inkomen != null) {
-      yield _inkomen;
-    } else if (_inkomenPartner != null) {
-      yield _inkomenPartner;
+    } else if (lInkomen != null) {
+      yield lInkomen;
+    } else if (lInkomenPartner != null) {
+      yield lInkomenPartner;
     }
   }
 
@@ -276,7 +277,7 @@ class InkomensOpDatum {
 class BerekenMaximaleLening {
   GegevensNormInkomen gegevens;
   FinancieringsLast financieringsLast;
-  Hypotheek hypotheek;
+  RemoveHypotheek hypotheek;
 
   BerekenMaximaleLening({
     required this.gegevens,
@@ -329,13 +330,13 @@ class BerekenMaximaleLening {
 
   double _berekenAfwijkingLast(double lening) {
     //Last berekenen
-    final somLeningen = _SomLeningen(
+    final somLeningen = SomLeningen(
         aftrekbaar:
             lening + gegevens.parallelLeningen.somLeningen - gegevens.erw);
 
-    gegevens.parallelLeningen.list.forEach((OptimalisatieLast sl) {
+    for (var sl in gegevens.parallelLeningen.list) {
       berekenIndividueleLast(sn: sl, somLeningen: somLeningen);
-    });
+    }
 
     berekenIndividueleLast(
         sn: gegevens.optimalisatieLast..lening = lening,
@@ -417,15 +418,15 @@ class BerekenMaximaleLening {
       initieleLening = ol.lening;
     } else {
       switch (statusLening.hypotheekVorm) {
-        case HypotheekVorm.Aflosvrij:
+        case HypotheekVorm.aflosvrij:
           initieleLening = ol.lening;
           break;
-        case HypotheekVorm.Linear:
+        case HypotheekVorm.linear:
           initieleLening = ol.lening *
               (statusLening.aflosTermijnInMaanden) /
               (statusLening.aflosTermijnInMaanden - statusLening.periode);
           break;
-        case HypotheekVorm.Annuity:
+        case HypotheekVorm.annuity:
           double r = statusLening.rente / 100.0 / 12.0;
           initieleLening = ol.lening *
               (1.0 - math.pow(1.0 + r, -statusLening.aflosTermijnInMaanden)) /
@@ -480,22 +481,21 @@ class GegevensNormInkomen {
   });
 
   GegevensNormInkomen.from({
-    required List<Hypotheek> parallelHypotheken,
-    required HypotheekProfiel profiel,
-    required Hypotheek hypotheek,
+    required List<RemoveHypotheek> parallelHypotheken,
+    required RemoveHypotheekProfiel profiel,
+    required RemoveHypotheek hypotheek,
     required this.inkomenOpDatum,
-    required DateTime startDatum,
+    required this.startDatum,
     required int periode,
     required this.schuldenMnd,
   })  : parallelLeningen = LastParallelLeningen.from(
             parallelHypotheken: parallelHypotheken,
             hypotheek: hypotheek,
             datum: startDatum),
-        startDatum = startDatum,
         normVersie = 0,
         optimalisatieLast = OptimalisatieLast(
           statusLening:
-              StatusLening.from(hypotheek: hypotheek, periode: periode),
+              RemoveStatusLening.from(hypotheek: hypotheek, periode: periode),
           toetsRente: FinancieringsLast.toetsRente(
               periodesMnd: hypotheek.periodeInMaanden, rente: hypotheek.rente),
         ),
@@ -555,13 +555,13 @@ class LastParallelLeningen {
   });
 
   LastParallelLeningen.from(
-      {required List<Hypotheek> parallelHypotheken,
-      required Hypotheek hypotheek,
+      {required List<RemoveHypotheek> parallelHypotheken,
+      required RemoveHypotheek hypotheek,
       required DateTime datum})
       : list = [],
         somLeningen = 0.0,
         somVerduurzaamKosten = 0.0 {
-    for (Hypotheek h in parallelHypotheken) {
+    for (RemoveHypotheek h in parallelHypotheken) {
       Termijn? termijn;
 
       for (Termijn t in h.termijnen) {
@@ -574,7 +574,7 @@ class LastParallelLeningen {
 
       if (termijn != null) {
         final statusLening = OptimalisatieLast(
-          statusLening: StatusLening(
+          statusLening: RemoveStatusLening(
               id: h.id,
               lening: termijn.lening,
               periode: termijn.periode,
@@ -625,7 +625,7 @@ class LastParallelLeningen {
 }
 
 class OptimalisatieLast {
-  StatusLening statusLening;
+  RemoveStatusLening statusLening;
   double initieleLening;
   double lening;
   double verduurzaamLening;
@@ -646,7 +646,7 @@ class OptimalisatieLast {
   double get toetsRenteBedrag => lening / 100.0 * toetsRente;
 
   OptimalisatieLast copyWith({
-    StatusLening? statusLening,
+    RemoveStatusLening? statusLening,
     double? lening,
     double? initieleLening,
     double? verduurzaamLening,
@@ -680,8 +680,8 @@ class OptimalisatieLast {
 
   factory OptimalisatieLast.fromMap(Map<String, dynamic> map) {
     return OptimalisatieLast(
-      statusLening:
-          StatusLening.fromMap(map['statusLening'] as Map<String, dynamic>),
+      statusLening: RemoveStatusLening.fromMap(
+          map['statusLening'] as Map<String, dynamic>),
       toetsRente: map['toetsRente'] as double,
       lening: map['lening'] as double,
       initieleLening: map['initieleLening'] as double,
@@ -697,14 +697,14 @@ class OptimalisatieLast {
       OptimalisatieLast.fromMap(json.decode(source) as Map<String, dynamic>);
 }
 
-class _SomLeningen {
+class SomLeningen {
   double somLening;
   double somToetsRente;
   double somLastBox1;
   double somLastBox3;
   double aftrekbaar;
 
-  _SomLeningen({
+  SomLeningen({
     this.somLening = 0.0,
     this.somToetsRente = 0.0,
     this.somLastBox1 = 0.0,
@@ -716,14 +716,14 @@ class _SomLeningen {
 
   double get somLast => somLastBox1 + somLastBox3;
 
-  _SomLeningen copyWith({
+  SomLeningen copyWith({
     double? somLening,
     double? somToetsRente,
     double? somLastBox1,
     double? somLastBox3,
     double? aftrekbaar,
   }) {
-    return _SomLeningen(
+    return SomLeningen(
       somLening: somLening ?? this.somLening,
       somToetsRente: somToetsRente ?? this.somToetsRente,
       somLastBox1: somLastBox1 ?? this.somLastBox1,
@@ -749,7 +749,7 @@ double berekenAnnuiteit(
 }
 
 berekenIndividueleLast(
-    {required OptimalisatieLast sn, required _SomLeningen somLeningen}) {
+    {required OptimalisatieLast sn, required SomLeningen somLeningen}) {
   final statusLening = sn.statusLening;
 
   final annuiteitMnd = berekenAnnuiteit(
@@ -762,7 +762,7 @@ berekenIndividueleLast(
   double annuiteitMndBox3 = 0.0;
 
   if (somLeningen.aftrekbaar > 0.0 &&
-      statusLening.hypotheekVorm != HypotheekVorm.Aflosvrij) {
+      statusLening.hypotheekVorm != HypotheekVorm.aflosvrij) {
     if (sn.lening < somLeningen.aftrekbaar) {
       annuiteitMndBox1 = annuiteitMnd;
       somLeningen.aftrekbaar -= sn.lening;

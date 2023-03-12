@@ -98,7 +98,7 @@ class FinancieringsLast {
   });
 
   FinancieringsLastTabel finanancieringsLastPercentage({
-    bool box3: false,
+    bool box3 = false,
     bool aow = false,
     required double toetsRente,
   }) {

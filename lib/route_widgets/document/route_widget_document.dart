@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../model/nl/hypotheek_container/hypotheek_container.dart';
 import '../../my_widgets/oh_no.dart';
 import '../../state_manager/routes/routes_app.dart';
 import '../../theme/theme.dart';
@@ -16,18 +13,12 @@ class Document extends ConsumerStatefulWidget {
 }
 
 class _DocumentState extends ConsumerState<Document> {
-  late GoRouter? _router =
+  late final GoRouter? _router =
       ref.read(routeDocumentProvider).routes[AppRoutes.document];
 
   @override
   void initState() {
     super.initState();
-
-    Future.delayed(Duration(seconds: 30), () async {
-      print('delay');
-      SharedPreferences pref = await SharedPreferences.getInstance();
-      pref.setString('test3', 'hihi');
-    });
   }
 
   @override
@@ -50,7 +41,7 @@ class _DocumentState extends ConsumerState<Document> {
     Widget body;
     final router = _router;
     body = router == null
-        ? OhNo(text: 'AppRoute main is not found.')
+        ? const OhNo(text: 'AppRoute main is not found.')
         : Router(
             backButtonDispatcher: ChildBackButtonDispatcher(
                 Router.of(context).backButtonDispatcher!)
@@ -69,10 +60,12 @@ class _DocumentState extends ConsumerState<Document> {
       case AppLifecycleState.inactive:
         break;
       case AppLifecycleState.paused:
-        ref.read(hypotheekContainerProvider).saveHypotheekContainer();
+        // TODO: Fix save
+        //ref.read(removeHypotheekContainerProvider).saveHypotheekContainer();
         break;
       case AppLifecycleState.detached:
-        ref.read(hypotheekContainerProvider).saveHypotheekContainer();
+        // TODO: Fix save
+        //ref.read(removeHypotheekContainerProvider).saveHypotheekContainer();
         break;
     }
   }

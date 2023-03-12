@@ -3,29 +3,22 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:mortgage_insight/model/nl/hypotheek/kosten_hypotheek.dart';
 import 'package:mortgage_insight/model/nl/hypotheek/parallel_leningen.dart';
-import '../../../utilities/Kalender.dart';
+import '../../../utilities/kalender.dart';
 import '../../../utilities/date.dart';
+import 'gegevens/hypotheek/hypotheek.dart';
+import 'gegevens/hypotheek_profiel/hypotheek_profiel.dart';
 import 'hypotheek_iterator.dart';
 import 'financierings_norm/norm.dart';
 
-enum HypotheekVorm { Aflosvrij, Linear, Annuity }
-
-enum OptiesHypotheekToevoegen {
-  nieuw,
-  verlengen,
-}
-
-enum DoelProfielOverzicht { nieuw, bestaand }
-
 class HypotheekProfielContainer {
-  HypotheekProfiel profiel;
+  RemoveHypotheekProfiel profiel;
 
   HypotheekProfielContainer(
     this.profiel,
   );
 
   HypotheekProfielContainer copyWith({
-    HypotheekProfiel? profiel,
+    RemoveHypotheekProfiel? profiel,
   }) {
     return HypotheekProfielContainer(
       profiel ?? this.profiel,
@@ -33,21 +26,21 @@ class HypotheekProfielContainer {
   }
 }
 
-class HypotheekProfielen {
+class RemoveHypotheekProfielen {
   String _profielID;
   Map<String, HypotheekProfielContainer> profielen;
   HypotheekProfielContainer? get profielContainer => profielen[_profielID];
 
   bool get isEmpty => profielen.isEmpty;
 
-  HypotheekProfielen({
+  RemoveHypotheekProfielen({
     String profielID = "",
     Map<String, HypotheekProfielContainer>? profielen,
     HypotheekProfielContainer? profiel,
   })  : _profielID = profielID,
         profielen = profielen ?? {};
 
-  add(HypotheekProfiel nieuwProfiel) {
+  add(RemoveHypotheekProfiel nieuwProfiel) {
     _profielID = nieuwProfiel.id;
     profielen[nieuwProfiel.id] = HypotheekProfielContainer(nieuwProfiel);
   }
@@ -93,7 +86,7 @@ class HypotheekProfielen {
     }
   }
 
-  updateHypotheekProfiel(HypotheekProfiel profiel) {
+  updateHypotheekProfiel(RemoveHypotheekProfiel profiel) {
     _profielID = profiel.id;
     profielen[profiel.id] = HypotheekProfielContainer(profiel);
   }
@@ -106,52 +99,53 @@ class HypotheekProfielen {
     };
   }
 
-  factory HypotheekProfielen.fromMap(Map<String, dynamic> map) {
-    return HypotheekProfielen(
+  factory RemoveHypotheekProfielen.fromMap(Map<String, dynamic> map) {
+    return RemoveHypotheekProfielen(
       profielID: map['profielID'],
       profielen:
           Map<String, Map<String, dynamic>>.from(map['hypotheekProfielen']).map(
-              (key, value) => MapEntry(key,
-                  HypotheekProfielContainer(HypotheekProfiel.fromMap(value)))),
+              (key, value) => MapEntry(
+                  key,
+                  HypotheekProfielContainer(
+                      RemoveHypotheekProfiel.fromMap(value)))),
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory HypotheekProfielen.fromJson(String source) =>
-      HypotheekProfielen.fromMap(json.decode(source));
+  factory RemoveHypotheekProfielen.fromJson(String source) =>
+      RemoveHypotheekProfielen.fromMap(json.decode(source));
 }
 
-class HypotheekProfiel {
+class RemoveHypotheekProfiel {
   String id;
   String omschrijving;
   bool inkomensNormToepassen;
   bool woningWaardeNormToepassen;
-  Map<String, Hypotheek> hypotheken;
-  List<Hypotheek> eersteHypotheken;
-  DoelProfielOverzicht doelOverzicht;
-  Situatie situatie;
-  EigenReserveWoning eigenReserveWoning;
+  Map<String, RemoveHypotheek> hypotheken;
+  List<RemoveHypotheek> eersteHypotheken;
+
+  bool starter;
+  RemoveEigenReserveWoning eigenReserveWoning;
   WoningLeningKostenGegevens vorigeWoningGegevens;
 
   DateTime datumWoningKopen;
 
-  HypotheekProfiel({
+  RemoveHypotheekProfiel({
     String? id,
-    Map<String, Hypotheek>? hypotheken,
-    List<Hypotheek>? eersteHypotheken,
+    Map<String, RemoveHypotheek>? hypotheken,
+    List<RemoveHypotheek>? eersteHypotheken,
     this.omschrijving = '',
     this.inkomensNormToepassen: true,
     this.woningWaardeNormToepassen: false,
-    this.doelOverzicht: DoelProfielOverzicht.nieuw,
-    this.situatie = Situatie.starter,
-    EigenReserveWoning? eigenReserveWoning,
+    this.starter = false,
+    RemoveEigenReserveWoning? eigenReserveWoning,
     WoningLeningKostenGegevens? vorigeWoningGegevens,
     DateTime? datumWoningKopen,
   })  : id = id ?? secondsID,
         hypotheken = hypotheken ?? {},
         eersteHypotheken = eersteHypotheken ?? [],
-        eigenReserveWoning = eigenReserveWoning ?? EigenReserveWoning(),
+        eigenReserveWoning = eigenReserveWoning ?? RemoveEigenReserveWoning(),
         vorigeWoningGegevens = vorigeWoningGegevens ??
             WoningLeningKostenGegevens(
                 kosten: WoningLeningKostenGegevens.suggestieKostenVorigeWoning()
@@ -164,7 +158,7 @@ class HypotheekProfiel {
     });
   }
 
-  void removeHypotheek(Hypotheek hypotheek) {
+  void removeHypotheek(RemoveHypotheek hypotheek) {
     hypotheken.remove(hypotheek.id);
     final vorigeHypotheek = hypotheken[hypotheek.vorige];
 
@@ -174,7 +168,7 @@ class HypotheekProfiel {
       vorigeHypotheek.volgende = '';
     }
 
-    void removeVolgende(Hypotheek hypotheek) {
+    void removeVolgende(RemoveHypotheek hypotheek) {
       final volgendeHypotheek = hypotheken[hypotheek.volgende];
 
       if (volgendeHypotheek != null) {
@@ -186,7 +180,7 @@ class HypotheekProfiel {
     removeVolgende(hypotheek);
   }
 
-  void addHypotheek(Hypotheek? hypotheek) {
+  void addHypotheek(RemoveHypotheek? hypotheek) {
     if (hypotheek == null) return;
 
     hypotheek.profiel = this;
@@ -199,7 +193,7 @@ class HypotheekProfiel {
       eersteHypotheken
         ..add(hypotheek)
         ..sort(
-          (Hypotheek a, Hypotheek b) {
+          (RemoveHypotheek a, RemoveHypotheek b) {
             return a.currentOrder - b.currentOrder;
           },
         );
@@ -209,7 +203,7 @@ class HypotheekProfiel {
     }
   }
 
-  void addOrder(Hypotheek hypotheek) {
+  void addOrder(RemoveHypotheek hypotheek) {
     final vorige = hypotheek.vorige;
 
     if (!hypotheek.order.containsKey(vorige)) {
@@ -228,15 +222,12 @@ class HypotheekProfiel {
     }
   }
 
-  int get maxTermijnenInJaren => doelOverzicht == DoelProfielOverzicht.nieuw &&
-          situatie == Situatie.starter
-      ? 40
-      : 30;
+  int get maxTermijnenInJaren => true ? 40 : 30;
 
   double woningWaardeVinden(DateTime startDatum) {
     double woningWaarde = 0.0;
 
-    for (Hypotheek h in HypotheekIterator(
+    for (RemoveHypotheek h in HypotheekIterator(
             eersteHypotheken: eersteHypotheken, hypotheken: hypotheken)
         .all()) {
       if (h.startDatum.compareTo(startDatum) <= 0 || woningWaarde == 0.0) {
@@ -277,30 +268,29 @@ class HypotheekProfiel {
       'eigenReserveWoning': eigenReserveWoning.toMap(),
       'vorigeWoningGegevens': vorigeWoningGegevens.toMap(),
       'woningWaardeNormToepassen': woningWaardeNormToepassen,
-      'doelOverzicht': doelOverzicht.index,
-      'hypotheken': hypotheken
-          .map((String key, Hypotheek value) => MapEntry(key, value.toMap())),
+      'hypotheken': hypotheken.map(
+          (String key, RemoveHypotheek value) => MapEntry(key, value.toMap())),
       'eersteHypotheken': eersteHypotheken.map((x) => x.id).toList(),
       'datumWoningKopen': datumWoningKopen.toIso8601String(),
     };
   }
 
-  factory HypotheekProfiel.fromMap(Map<String, dynamic> map) {
+  factory RemoveHypotheekProfiel.fromMap(Map<String, dynamic> map) {
     final hypotheken = Map<String, dynamic>.from(map['hypotheken']).map(
-        (String key, dynamic value) =>
-            MapEntry<String, Hypotheek>(key, Hypotheek.fromMap(value)));
+        (String key, dynamic value) => MapEntry<String, RemoveHypotheek>(
+            key, RemoveHypotheek.fromMap(value)));
 
-    return HypotheekProfiel(
+    return RemoveHypotheekProfiel(
       id: map['id'],
       omschrijving: map['omschrijving'],
       inkomensNormToepassen: map['inkomensNormToepassen'],
       vorigeWoningGegevens:
           WoningLeningKostenGegevens.fromMap(map['vorigeWoningGegevens']),
-      eigenReserveWoning: EigenReserveWoning.fromMap(map['eigenReserveWoning']),
+      eigenReserveWoning:
+          RemoveEigenReserveWoning.fromMap(map['eigenReserveWoning']),
       woningWaardeNormToepassen: map['woningWaardeNormToepassen'],
-      doelOverzicht: DoelProfielOverzicht.values[map['doelOverzicht']],
       hypotheken: hypotheken,
-      eersteHypotheken: List<Hypotheek>.from(
+      eersteHypotheken: List<RemoveHypotheek>.from(
           map['eersteHypotheken'].map((id) => hypotheken[id])),
       datumWoningKopen: DateTime.parse(map['datumWoningKopen']).toLocal(),
     );
@@ -308,32 +298,30 @@ class HypotheekProfiel {
 
   String toJson() => json.encode(toMap());
 
-  factory HypotheekProfiel.fromJson(String source) =>
-      HypotheekProfiel.fromMap(json.decode(source));
+  factory RemoveHypotheekProfiel.fromJson(String source) =>
+      RemoveHypotheekProfiel.fromMap(json.decode(source));
 
-  HypotheekProfiel copyWith({
+  RemoveHypotheekProfiel copyWith({
     String? id,
     String? omschrijving,
     bool? financieringsNormToepassen,
     bool? woningWaardeNormToepassen,
     bool? nhgToepassen,
     WoningLeningKostenGegevens? vorigeWoningGegevens,
-    EigenReserveWoning? eigenReserveWoning,
-    Map<String, Hypotheek>? hypotheken,
-    List<Hypotheek>? eersteHypotheken,
-    DoelProfielOverzicht? doelOverzicht,
-    Situatie? situatie,
+    RemoveEigenReserveWoning? eigenReserveWoning,
+    Map<String, RemoveHypotheek>? hypotheken,
+    List<RemoveHypotheek>? eersteHypotheken,
     DateTime? datumWoningKopen,
   }) {
-    final Map<String, Hypotheek> kopieHypotheken = hypotheken ??
+    final Map<String, RemoveHypotheek> kopieHypotheken = hypotheken ??
         this.hypotheken.map((key, value) => MapEntry(key, value.copyWith()));
 
-    final List<Hypotheek> kopieEersteHypotheken =
+    final List<RemoveHypotheek> kopieEersteHypotheken =
         (eersteHypotheken ?? this.eersteHypotheken)
             .map((e) => kopieHypotheken[e.id]!)
             .toList();
 
-    return HypotheekProfiel(
+    return RemoveHypotheekProfiel(
       id: id ?? this.id,
       omschrijving: omschrijving ?? this.omschrijving,
       inkomensNormToepassen:
@@ -346,14 +334,12 @@ class HypotheekProfiel {
           eigenReserveWoning ?? this.eigenReserveWoning.copyWith(),
       hypotheken: kopieHypotheken,
       eersteHypotheken: kopieEersteHypotheken,
-      doelOverzicht: doelOverzicht ?? this.doelOverzicht,
-      situatie: situatie ?? this.situatie,
       datumWoningKopen: datumWoningKopen ?? this.datumWoningKopen,
     );
   }
 }
 
-class Hypotheek {
+class RemoveHypotheek {
   int leningNummer = 0;
   final String id;
   String omschrijving;
@@ -373,8 +359,8 @@ class Hypotheek {
   WoningLeningKostenGegevens woningLeningKosten;
   VerbouwVerduurzaamKosten verbouwVerduurzaamKosten;
   OptiesHypotheekToevoegen optiesHypotheekToevoegen;
-  ParallelLeningen parallelLeningen;
-  HypotheekProfiel? profiel;
+  RemoveParallelLeningen parallelLeningen;
+  RemoveHypotheekProfiel? profiel;
 
   int get currentOrder => order[vorige] ?? -1;
 
@@ -396,7 +382,7 @@ class Hypotheek {
   DateTime datumDeelsAfgelosteLening;
   bool afgesloten;
 
-  Hypotheek({
+  RemoveHypotheek({
     String? id,
     this.omschrijving = '',
     required this.optiesHypotheekToevoegen,
@@ -410,7 +396,7 @@ class Hypotheek {
     DateTime? eindDatum,
     required this.periodeInMaanden,
     required this.aflosTermijnInMaanden,
-    this.hypotheekvorm = HypotheekVorm.Annuity,
+    this.hypotheekvorm = HypotheekVorm.annuity,
     List<Termijn>? termijnen,
     this.rente = 1.0,
     this.boeteVrijPercentage = 10.0,
@@ -424,7 +410,7 @@ class Hypotheek {
     VerbouwVerduurzaamKosten? verduurzaamKosten,
     this.deelsAfgelosteLening = false,
     DateTime? datumDeelsAfgelosteLening,
-    ParallelLeningen? parallelLeningen,
+    RemoveParallelLeningen? parallelLeningen,
     bool afgesloten = false,
   })  : assert(periodeInMaanden > 0 || eindDatum != null,
             'EindDatum kan niet bepaald worden, vul aantal periodes in in Maanden > 0 of voeg einddatum toe'),
@@ -436,7 +422,7 @@ class Hypotheek {
         startDatumAflossen = startDatumAflossen ?? startDatum,
         _eindDatum = eindDatum,
         order = order ?? {},
-        parallelLeningen = parallelLeningen ?? ParallelLeningen(),
+        parallelLeningen = parallelLeningen ?? RemoveParallelLeningen(),
         woningLeningKosten = woningLeningKosten ?? WoningLeningKostenGegevens(),
         verbouwVerduurzaamKosten =
             verduurzaamKosten ?? VerbouwVerduurzaamKosten(),
@@ -594,7 +580,7 @@ class Hypotheek {
           leningPeriode / 100.0 * maandRente * ratio;
 
       switch (a.hypotheekVorm) {
-        case HypotheekVorm.Annuity:
+        case HypotheekVorm.annuity:
           {
             double annuity = leningPeriode /
                 100.0 *
@@ -606,7 +592,7 @@ class Hypotheek {
             aflossen = annuity - maandRenteBedragRatio;
             break;
           }
-        case HypotheekVorm.Linear:
+        case HypotheekVorm.linear:
           {
             aflossen =
                 leningPeriode / (aflosTermijnInMaanden - a.periode) * ratio;
@@ -783,7 +769,7 @@ class Hypotheek {
     afgesloten = _startDatum.isBefore(DateUtils.dateOnly(DateTime.now()));
   }
 
-  Hypotheek copyWith({
+  RemoveHypotheek copyWith({
     String? id,
     String? omschrijving,
     OptiesHypotheekToevoegen? optiesHypotheekToevoegen,
@@ -811,15 +797,15 @@ class Hypotheek {
     Map<String, int>? order,
     double? inkomen,
     double? inkomenPartner,
-    HypotheekProfiel? profiel,
-    ParallelLeningen? parallelLeningen,
+    RemoveHypotheekProfiel? profiel,
+    RemoveParallelLeningen? parallelLeningen,
     WoningLeningKostenGegevens? woningLeningKosten,
     VerbouwVerduurzaamKosten? verduurzaamKosten,
     bool? deelsAfgelosteLening,
     DateTime? datumDeelsAfgelosteLening,
     bool? afgesloten,
   }) {
-    return Hypotheek(
+    return RemoveHypotheek(
       id: id ?? this.id,
       omschrijving: omschrijving ?? this.omschrijving,
       optiesHypotheekToevoegen:
@@ -889,8 +875,8 @@ class Hypotheek {
     };
   }
 
-  factory Hypotheek.fromMap(Map<String, dynamic> map) {
-    return Hypotheek(
+  factory RemoveHypotheek.fromMap(Map<String, dynamic> map) {
+    return RemoveHypotheek(
         id: map['id'],
         omschrijving: map['omschrijving'],
         optiesHypotheekToevoegen:
@@ -925,13 +911,14 @@ class Hypotheek {
         datumDeelsAfgelosteLening:
             DateTime.parse(map['datumDeelsAfgelosteLening']).toLocal(),
         afgesloten: map['afgesloten'],
-        parallelLeningen: ParallelLeningen.fromMap(map['parallelLeningen']));
+        parallelLeningen:
+            RemoveParallelLeningen.fromMap(map['parallelLeningen']));
   }
 
   String toJson() => json.encode(toMap());
 
-  factory Hypotheek.fromJson(String source) =>
-      Hypotheek.fromMap(json.decode(source));
+  factory RemoveHypotheek.fromJson(String source) =>
+      RemoveHypotheek.fromMap(json.decode(source));
 }
 
 class Termijn {
@@ -957,7 +944,7 @@ class Termijn {
     DateTime? eindPeriode,
     required this.startDatum,
     required this.eindDatum,
-    this.hypotheekVorm = HypotheekVorm.Aflosvrij,
+    this.hypotheekVorm = HypotheekVorm.aflosvrij,
     this.rente = 0.0,
     this.extraAflossenIngevuld = 0.0,
     this.maandRenteBedragRatio = 0.0,
@@ -1238,5 +1225,5 @@ const _daysInMonthArray = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
 DateTime get hypotheekDatumSuggestie => DateUtils.dateOnly(
       Kalender.voegPeriodeToe(DateTime.now(),
-          maanden: 3, periodeOpties: PeriodeOpties.EERSTEDAG),
+          maanden: 3, periodeOpties: PeriodeOpties.eerstedag),
     );

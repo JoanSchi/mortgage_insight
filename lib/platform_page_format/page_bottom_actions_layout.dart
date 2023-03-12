@@ -38,7 +38,7 @@ class PageActionBottomLayout extends StatelessWidget {
               Row(
                 children: [
                   if (left != null) left,
-                  Expanded(
+                  const Expanded(
                     child: SizedBox(),
                   ),
                   if (right != null) right,

@@ -1,42 +1,36 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mortgage_insight/model/nl/hypotheek_container/hypotheek_container.dart';
-
-import '../../model/nl/hypotheek/hypotheek.dart';
+import 'package:mortgage_insight/model/nl/hypotheek/gegevens/hypotheek_profiel/hypotheek_profiel.dart';
+import '../../model/nl/hypotheek/gegevens/hypotheek/hypotheek.dart';
 import '../../my_widgets/mortgage_card.dart';
 import '../../my_widgets/summary_pie_chart/pie_chart.dart';
-import '../../utilities/MyNumberFormat.dart';
-import 'state_hypotheek/state_page_hypotheek.dart';
+import '../../utilities/my_number_format.dart';
 
-class ProfielCard extends ConsumerStatefulWidget {
-  final HypotheekProfiel profiel;
-  final String? selected;
+class ProfielCard extends StatelessWidget {
+  final String actief;
+  final HypotheekProfiel hp;
+  final VoidCallback selecteren;
+  final VoidCallback verwijderen;
+  final VoidCallback bewerken;
 
-  ProfielCard({
-    Key? key,
-    required this.profiel,
-    required this.selected,
-  }) : super(key: key);
-
-  @override
-  ConsumerState<ProfielCard> createState() => _ProfielCardState();
-}
-
-class _ProfielCardState extends ConsumerState<ProfielCard> {
-  late final nf = MyNumberFormat(context);
-  HypotheekProfiel get profiel => widget.profiel;
+  const ProfielCard({
+    super.key,
+    required this.hp,
+    required this.actief,
+    required this.selecteren,
+    required this.verwijderen,
+    required this.bewerken,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final omschrijving =
-        profiel.omschrijving.isEmpty ? profiel.id : profiel.omschrijving;
+    final omschrijving = hp.omschrijving.isEmpty ? hp.id : hp.omschrijving;
 
     return MoCard(
-      onTap: () => selecteerProfiel(profiel.id),
-      onLongPress: edit,
-      color: widget.selected == profiel.id
-          ? Color.fromARGB(255, 246, 250, 230)
-          : Color(0xFFe6f5fa),
+      onTap: () => selecteerProfiel(hp.id),
+      onLongPress: bewerken,
+      color: actief == hp.id
+          ? const Color.fromARGB(255, 246, 250, 230)
+          : const Color(0xFFe6f5fa),
       top: SizedBox(
         height: 56.0,
         child: Stack(children: [
@@ -46,8 +40,8 @@ class _ProfielCardState extends ConsumerState<ProfielCard> {
             bottom: 8.0,
             child: Row(children: [
               Radio<String>(
-                  value: profiel.id,
-                  groupValue: widget.selected,
+                  value: hp.id,
+                  groupValue: actief,
                   onChanged: selecteerProfiel),
               Text(omschrijving, textScaleFactor: 1.2)
             ]),
@@ -69,8 +63,8 @@ class _ProfielCardState extends ConsumerState<ProfielCard> {
               top: 0.0,
               right: 0.0,
               bottom: 0.0,
-              child: ProfielCenter(
-                profiel: profiel,
+              child: HypotheekProfielCenter(
+                hp: hp,
               )),
         ],
       ),
@@ -79,67 +73,43 @@ class _ProfielCardState extends ConsumerState<ProfielCard> {
   }
 
   void selecteerProfiel(String? id) {
-    if (id == null) return;
-
-    ref
-        .read(hypotheekContainerProvider)
-        .changeSelectedHypotheekContainerProfiel(id);
-    ref.read(pageHypotheekProvider).page = 1;
-  }
-
-  void edit() {
-    final profielContainer = ref.read(hypotheekContainerProvider);
-// TODO: Fix
-    // ref.read(routeEditPageProvider.notifier).editState = EditRouteState(
-    //   route: routeNieweHypotheekProfielEdit,
-    //   object: HypotheekProfielViewModel(
-    //       hypotheekProfielen: profielContainer.container.hypotheekProfielen,
-    //       profiel: profielContainer.huidigeHypotheekProfielContainer?.profiel),
-    // );
+    selecteren();
   }
 
   void onSelected(String selected) {
     switch (selected) {
       case 'edit':
-        edit();
+        bewerken();
         break;
       case 'delete':
-        ref
-            .read(hypotheekContainerProvider.notifier)
-            .removeProfielHypotheek(widget.profiel);
-
+        verwijderen();
         break;
     }
   }
 }
 
-FittedSizes defaultIncomeFit(_fit, Size inputSize, Size outputSize) {
-  if (inputSize.height <= 0.0 ||
-      inputSize.width <= 0.0 ||
-      outputSize.height <= 0.0 ||
-      outputSize.width <= 0.0) return const FittedSizes(Size.zero, Size.zero);
+// FittedSizes _defaultBoxFit(BoxFit fit, Size inputSize, Size outputSize) {
+//   if (inputSize.height <= 0.0 ||
+//       inputSize.width <= 0.0 ||
+//       outputSize.height <= 0.0 ||
+//       outputSize.width <= 0.0) return const FittedSizes(Size.zero, Size.zero);
 
-  Size sourceSize = inputSize;
+//   Size sourceSize = inputSize;
 
-  final scale = (outputSize.width / 3.0 * 2.0) / inputSize.width;
-  Size destinationSize = sourceSize * scale;
+//   final scale = (outputSize.width / 3.0 * 2.0) / inputSize.width;
+//   Size destinationSize = sourceSize * scale;
 
-  return FittedSizes(sourceSize, destinationSize);
-}
+//   return FittedSizes(sourceSize, destinationSize);
+// }
 
-class ProfielCenter extends StatefulWidget {
-  final HypotheekProfiel profiel;
-  ProfielCenter({Key? key, required this.profiel}) : super(key: key);
+class HypotheekProfielCenter extends StatelessWidget {
+  final HypotheekProfiel hp;
 
-  @override
-  State<ProfielCenter> createState() => _ProfielCenterState();
-}
-
-class _ProfielCenterState extends State<ProfielCenter> {
-  late MyNumberFormat nf = MyNumberFormat(context);
+  const HypotheekProfielCenter({super.key, required this.hp});
 
   @override
   Widget build(BuildContext context) {
+    final nf = MyNumberFormat(context);
     double somLening = 0.0;
     double somAflossen = 0.0;
     double somRente = 0.0;
@@ -159,7 +129,7 @@ class _ProfielCenterState extends State<ProfielCenter> {
       }
     }
 
-    for (Hypotheek h in widget.profiel.eersteHypotheken) {
+    for (Hypotheek h in hp.eersteHypotheken) {
       if (h.lening == 0.0) {
         continue;
       }
@@ -171,7 +141,7 @@ class _ProfielCenterState extends State<ProfielCenter> {
       }
 
       Hypotheek vorige = h;
-      Hypotheek? volgende = widget.profiel.hypotheken[h.volgende];
+      Hypotheek? volgende = hp.hypotheken[h.volgende];
 
       while (volgende != null) {
         if (vorige.restSchuld < volgende.lening) {
@@ -185,12 +155,12 @@ class _ProfielCenterState extends State<ProfielCenter> {
           break;
         }
 
-        volgende = widget.profiel.hypotheken[volgende.volgende];
+        volgende = hp.hypotheken[volgende.volgende];
       }
     }
 
     if (somLening == 0.0) {
-      return Center(
+      return const Center(
           child: Text(
         'Geen lening',
         textAlign: TextAlign.center,
@@ -199,7 +169,7 @@ class _ProfielCenterState extends State<ProfielCenter> {
     }
 
     if (geenTermijn.isNotEmpty) {
-      return Center(
+      return const Center(
           child: Text(
         'Geen Termijn:\ngeenTermijn',
         textAlign: TextAlign.center,
@@ -210,15 +180,18 @@ class _ProfielCenterState extends State<ProfielCenter> {
     final som = somLening + somRente;
 
     final pieces = <PiePiece>[
-      PiePiece(value: somAflossen, name: 'Afgelost', color: Color(0xFFF6E7D8)),
+      PiePiece(
+          value: somAflossen, name: 'Afgelost', color: const Color(0xFFF6E7D8)),
       if (restSchuld > 0.0)
         PiePiece(
-            value: restSchuld, name: 'RestSchuld', color: Color(0xFFF68989)),
-      PiePiece(value: somRente, name: 'Rente', color: Color(0xFFC65D7B)),
+            value: restSchuld,
+            name: 'RestSchuld',
+            color: const Color(0xFFF68989)),
+      PiePiece(value: somRente, name: 'Rente', color: const Color(0xFFC65D7B)),
     ];
 
     final overlayPiePiece = <PiePiece>[
-      PiePiece(value: somLening, name: 'Lening', color: Color(0xFF874356))
+      PiePiece(value: somLening, name: 'Lening', color: const Color(0xFF874356))
     ];
     // calculateWidthFromText(
     //     textToWidth: widthLegend,
@@ -239,9 +212,9 @@ class _ProfielCenterState extends State<ProfielCenter> {
                 bottom: 0.0,
                 child: PieChart(
                   padding: 4.0,
-                  child: Container(),
                   total: som,
                   pieces: pieces,
+                  child: Container(),
                 ),
               ),
               Positioned(
@@ -251,9 +224,9 @@ class _ProfielCenterState extends State<ProfielCenter> {
                 bottom: 0.0,
                 child: PieChart(
                   paddingRatio: 1.0 / 6.0,
-                  child: Container(),
                   total: som,
                   pieces: overlayPiePiece,
+                  child: Container(),
                 ),
               ),
             ],

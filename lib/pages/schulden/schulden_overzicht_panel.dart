@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mortgage_insight/model/nl/hypotheek_document/provider/hypotheek_document_provider.dart';
 import 'package:mortgage_insight/navigation/navigation_page_items.dart';
 import 'package:mortgage_insight/pages/schulden/schuld_provider.dart';
 import 'package:mortgage_insight/state_manager/routes/routes_app.dart';
-
-import '../../model/nl/hypotheek_container/hypotheek_container.dart';
 import '../../model/nl/schulden/schulden.dart';
 import '../../platform_page_format/default_page.dart';
-import '../../platform_page_format/fabProperties.dart';
+import '../../platform_page_format/fab_properties.dart';
+import '../../platform_page_format/page_properties.dart';
 import '../../utilities/device_info.dart';
-import 'debt_list/debt_list.dart';
+import 'schulden_card/schulden_card.dart';
 
 class SchuldenOverzichtPanel extends ConsumerStatefulWidget {
   @override
@@ -23,7 +23,7 @@ class _SchuldenOverzichtPanelState
     ref.read(schuldProvider.notifier).resetSchuld();
     ref
         .read(routeDocumentProvider.notifier)
-        .setEditRouteName(name: routeDebtsEdit);
+        .setEditRouteName(name: routeDebtsAdd);
   }
 
   @override
@@ -31,24 +31,88 @@ class _SchuldenOverzichtPanelState
     final theme = Theme.of(context);
 
     SchuldenOverzicht schulden = ref.watch(
-        hypotheekContainerProvider.select((value) => value.schuldenOverzicht));
+        hypotheekDocumentProvider.select((value) => value.schuldenOverzicht));
 
-    final bodyBuilder =
-        ({required BuildContext context, required bool nested}) => Builder(
-            builder: (context) => GridList(
-                  list: schulden.lijst,
-                  nested: nested,
-                ));
+    final lijst = schulden.lijst;
+    final bodyBuilder = (
+            {required BuildContext context,
+            required bool nested,
+            required double topPadding,
+            required double bottomPadding}) =>
+        Builder(
+            builder: (context) => CustomScrollView(slivers: [
+                  if (nested)
+                    SliverOverlapInjector(
+                      // This is the flip side of the SliverOverlapAbsorber
+                      // above.
+                      handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
+                          context),
+                    ),
+                  if (schulden.lijst.length > 0)
+                    SliverGrid(
+                        gridDelegate:
+                            const SliverGridDelegateWithMaxCrossAxisExtent(
+                          maxCrossAxisExtent: 600.0,
+                          mainAxisSpacing: 5.0,
+                          crossAxisSpacing: 5.0,
+                          childAspectRatio: 1.5,
+                        ),
+                        delegate: SliverChildBuilderDelegate(
+                          (BuildContext context, int index) {
+                            final schuld = lijst[index];
+
+                            return schuld.map(
+                                leaseAuto: (LeaseAuto leaseAuto) =>
+                                    LeaseAutoCard(
+                                        leaseAuto: leaseAuto,
+                                        aanpassen: () => aanpassen(leaseAuto),
+                                        verwijderen: () =>
+                                            verwijderen(leaseAuto)),
+                                aflopendKrediet: (AflopendKrediet ak) =>
+                                    AflopendKredietCard(
+                                        ak: ak,
+                                        aanpassen: () => aanpassen(ak),
+                                        verwijderen: () => verwijderen(ak)),
+                                verzendKrediet: (VerzendKrediet vk) =>
+                                    VerzendKredietCard(
+                                        vk: vk,
+                                        aanpassen: () => aanpassen(vk),
+                                        verwijderen: () => verwijderen(vk)),
+                                doorlopendKrediet: (DoorlopendKrediet dk) =>
+                                    DoorlopendKredietCard(
+                                        dk: dk,
+                                        aanpassen: () => aanpassen(dk),
+                                        verwijderen: () => verwijderen(dk)));
+                          },
+                          childCount: lijst.length,
+                        ))
+                ]));
 
     return DefaultPage(
       title: 'Schulden',
+      matchPageProperties: const [
+        MatchPageProperties(
+            types: {FormFactorType.unknown},
+            pageProperties: PageProperties(hasNavigationBar: true))
+      ],
       imageBuilder: (_) => Image(
           image: AssetImage(
-            'graphics/fit_debts.png',
+            'graphics/schuld.png',
           ),
           color: theme.colorScheme.onSurface),
       bodyBuilder: bodyBuilder,
       fabProperties: FabProperties(onTap: add, icon: Icon(Icons.add)),
     );
+  }
+
+  void aanpassen(Schuld schuld) {
+    ref.read(schuldProvider.notifier).editSchuld(schuld);
+    ref
+        .read(routeDocumentProvider.notifier)
+        .setEditRouteName(name: routeDebtsEdit);
+  }
+
+  void verwijderen(Schuld schuld) {
+    ref.read(hypotheekDocumentProvider.notifier).schuldVerwijderen(schuld);
   }
 }

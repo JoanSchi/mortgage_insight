@@ -9,13 +9,13 @@ import 'package:ltrb_navigation_drawer/ltbr_drawer.dart';
 import 'package:ltrb_navigation_drawer/ltbr_drawer_model.dart';
 import 'package:ltrb_navigation_drawer/ltbr_drawer_widgets.dart';
 import 'package:ltrb_navigation_drawer/overlay_indicator/ltbr_drawer_indicator.dart';
+import 'package:mortgage_insight/model/nl/hypotheek_document/provider/hypotheek_document_provider.dart';
 import '../layout/transition/scale_size_transition.dart';
 import '../route_widgets/document/route_widget_page.dart';
 import '../state_manager/routes/routes_app.dart';
 import '../state_manager/routes/routes_handle_app.dart';
 import '../theme/ltrb_navigation_style.dart';
 import 'navigation_document_examples.dart';
-import '../model/nl/hypotheek_container/hypotheek_container.dart';
 import 'navigation_login_button.dart';
 import 'navigation_page_items.dart';
 import '../utilities/device_info.dart';
@@ -49,10 +49,10 @@ class _MediumDrawerState extends State<MediumDrawer> {
 
     return LtrbDrawer(
       buildOverlay: defaultArrowIndicator(),
-      body: MyRoutePage(),
+      body: const MyRoutePage(),
       expandBody: false,
       allowMaximumSize: false,
-      scrimeColorEnd: Color.fromARGB(9, 0, 0, 0),
+      scrimeColorEnd: const Color.fromARGB(9, 0, 0, 0),
 
       minimumSize: minimumSize,
       preferredSize: sizeExtend,
@@ -106,13 +106,14 @@ class LeftNavigation extends ConsumerWidget {
         height: 48.0,
         width: 48.0,
         child: IconButton(
-            onPressed: () => print('setting'), icon: Icon(Icons.settings)),
+            onPressed: () => debugPrint('setting'),
+            icon: const Icon(Icons.settings)),
       ),
       SizedBox(
         height: 48.0,
         width: 48.0,
-        child:
-            IconButton(onPressed: () => print('info'), icon: Icon(Icons.info)),
+        child: IconButton(
+            onPressed: () => debugPrint('info'), icon: const Icon(Icons.info)),
       )
     ];
 
@@ -120,18 +121,19 @@ class LeftNavigation extends ConsumerWidget {
       IconButton(
         icon: const Icon(Icons.add),
         onPressed: () {
-          resetHypotheekInzicht(ref);
+          ref.read(hypotheekDocumentProvider.notifier).reset();
           drawerModel.pop();
         },
       ),
       IconButton(
         icon: const ImageIcon(AssetImage('graphics/ic_open.png')),
-        onPressed: () => print("open"),
+        onPressed: () => debugPrint("open"),
       ),
       IconButton(
         icon: const Icon(Icons.import_export),
         onPressed: () {
-          ref.read(hypotheekContainerProvider).saveHypotheekContainer();
+          // TODO:
+          //ref.read(removeHypotheekContainerProvider).saveHypotheekContainer();
           drawerModel.pop();
         },
       )
@@ -140,7 +142,7 @@ class LeftNavigation extends ConsumerWidget {
     int bottomLeftColumnNumberDefaultActions;
     int bottomLeftRowNumberActionButtons;
 
-    if (defaultActionsList.length > 0) {
+    if (defaultActionsList.isNotEmpty) {
       bottomLeftRowNumberActionButtons =
           (drawerModel.minimumSize - boxPaddingStart.horizontal) ~/ 56.0;
       bottomLeftColumnNumberDefaultActions =
@@ -317,7 +319,7 @@ class LeftNavigation extends ConsumerWidget {
 
           return DefaultTextStyle(
             textAlign: TextAlign.center,
-            style: dataTheme.textTheme.bodyText2!
+            style: dataTheme.textTheme.bodyMedium!
                 .copyWith(color: Colors.white, fontSize: 22.0),
             child: Padding(
               padding: padding,
@@ -351,7 +353,7 @@ class LeftNavigation extends ConsumerWidget {
                         bottom: 0.0,
                         width: menuWidth,
                         child: Padding(
-                          padding: EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.all(8.0),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
@@ -363,17 +365,17 @@ class LeftNavigation extends ConsumerWidget {
                                   color: deviceScreen.theme
                                       .extension<LtrbNavigationStyle>()!
                                       .imageColor),
-                              SizedBox(
+                              const SizedBox(
                                 height: 8.0,
                               ),
                               Expanded(child: menu),
                               DefaultActions(
-                                children: defaultActionsList,
                                 rowNumber: bottomLeftRowNumberActionButtons,
                                 scale: leftBottomActionsScale,
                                 visible: !minimizeButtons,
+                                children: defaultActionsList,
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 12.0,
                               ),
                             ],
@@ -507,7 +509,7 @@ class _LogoState extends State<Logo> with SingleTickerProviderStateMixin {
             : Stack(
                 children: [
                   _controller.value == 1.0
-                      ? SizedBox.shrink()
+                      ? const SizedBox.shrink()
                       : Padding(
                           padding:
                               EdgeInsets.only(top: boxPaddingStart.top + 8.0),
@@ -515,7 +517,7 @@ class _LogoState extends State<Logo> with SingleTickerProviderStateMixin {
                               style: navigationStyle?.headerTextStyle),
                         ),
                   _controller.value == 0.0
-                      ? SizedBox.shrink()
+                      ? const SizedBox.shrink()
                       : Padding(
                           padding:
                               EdgeInsets.only(top: widget.minimumHeight / 2.0),
@@ -742,7 +744,7 @@ class SelectedTextButton<T> extends StatefulWidget {
   final double minWidthText;
   final VoidCallback? onPress;
 
-  SelectedTextButton(
+  const SelectedTextButton(
       {Key? key,
       required this.child,
       required this.value,
@@ -776,16 +778,12 @@ class _SelectedTextButtonState<T> extends State<SelectedTextButton<T>> {
     return LayoutBuilder(builder: (context, constraints) {
       return TextButton(
           onPressed: handlePress,
-          child: DrawerOverflowBox(
-            child: widget.child,
-            minWidth: widget.minWidthText,
-          ),
           style: TextButton.styleFrom(
               padding:
                   const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
               textStyle:
-                  themeData.textTheme.bodyText2!.copyWith(fontSize: 18.0),
-              minimumSize: Size(56.0, 56.0),
+                  themeData.textTheme.bodyMedium!.copyWith(fontSize: 18.0),
+              minimumSize: const Size(56.0, 56.0),
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               foregroundColor: widget._selected
                   ? widget.selectedTextColor
@@ -793,7 +791,11 @@ class _SelectedTextButtonState<T> extends State<SelectedTextButton<T>> {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16.0)),
               backgroundColor:
-                  widget._selected ? widget.selectedBackbround : null)
+                  widget._selected ? widget.selectedBackbround : null),
+          child: DrawerOverflowBox(
+            minWidth: widget.minWidthText,
+            child: widget.child,
+          )
 
           // animationDuration: Duration.zero
           );
@@ -811,7 +813,7 @@ class SelectedIconButton<T> extends StatefulWidget {
   final Color? backgroundColorSelected;
   final Color? iconColorSelected;
 
-  SelectedIconButton(
+  const SelectedIconButton(
       {Key? key,
       required this.icon,
       required this.value,
@@ -859,7 +861,7 @@ class _SelectedIconButtonState<T> extends State<SelectedIconButton<T>> {
       type:
           background == null ? MaterialType.transparency : MaterialType.canvas,
       color: widget._backgroundColor,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(16.0)),
       ),
       child: child,
@@ -896,7 +898,7 @@ class ExpandDrawerButton extends StatelessWidget {
                   drawerAnimation: DrawerAnimationStartEnd(
                       animationEndRatio: 0.5, reverse: false, toEnd: false),
                   animatable: Tween<double>(begin: 0.0, end: 0.5 * math.pi)),
-              child: Icon(
+              child: const Icon(
                 Icons.chevron_right,
                 // color: Colors.white,
               ),
@@ -909,8 +911,8 @@ class ExpandDrawerButton extends StatelessWidget {
                         ? null
                         : Transform(
                             transform: Matrix4.rotationY(valueTween),
-                            child: child,
                             alignment: Alignment.center,
+                            child: child,
                           ));
               },
             ),
@@ -920,7 +922,7 @@ class ExpandDrawerButton extends StatelessWidget {
                   drawerAnimation: DrawerAnimationStartEnd(
                       animationBeginRatio: 0.5, reverse: false, toEnd: false),
                   animatable: Tween<double>(begin: 0.5 * math.pi, end: 0.0)),
-              child: Icon(Icons.chevron_left),
+              child: const Icon(Icons.chevron_left),
               builder: (BuildContext context, double value, double valueTween,
                   Widget? child) {
                 return SizedBox(
@@ -930,8 +932,8 @@ class ExpandDrawerButton extends StatelessWidget {
                         ? null
                         : Transform(
                             transform: Matrix4.rotationY(valueTween),
-                            child: child,
                             alignment: Alignment.center,
+                            child: child,
                           ));
               },
             )
@@ -959,7 +961,7 @@ class Documents extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          SizedBox(
+          const SizedBox(
             height: 8,
           ),
           DrawerOverflowBox(
@@ -968,7 +970,7 @@ class Documents extends StatelessWidget {
                 'Documenten',
                 style: navigationStyle?.headerTextStyle,
               )),
-          SizedBox(
+          const SizedBox(
             height: 12.0,
           ),
           Expanded(
@@ -1024,7 +1026,7 @@ class RightExtendRibbon extends StatelessWidget {
               onTap: () {},
             ),
             ...extendedActions,
-            Expanded(
+            const Expanded(
                 child: Center(
               child: Divider(),
             )),

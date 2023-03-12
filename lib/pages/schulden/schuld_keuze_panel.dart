@@ -1,92 +1,38 @@
+import 'dart:async';
+
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mortgage_insight/model/nl/hypotheek_document/provider/hypotheek_document_provider.dart';
+import 'package:mortgage_insight/pages/schulden/aflopend_krediet/aflopend_krediet_panel.dart';
 
 import 'package:mortgage_insight/pages/schulden/doorlopend_krediet.dart/doorlopend_krediet.dart';
 import 'package:mortgage_insight/pages/schulden/lease_auto/lease_auto.dart';
 
 import 'package:mortgage_insight/pages/schulden/schuld_provider.dart';
-
+import 'package:mortgage_insight/pages/schulden/verzend_krediet/verzend_krediet.dart';
 import 'package:mortgage_insight/platform_page_format/page_actions.dart';
-
-import 'package:mortgage_insight/utilities/Kalender.dart';
 import 'package:mortgage_insight/utilities/device_info.dart';
-
 import '../../model/nl/schulden/schulden.dart';
-
 import '../../platform_page_format/default_page.dart';
 import '../../platform_page_format/page_properties.dart';
 import '../../utilities/message_listeners.dart';
 
 import 'package:go_router/go_router.dart';
 
-final _messageListeners = MessageListener<AcceptCancelBackMessage>();
-
-class SchuldKeuzePanel extends StatelessWidget {
-  const SchuldKeuzePanel({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    final back = PageActionItem(
-        voidCallback: () => _messageListeners
-            .invoke(AcceptCancelBackMessage(msg: AcceptCancelBack.back)),
-        icon: Icons.arrow_back);
-
-    return DefaultPage(
-        matchPageProperties: [
-          MatchPageProperties(
-              types: {FormFactorType.Unknown},
-              pageProperties: PageProperties(leftTopActions: [back]))
-        ],
-        title: 'Toevoegen',
-        imageBuilder: (_) => Image(
-            image: AssetImage(
-              'graphics/fit_debts.png',
-            ),
-            color: theme.colorScheme.onSurface),
-        bodyBuilder: ({required BuildContext context, required bool nested}) =>
-            SchuldSelectiePageViewer(nested: nested));
-  }
-}
-
-// class SelectieNieuwOfBestaandeSchuld extends ConsumerWidget {
-//   final bool nested;
-
-//   SelectieNieuwOfBestaandeSchuld({Key? key, required this.nested})
-//       : super(key: key);
-
-//   @override
-//   Widget build(BuildContext context, WidgetRef ref) {
-//     SchuldItem? s = ref.watch(schuldProvider);
-
-//     if (s != null && s.id > 0) {
-//       return MessageListenerWidget<AcceptCancelBackMessage>(
-//           onMessage: (AcceptCancelBackMessage msg) {
-//             if (msg.msg == AcceptCancelBack.back) context.pop();
-//           },
-//           listener: _messageListeners,
-//           child: _editPanel(s));
-//     } else {
-//       return SchuldSelectiePageViewer(
-//         nested: nested,
-//       );
-//     }
-//   }
-// }
-
-class SchuldSelectiePageViewer extends ConsumerStatefulWidget {
-  final bool nested;
-
-  SchuldSelectiePageViewer({Key? key, required this.nested}) : super(key: key);
+class SchuldKeuzePanel extends ConsumerStatefulWidget {
+  const SchuldKeuzePanel({
+    Key? key,
+  }) : super(key: key);
 
   @override
-  ConsumerState<SchuldSelectiePageViewer> createState() =>
-      _DebtPageViewerState();
+  ConsumerState<SchuldKeuzePanel> createState() => _SchuldKeuzePanelState();
 }
 
-class _DebtPageViewerState extends ConsumerState<SchuldSelectiePageViewer> {
+class _SchuldKeuzePanelState extends ConsumerState<SchuldKeuzePanel> {
+  final _messageListeners = MessageListener<AcceptCancelBackMessage>();
   late PageController _pageController;
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -100,81 +46,50 @@ class _DebtPageViewerState extends ConsumerState<SchuldSelectiePageViewer> {
     super.dispose();
   }
 
-  selected(SchuldItem item) {
-    Schuld? schuld = ref.read(schuldProvider).schuld;
-    setState(() {
-      switch (item.categorie) {
-        case SchuldenCategorie.aflopend_krediet:
-          break;
-        case SchuldenCategorie.doorlopend_krediet:
-          if (schuld != null) {
-            schuld.maybeMap<void>(
-                doorlopendKrediet: (DoorlopendKrediet value) {},
-                orElse: () => nieuwLeaseAuto(item));
-          } else {
-            nieuwDoorlopendKrediet(item);
-          }
-          break;
-        case SchuldenCategorie.verzendhuiskrediet:
-          // TODO: Handle this case.
-          break;
-        case SchuldenCategorie.operationele_autolease:
-          if (schuld != null) {
-            schuld.maybeMap<void>(
-                leaseAuto: (LeaseAuto value) {},
-                orElse: () => nieuwLeaseAuto(item));
-          } else {
-            nieuwLeaseAuto(item);
-          }
+  void selected(SchuldItem item) {
+    ref.read(schuldProvider.notifier).selectSchuld(item);
 
-          break;
-      }
-      _pageController.animateToPage(1,
-          duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
-    });
-  }
-
-  void nieuwLeaseAuto(SchuldItem item) {
-    ref.read(schuldProvider.notifier).setSchuld(
-        schuld: LeaseAuto(
-            id: -1,
-            categorie: SchuldenCategorie.operationele_autolease,
-            omschrijving: 'Lease Auto',
-            beginDatum: DateUtils.dateOnly(DateTime.now()),
-            statusBerekening: StatusBerekening.nietBerekend,
-            error: '',
-            jaren: 2,
-            maanden: 0,
-            mndBedrag: 0.0),
-        schuldItem: item);
-  }
-
-  void nieuwDoorlopendKrediet(SchuldItem item) {
-    final begin = DateUtils.dateOnly(DateTime.now());
-    ref.read(schuldProvider.notifier).setSchuld(
-        schuld: DoorlopendKrediet(
-          id: -1,
-          categorie: SchuldenCategorie.doorlopend_krediet,
-          omschrijving: 'DK',
-          beginDatum: begin,
-          statusBerekening: StatusBerekening.nietBerekend,
-          error: '',
-          eindDatumGebruiker: Kalender.voegPeriodeToe(begin, jaren: 1),
-          heeftEindDatum: true,
-          bedrag: 0.0,
-        ),
-        schuldItem: item);
+    _pageController.animateToPage(1,
+        duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
+    final back = PageActionItem(
+        voidCallback: () => _messageListeners
+            .invoke(AcceptCancelBackMessage(msg: AcceptCancelBack.back)),
+        icon: Icons.arrow_back);
+
+    return DefaultPage(
+        matchPageProperties: [
+          MatchPageProperties(
+              types: {FormFactorType.unknown},
+              pageProperties: PageProperties(leftTopActions: [back]))
+        ],
+        title: 'Toevoegen',
+        imageBuilder: (_) => Image(
+            image: const AssetImage(
+              'graphics/schuld.png',
+            ),
+            color: theme.colorScheme.onSurface),
+        bodyBuilder: (
+                {required BuildContext context,
+                required bool nested,
+                required double topPadding,
+                required double bottomPadding}) =>
+            _build(context, theme, nested, topPadding, bottomPadding));
+  }
+
+  Widget _build(BuildContext context, ThemeData theme, bool nested,
+      double topPadding, double bottomPadding) {
     SchuldBewerken bewerken = ref.watch(schuldProvider);
 
     final list = LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) =>
             CustomScrollView(slivers: [
-              if (widget.nested)
+              if (nested)
                 SliverOverlapInjector(
                   // This is the flip side of the SliverOverlapAbsorber
                   // above.
@@ -208,31 +123,43 @@ class _DebtPageViewerState extends ConsumerState<SchuldSelectiePageViewer> {
     Widget? editPanel =
         bewerken.schuld?.map<Widget>(leaseAuto: (LeaseAuto value) {
       return LeaseAutoPanel(
-        messageListener: _messageListeners,
-        key: Key('edit_operationalLeaseAuto'),
+        topPadding: topPadding,
+        bottomPadding: bottomPadding,
+        key: const Key('edit_operationalLeaseAuto'),
       );
     }, verzendKrediet: (VerzendKrediet verzend) {
-      return Text(':(');
+      return VerzendKredietPanel(
+        topPadding: topPadding,
+        bottomPadding: bottomPadding,
+      );
     }, doorlopendKrediet: (DoorlopendKrediet value) {
       return DoorlopendKredietPanel(
-        messageListener: _messageListeners,
+        topPadding: topPadding,
+        bottomPadding: bottomPadding,
       );
     }, aflopendKrediet: (AflopendKrediet value) {
-      return Text(':(');
+      return AflopendKredietPanel(
+        topPadding: topPadding,
+        bottomPadding: bottomPadding,
+      );
     });
 
-    final pageView = PageView(
-      controller: _pageController,
-      children: [
-        list,
-        if (editPanel != null)
-          AcceptCanelPanel(
-              accept: () => _messageListeners.invoke(
-                  AcceptCancelBackMessage(msg: AcceptCancelBack.accept)),
-              cancel: () => _messageListeners.invoke(
-                  AcceptCancelBackMessage(msg: AcceptCancelBack.cancel)),
-              child: editPanel)
-      ],
+    final pageView = MediaQuery(
+      data: MediaQuery.of(context).copyWith(
+          gestureSettings: const DeviceGestureSettings(touchSlop: kTouchSlop)),
+      child: PageView(
+        controller: _pageController,
+        children: [
+          list,
+          if (editPanel != null)
+            AcceptCanelPanel(
+                accept: () => _messageListeners.invoke(
+                    AcceptCancelBackMessage(msg: AcceptCancelBack.accept)),
+                cancel: () => _messageListeners.invoke(
+                    AcceptCancelBackMessage(msg: AcceptCancelBack.cancel)),
+                child: Form(key: _formKey, child: editPanel))
+        ],
+      ),
     );
 
     return MessageListenerWidget<AcceptCancelBackMessage>(
@@ -240,83 +167,44 @@ class _DebtPageViewerState extends ConsumerState<SchuldSelectiePageViewer> {
   }
 
   void message(AcceptCancelBackMessage msg) {
+    switch (msg.msg) {
+      case AcceptCancelBack.accept:
+        FocusScope.of(context).unfocus();
+
+        scheduleMicrotask(() {
+          if ((_formKey.currentState?.validate() ?? false)) {
+            final schuld = ref.read(schuldProvider).schuld;
+            if (schuld != null) {
+              ref
+                  .read(hypotheekDocumentProvider.notifier)
+                  .schuldToevoegen(schuld);
+            }
+
+            scheduleMicrotask(() {
+              context.pop();
+            });
+          }
+        });
+
+        break;
+      case AcceptCancelBack.cancel:
+        if (_pageController.page == 1) {
+          _pageController.animateToPage(0,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut);
+        } else {
+          context.pop();
+        }
+        break;
+      default:
+        break;
+    }
+
     if (msg.msg == AcceptCancelBack.back) {
-      if (_pageController.page == 1) {
-        _pageController.animateToPage(0,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut);
-      } else {
-        context.pop();
-      }
+      context.pop();
     }
   }
 }
-
-// Widget _editPanel(SchuldBewerken item) {
-//   Widget editPanel = item.schuld?.map<Widget>(leaseAuto: (LeaseAuto value) {
-//         return LeaseAutoPanel(
-//           messageListener: _messageListeners,
-//           key: Key('edit_operationalLeaseAuto'),
-//         );
-//       }, verzendKrediet: (VerzendKrediet verzend) {
-//         return Text(':(');
-//       }, doorlopendKrediet: (DoorlopendKrediet value) {
-//         return Text(':(');
-//       }, aflopendKrediet: (AflopendKrediet value) {
-//         return Text(':(');
-//       }) ??
-//       OhNo(text: 'Schuld is null!');
-
-//   // case RemoveAflopendKrediet:
-//   //   {
-//   //     editPanel = AflopendKredietPanel(
-//   //       messageListener: _messageListeners,
-//   //       key: Key('edit'),
-//   //       aflopendKrediet: s as RemoveAflopendKrediet,
-//   //     );
-//   //     break;
-//   //   }
-//   // case RemoveVerzendhuisKrediet:
-//   //   {
-//   //     editPanel = VerzendKredietPanel(
-//   //       messageListener: _messageListeners,
-//   //       key: Key('edit_verzendhuiskrediet'),
-//   //       verzendHuisKrediet: s as RemoveVerzendhuisKrediet,
-//   //     );
-//   //     break;
-//   //   }
-//   // case RemoveOperationalLeaseAuto:
-//   //   {
-//   //     editPanel = LeaseAutoPanel(
-//   //       messageListener: _messageListeners,
-//   //       key: Key('edit_operationalLeaseAuto'),
-//   //       operationalLeaseAuto: s as RemoveOperationalLeaseAuto,
-//   //     );
-//   //     break;
-//   //   }
-
-//   // case DoorlopendKrediet:
-//   //   {
-//   //     editPanel = DoorlopendKredietPanel(
-//   //       messageListener: _messageListeners,
-//   //       key: Key('edit_operationalLeaseAuto'),
-//   //       doorlopendKrediet: s as RemoveDoorlopendKrediet,
-//   //     );
-//   //     break;
-//   //   }
-//   // default:
-//   //   {
-//   //     return Center(child: Text(':{', textScaleFactor: 20.0));
-//   //   }
-//   // }
-
-//   return AcceptCanelPanel(
-//       accept: () => _messageListeners
-//           .invoke(AcceptCancelBackMessage(msg: AcceptCancelBack.accept)),
-//       cancel: () => _messageListeners
-//           .invoke(AcceptCancelBackMessage(msg: AcceptCancelBack.cancel)),
-//       child: editPanel);
-// }
 
 class SelectedTextButton extends StatefulWidget {
   final SchuldItem value;
@@ -331,7 +219,7 @@ class SelectedTextButton extends StatefulWidget {
   final Color selectedTextColor;
   final double minWidthText;
 
-  SelectedTextButton(
+  const SelectedTextButton(
       {Key? key,
       required this.text,
       required this.value,
@@ -408,19 +296,19 @@ class _SelectedTextButtonState<T> extends State<SelectedTextButton>
         child: InkWell(
           customBorder:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
+          onTap: handlePress,
           child: SizedBox(
               width: 300,
               height: 56,
               child: Center(
                   child: Text(
                 widget.text,
-                style: themeData.textTheme.bodyText2?.copyWith(
+                style: themeData.textTheme.bodyMedium?.copyWith(
                     fontSize: 18.0,
                     color: widget._selected
                         ? Colors.white
                         : themeData.colorScheme.onSecondary),
               ))),
-          onTap: handlePress,
         ));
 
     return AnimatedBuilder(
@@ -459,13 +347,13 @@ class BackgroundSelectedTextButton extends CustomPainter {
       double right = left + width;
       double bottom = top + height;
 
-      Paint _paint = Paint()
+      Paint paint = Paint()
         ..color = color!
         ..style = PaintingStyle.fill;
 
       canvas.drawRRect(
           RRect.fromLTRBR(left, top, right, bottom, Radius.circular(radial)),
-          _paint);
+          paint);
     }
   }
 

@@ -1,20 +1,22 @@
 import 'dart:collection';
 
+import 'package:flutter/foundation.dart';
+
 import 'hypotheek.dart';
 
 class HypotheekIterateItem extends LinkedListEntry<HypotheekIterateItem> {
-  Hypotheek hypotheek;
+  RemoveHypotheek hypotheek;
   bool last = false;
 
   HypotheekIterateItem(this.hypotheek);
 
-  List<Hypotheek> get parallelHypotheken =>
-      list?.map((e) => e.hypotheek).where((Hypotheek e) {
-        print(
+  List<RemoveHypotheek> get parallelHypotheken =>
+      list?.map((e) => e.hypotheek).where((RemoveHypotheek e) {
+        debugPrint(
             'id e ${e.id} id hypotheek ${hypotheek.id} not equal ${hypotheek != e} ${e.eindDatum.compareTo(hypotheek.startDatum)}');
-        print('date e ${e.eindDatum}');
-        print('date hypotheek ${hypotheek.startDatum}');
-        print(
+        debugPrint('date e ${e.eindDatum}');
+        debugPrint('date hypotheek ${hypotheek.startDatum}');
+        debugPrint(
             'toevoegen ${e != hypotheek && e.eindDatum.compareTo(hypotheek.startDatum) > 0}');
         return e != hypotheek &&
             e.eindDatum.compareTo(hypotheek.startDatum) > 0;
@@ -23,15 +25,15 @@ class HypotheekIterateItem extends LinkedListEntry<HypotheekIterateItem> {
 }
 
 class HypotheekIterator {
-  List<Hypotheek> eersteHypotheken;
-  Map<String, Hypotheek> hypotheken;
+  List<RemoveHypotheek> eersteHypotheken;
+  Map<String, RemoveHypotheek> hypotheken;
 
   HypotheekIterator({required this.eersteHypotheken, required this.hypotheken});
 
-  Iterable<Hypotheek> all() sync* {
+  Iterable<RemoveHypotheek> all() sync* {
     LinkedList<HypotheekIterateItem> linkedList = LinkedList();
 
-    for (Hypotheek h in eersteHypotheken) {
+    for (RemoveHypotheek h in eersteHypotheken) {
       linkedList.add(HypotheekIterateItem(h));
     }
 
@@ -61,10 +63,10 @@ class HypotheekIterator {
     }
   }
 
-  HypotheekIterateItem onlyWithParallel(Hypotheek hypotheek) {
+  HypotheekIterateItem onlyWithParallel(RemoveHypotheek hypotheek) {
     LinkedList<HypotheekIterateItem> linkedList = LinkedList();
 
-    for (Hypotheek h in eersteHypotheken) {
+    for (RemoveHypotheek h in eersteHypotheken) {
       linkedList.add(HypotheekIterateItem(h));
     }
 
@@ -75,7 +77,7 @@ class HypotheekIterator {
         if (e.last) continue;
 
         if (e.hypotheek == hypotheek) {
-          print('returned hypotheek ${e.hypotheek.id}');
+          debugPrint('returned hypotheek ${e.hypotheek.id}');
           return e;
         }
         if (iItem == null ||
@@ -100,11 +102,11 @@ class HypotheekIterator {
   }
 
   Iterable<HypotheekIterateItem> parallel(
-    Hypotheek? vanaf,
+    RemoveHypotheek? vanaf,
   ) sync* {
     LinkedList<HypotheekIterateItem> linkedList = LinkedList();
 
-    for (Hypotheek h in eersteHypotheken) {
+    for (RemoveHypotheek h in eersteHypotheken) {
       linkedList.add(HypotheekIterateItem(h));
     }
 
@@ -142,10 +144,10 @@ class HypotheekIterator {
   }
 
   Iterable<HypotheekIterateItem> parallelTm(
-      {Hypotheek? vanaf, Hypotheek? tm}) sync* {
+      {RemoveHypotheek? vanaf, RemoveHypotheek? tm}) sync* {
     LinkedList<HypotheekIterateItem> linkedList = LinkedList();
 
-    for (Hypotheek h in eersteHypotheken) {
+    for (RemoveHypotheek h in eersteHypotheken) {
       linkedList.add(HypotheekIterateItem(h));
     }
 

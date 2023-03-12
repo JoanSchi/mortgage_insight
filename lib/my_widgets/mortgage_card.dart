@@ -74,7 +74,7 @@ class MoCard extends StatelessWidget {
     return Card(
         clipBehavior: Clip.antiAlias,
         color: color,
-        margin: EdgeInsets.symmetric(vertical: 4.0, horizontal: 4.0),
+        margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 4.0),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16.0),
         ),
@@ -94,15 +94,15 @@ class MoCardMenuItem {
   });
 
   MoCardMenuItem.edit({
-    this.action: 'edit',
-    this.icon: const Icon(Icons.edit),
-    this.text: const Text('Bewerken'),
+    this.action = 'edit',
+    this.icon = const Icon(Icons.edit),
+    this.text = const Text('Bewerken'),
   });
 
   MoCardMenuItem.delete({
-    this.action: 'delete',
-    this.icon: const Icon(Icons.delete),
-    this.text: const Text('Verwijderen'),
+    this.action = 'delete',
+    this.icon = const Icon(Icons.delete),
+    this.text = const Text('Verwijderen'),
   });
 }
 

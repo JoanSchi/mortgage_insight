@@ -55,13 +55,13 @@ class MySliverQuiltedGridDelegate extends SliverGridDelegate {
   /// {@macro fsgv.global.crossAxisSpacing}
   final double crossAxisSpacing;
 
-  final _QuiltedTilePattern _pattern;
+  final QuiltedTilePattern _pattern;
 
   @override
-  _SliverQuiltedGridLayout getLayout(SliverConstraints constraints) {
+  SliverQuiltedGridLayout getLayout(SliverConstraints constraints) {
     final crossAxisExtent = constraints.crossAxisExtent;
     final cellExtent = (64.0 + crossAxisSpacing);
-    return _SliverQuiltedGridLayout(
+    return SliverQuiltedGridLayout(
       cellExtent: cellExtent,
       crossAxisExtent: crossAxisExtent,
       crossAxisSpacing: crossAxisSpacing,
@@ -79,8 +79,8 @@ class MySliverQuiltedGridDelegate extends SliverGridDelegate {
   }
 }
 
-class _QuiltedTilePattern {
-  const _QuiltedTilePattern({
+class QuiltedTilePattern {
+  const QuiltedTilePattern({
     required this.tiles,
     required this.crossAxisIndexes,
     required this.mainAxisIndexes,
@@ -130,8 +130,8 @@ class _QuiltedTilePattern {
 
 /// Layout that looks like the Quilted image list in
 /// https://material.io/components/image-lists.
-class _SliverQuiltedGridLayout extends SliverGridLayout {
-  const _SliverQuiltedGridLayout({
+class SliverQuiltedGridLayout extends SliverGridLayout {
+  const SliverQuiltedGridLayout({
     required double cellExtent,
     required this.crossAxisExtent,
     required this.mainAxisSpacing,
@@ -156,7 +156,7 @@ class _SliverQuiltedGridLayout extends SliverGridLayout {
 
   final double crossAxisStride;
 
-  final _QuiltedTilePattern pattern;
+  final QuiltedTilePattern pattern;
 
   /// Whether the children should be placed in the opposite order of increasing
   /// coordinates in the cross axis.
@@ -224,8 +224,9 @@ class _SliverQuiltedGridLayout extends SliverGridLayout {
     double crossAxisStart,
     double childCrossAxisExtent,
   ) {
-    if (reverseCrossAxis)
+    if (reverseCrossAxis) {
       return crossAxisExtent - crossAxisStart - childCrossAxisExtent;
+    }
     return crossAxisStart;
   }
 
@@ -368,7 +369,7 @@ extension ListNumExtensions on List<num> {
 }
 
 extension on List<MyQuiltedGridTile> {
-  _QuiltedTilePattern toPattern(
+  QuiltedTilePattern toPattern(
     int crossAxisCount,
     QuiltedGridRepeatPattern repeatPattern,
   ) {
@@ -446,7 +447,7 @@ extension on List<MyQuiltedGridTile> {
       tiles.addAll(repeatedTiles);
     }
 
-    return _QuiltedTilePattern(
+    return QuiltedTilePattern(
       tiles: tiles,
       mainAxisIndexes: mainAxisIndexes,
       crossAxisIndexes: crossAxisIndexes,

@@ -8,8 +8,10 @@ part of 'schulden.dart';
 
 _$_SchuldenOverzicht _$$_SchuldenOverzichtFromJson(Map<String, dynamic> json) =>
     _$_SchuldenOverzicht(
-      lijst: IList<Schuld>.fromJson(json['lijst'],
-          (value) => Schuld.fromJson(value as Map<String, dynamic>)),
+      lijst: json['lijst'] == null
+          ? const IListConst([])
+          : IList<Schuld>.fromJson(json['lijst'],
+              (value) => Schuld.fromJson(value as Map<String, dynamic>)),
     );
 
 Map<String, dynamic> _$$_SchuldenOverzichtToJson(
@@ -49,10 +51,10 @@ Map<String, dynamic> _$$LeaseAutoToJson(_$LeaseAuto instance) =>
     };
 
 const _$SchuldenCategorieEnumMap = {
-  SchuldenCategorie.aflopend_krediet: 'aflopend_krediet',
-  SchuldenCategorie.doorlopend_krediet: 'doorlopend_krediet',
+  SchuldenCategorie.aflopendKrediet: 'aflopendKrediet',
+  SchuldenCategorie.doorlopendKrediet: 'doorlopendKrediet',
   SchuldenCategorie.verzendhuiskrediet: 'verzendhuiskrediet',
-  SchuldenCategorie.operationele_autolease: 'operationele_autolease',
+  SchuldenCategorie.autolease: 'autolease',
 };
 
 const _$StatusBerekeningEnumMap = {
@@ -76,7 +78,7 @@ _$VerzendKrediet _$$VerzendKredietFromJson(Map<String, dynamic> json) =>
       maanden: json['maanden'] as int,
       minMaanden: json['minMaanden'] as int,
       maxMaanden: json['maxMaanden'] as int,
-      isTotalbedrag: json['isTotalbedrag'] as bool,
+      vkBedrag: $enumDecode(_$VKbedragEnumMap, json['vkBedrag']),
       heeftSlotTermijn: json['heeftSlotTermijn'] as bool,
       decimalen: json['decimalen'] as int,
       $type: json['runtimeType'] as String?,
@@ -96,11 +98,16 @@ Map<String, dynamic> _$$VerzendKredietToJson(_$VerzendKrediet instance) =>
       'maanden': instance.maanden,
       'minMaanden': instance.minMaanden,
       'maxMaanden': instance.maxMaanden,
-      'isTotalbedrag': instance.isTotalbedrag,
+      'vkBedrag': _$VKbedragEnumMap[instance.vkBedrag]!,
       'heeftSlotTermijn': instance.heeftSlotTermijn,
       'decimalen': instance.decimalen,
       'runtimeType': instance.$type,
     };
+
+const _$VKbedragEnumMap = {
+  VKbedrag.totaal: 'totaal',
+  VKbedrag.mnd: 'mnd',
+};
 
 _$DoorlopendKrediet _$$DoorlopendKredietFromJson(Map<String, dynamic> json) =>
     _$DoorlopendKrediet(
@@ -156,10 +163,11 @@ _$AflopendKrediet _$$AflopendKredietFromJson(Map<String, dynamic> json) =>
       somInterest: (json['somInterest'] as num).toDouble(),
       somAnn: (json['somAnn'] as num).toDouble(),
       slotTermijn: (json['slotTermijn'] as num).toDouble(),
-      aflosTabelOpties:
-          AflosTabelOpties.fromJson(json['aflosTabelOpties'] as String),
+      tableMonthOptions: TableMonthOptions.fromJson(
+          json['tableMonthOptions'] as Map<String, dynamic>),
       decimalen: json['decimalen'] as int,
-      renteGebrokenMaand: json['renteGebrokenMaand'] as bool,
+      eersteGebrokenMaandAlleenRente:
+          json['eersteGebrokenMaandAlleenRente'] as bool,
       betaling: $enumDecode(_$AKbetalingEnumMap, json['betaling']),
       $type: json['runtimeType'] as String?,
     );
@@ -188,17 +196,16 @@ Map<String, dynamic> _$$AflopendKredietToJson(_$AflopendKrediet instance) =>
       'somInterest': instance.somInterest,
       'somAnn': instance.somAnn,
       'slotTermijn': instance.slotTermijn,
-      'aflosTabelOpties': instance.aflosTabelOpties,
+      'tableMonthOptions': instance.tableMonthOptions,
       'decimalen': instance.decimalen,
-      'renteGebrokenMaand': instance.renteGebrokenMaand,
+      'eersteGebrokenMaandAlleenRente': instance.eersteGebrokenMaandAlleenRente,
       'betaling': _$AKbetalingEnumMap[instance.betaling]!,
       'runtimeType': instance.$type,
     };
 
 const _$AKbetalingEnumMap = {
-  AKbetaling.per_periode: 'per_periode',
-  AKbetaling.per_maand: 'per_maand',
-  AKbetaling.per_eerst_volgende_maand: 'per_eerst_volgende_maand',
+  AKbetaling.ingangsdatum: 'ingangsdatum',
+  AKbetaling.perEerstVolgendeMaand: 'perEerstVolgendeMaand',
 };
 
 _$_AKtermijnAnn _$$_AKtermijnAnnFromJson(Map<String, dynamic> json) =>

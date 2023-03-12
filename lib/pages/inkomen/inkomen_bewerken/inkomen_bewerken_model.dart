@@ -3,13 +3,13 @@ import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../model/nl/inkomen/inkomen.dart';
-import '../../../utilities/Kalender.dart';
+import '../../../utilities/kalender.dart';
 import '../../../utilities/date.dart';
 import 'inkomen_bewerken.dart';
 
 final inkomenBewerkenProvider =
-    StateNotifierProvider<InkomenNotifier, InkomenBewerken>((ref) {
-  return InkomenNotifier(InkomenBewerken(
+    StateNotifierProvider<InkomenBewerkenNotifier, InkomenBewerken>((ref) {
+  return InkomenBewerkenNotifier(InkomenBewerken(
       inkomen: Inkomen(
         datum: monthYear(DateTime.now()),
         partner: false,
@@ -26,8 +26,8 @@ final inkomenBewerkenProvider =
       blokDatum: DateTime(0)));
 });
 
-class InkomenNotifier extends StateNotifier<InkomenBewerken> {
-  InkomenNotifier(super.state);
+class InkomenBewerkenNotifier extends StateNotifier<InkomenBewerken> {
+  InkomenBewerkenNotifier(super.state);
 
   void bestaand({required IList<Inkomen> lijst, required Inkomen inkomen}) {
     _evaluatie(inkomen: inkomen, lijst: lijst);

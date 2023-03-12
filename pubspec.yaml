@@ -31,14 +31,12 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-  google_fonts: ^3.0.1
+  google_fonts: ^4.0.3
   flutter_riverpod: ^2.1.1
   flextable:
     path: ../flextable
   ltrb_navigation_drawer:
     path: ../ltrb_navigation_drawer
-  # nested_scroll_view_3m:
-  #   path: ../nested_scroll_view_3m
   shared_preferences: ^2.0.15
   go_router: ^6.0.0
   custom_sliver_appbar:
@@ -47,9 +45,14 @@ dependencies:
     path: ../date_input_picker
   selectable_group_widgets:
     path: ../selectable_group_widgets
+  sliver_row_box:
+    path: ../sliver_row_box
+  # selectable_popupmenu:
+  #   path: ../selectable_popupmenu
   freezed_annotation: ^2.2.0
   json_annotation: ^4.8.0
-  fast_immutable_collections: ^8.2.0
+  fast_immutable_collections: ^9.0.0
+  intl: ^0.17.0
 
   
 

@@ -24,7 +24,7 @@ class SelectableGroupOptions {
 
   const SelectableGroupOptions({
     this.selectedGroupTheme = SelectedGroupTheme.materialInkWell,
-    this.space: 0.0,
+    this.space = 0.0,
   });
 }
 
@@ -86,6 +86,8 @@ class MyRadioGroup<V> extends RadioGroup<V, SelectableGroupOptions> {
                     value: s.value,
                     groupValue: groupValue,
                     enabled: enabled,
+                    primaryColor: primaryColor,
+                    onPrimaryColor: onPrimaryColor,
                     outlinedBorder: const StadiumBorder()),
               )
           ];
@@ -119,7 +121,7 @@ class MyRadioGroup<V> extends RadioGroup<V, SelectableGroupOptions> {
       }
     }
 
-    return object ?? SelectableGroupOptions();
+    return object ?? const SelectableGroupOptions();
   }
 }
 
@@ -217,7 +219,7 @@ class MyCheckGroup<V> extends CheckGroup<V, SelectableGroupOptions> {
       }
     }
 
-    return object ?? SelectableGroupOptions();
+    return object ?? const SelectableGroupOptions();
   }
 }
 

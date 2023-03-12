@@ -1,9 +1,8 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:mortgage_insight/my_widgets/oh_no.dart';
 import 'package:mortgage_insight/platform_page_format/phone_page_scrollbars.dart';
 import 'package:mortgage_insight/utilities/device_info.dart';
-import 'fabProperties.dart';
+import 'fab_properties.dart';
 import 'monitor_page.dart';
 import 'page_properties.dart';
 import 'phone_page_slivers_appbar.dart';
@@ -11,7 +10,10 @@ import 'table_page_slivers_appbar.dart';
 import 'tablet_page_scrollbars.dart';
 
 typedef BodyBuilder = Widget Function(
-    {required BuildContext context, required bool nested});
+    {required BuildContext context,
+    required bool nested,
+    required double topPadding,
+    required double bottomPadding});
 
 class DefaultPage extends StatefulWidget {
   final BodyBuilder bodyBuilder;
@@ -34,11 +36,11 @@ class DefaultPage extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<DefaultPage> createState() => _DefaultPageState();
+  State<DefaultPage> createState() => DefaultPageState();
 
-  static _DefaultPageState of(BuildContext context) {
-    final _DefaultPageState? result =
-        context.findAncestorStateOfType<_DefaultPageState>();
+  static DefaultPageState of(BuildContext context) {
+    final DefaultPageState? result =
+        context.findAncestorStateOfType<DefaultPageState>();
     if (result != null) return result;
     throw FlutterError.fromParts(<DiagnosticsNode>[
       ErrorSummary(
@@ -58,7 +60,7 @@ class DefaultPage extends StatefulWidget {
   }
 }
 
-class _DefaultPageState extends State<DefaultPage> {
+class DefaultPageState extends State<DefaultPage> {
   @override
   Widget build(BuildContext context) {
     final deviceScreen = DeviceScreen3.of(context);
@@ -67,8 +69,8 @@ class _DefaultPageState extends State<DefaultPage> {
 
     if (deviceScreen.hasScrollBars) {
       switch (deviceScreen.formFactorType) {
-        case FormFactorType.SmallPhone:
-        case FormFactorType.LargePhone:
+        case FormFactorType.smallPhone:
+        case FormFactorType.largePhone:
           return PhonePageScrollBars(
               title: widget.title,
               imageBuilder: widget.imageBuilder,
@@ -77,7 +79,7 @@ class _DefaultPageState extends State<DefaultPage> {
               fabProperties: widget.fabProperties,
               notificationDept: widget.notificationDept,
               bodyBuilder: widget.bodyBuilder);
-        case FormFactorType.Tablet:
+        case FormFactorType.tablet:
           return TablePageScrollBars(
             title: widget.title,
             imageBuilder: widget.imageBuilder,
@@ -88,20 +90,20 @@ class _DefaultPageState extends State<DefaultPage> {
             bodyBuilder: widget.bodyBuilder,
           );
 
-        case FormFactorType.Monitor:
+        case FormFactorType.monitor:
           return MonitorPage(
             bodyBuilder: widget.bodyBuilder,
             pageProperties: pageProperties,
             fabProperties: widget.fabProperties,
             bottom: widget.bottom,
           );
-        case FormFactorType.Unknown:
-          return OhNo(text: 'FormFactorType is Unknown!');
+        case FormFactorType.unknown:
+          return const OhNo(text: 'FormFactorType is Unknown!');
       }
     } else {
       switch (deviceScreen.formFactorType) {
-        case FormFactorType.SmallPhone:
-        case FormFactorType.LargePhone:
+        case FormFactorType.smallPhone:
+        case FormFactorType.largePhone:
           return PhonePageSliverAppBar(
             bottom: widget.bottom,
             imageBuilder: widget.imageBuilder,
@@ -111,7 +113,7 @@ class _DefaultPageState extends State<DefaultPage> {
             fabProperties: widget.fabProperties,
           );
 
-        case FormFactorType.Tablet:
+        case FormFactorType.tablet:
           return TablePageSliverAppBar(
             bottom: widget.bottom,
             imageBuilder: widget.imageBuilder,
@@ -120,13 +122,13 @@ class _DefaultPageState extends State<DefaultPage> {
             fabProperties: widget.fabProperties,
             bodyBuilder: widget.bodyBuilder,
           );
-        case FormFactorType.Monitor:
+        case FormFactorType.monitor:
           return MonitorPage(
             bodyBuilder: widget.bodyBuilder,
             bottom: widget.bottom,
           );
-        case FormFactorType.Unknown:
-          return OhNo(text: 'FormFactorType is Unknown!');
+        case FormFactorType.unknown:
+          return const OhNo(text: 'FormFactorType is Unknown!');
       }
     }
   }
@@ -149,7 +151,7 @@ class _DefaultPageState extends State<DefaultPage> {
       }
     }
 
-    return latestPageProperties ?? PageProperties();
+    return latestPageProperties ?? const PageProperties();
   }
 }
 
@@ -158,7 +160,7 @@ class AcceptCanelPanel extends StatelessWidget {
   final VoidCallback? cancel;
   final VoidCallback? accept;
 
-  AcceptCanelPanel({
+  const AcceptCanelPanel({
     Key? key,
     required this.child,
     this.cancel,
@@ -171,13 +173,13 @@ class AcceptCanelPanel extends StatelessWidget {
     Orientation orientation;
 
     switch (screen.formFactorType) {
-      case FormFactorType.SmallPhone:
-      case FormFactorType.LargePhone:
-      case FormFactorType.Unknown:
+      case FormFactorType.smallPhone:
+      case FormFactorType.largePhone:
+      case FormFactorType.unknown:
         orientation = screen.orientation;
         break;
-      case FormFactorType.Tablet:
-      case FormFactorType.Monitor:
+      case FormFactorType.tablet:
+      case FormFactorType.monitor:
         orientation = (screen.size.height < 600)
             ? Orientation.landscape
             : Orientation.portrait;
@@ -194,10 +196,10 @@ class AcceptCanelPanel extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             if (cancel != null)
-              TextButton(onPressed: cancel, child: Text('Annuleren')),
+              TextButton(onPressed: cancel, child: const Text('Annuleren')),
             if (accept != null)
-              TextButton(onPressed: accept, child: Text('Opslaan')),
-            SizedBox(
+              TextButton(onPressed: accept, child: const Text('Opslaan')),
+            const SizedBox(
               width: 16.0,
             )
           ],
@@ -208,14 +210,14 @@ class AcceptCanelPanel extends StatelessWidget {
         SizedBox(
           width: 64.0,
           child: (cancel != null)
-              ? IconButton(onPressed: cancel, icon: Icon(Icons.close))
+              ? IconButton(onPressed: cancel, icon: const Icon(Icons.close))
               : null,
         ),
         Expanded(child: child),
         SizedBox(
           width: 64.0,
           child: (accept != null)
-              ? IconButton(onPressed: accept, icon: Icon(Icons.save_alt))
+              ? IconButton(onPressed: accept, icon: const Icon(Icons.save_alt))
               : null,
         )
       ]);
@@ -229,15 +231,13 @@ class Oops extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: CustomScrollView(key: Key('list'), slivers: [
-        SliverOverlapInjector(
-          // This is the flip side of the SliverOverlapAbsorber above.
-          handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-        ),
-        SliverToBoxAdapter(
-            child: Center(child: Text(':{', textScaleFactor: 20.0)))
-      ]),
-    );
+    return CustomScrollView(key: const Key('list'), slivers: [
+      SliverOverlapInjector(
+        // This is the flip side of the SliverOverlapAbsorber above.
+        handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+      ),
+      const SliverToBoxAdapter(
+          child: Center(child: Text(':{', textScaleFactor: 20.0)))
+    ]);
   }
 }

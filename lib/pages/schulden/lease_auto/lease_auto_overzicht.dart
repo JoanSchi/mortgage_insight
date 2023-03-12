@@ -5,12 +5,12 @@ import 'package:mortgage_insight/model/nl/schulden/autolease_verwerken.dart';
 import 'package:mortgage_insight/my_widgets/oh_no.dart';
 import 'package:mortgage_insight/pages/schulden/schuld_provider.dart';
 import '../../../model/nl/schulden/schulden.dart';
-import '../../../utilities/MyNumberFormat.dart';
+import '../../../utilities/my_number_format.dart';
 import '../../../utilities/date.dart';
 import '../../../utilities/value_to_width.dart';
 
 class OverzichtLeaseAuto extends ConsumerStatefulWidget {
-  OverzichtLeaseAuto({Key? key}) : super(key: key);
+  const OverzichtLeaseAuto({Key? key}) : super(key: key);
 
   @override
   ConsumerState<OverzichtLeaseAuto> createState() => OverzichtLeaseAutoState();
@@ -34,12 +34,11 @@ class OverzichtLeaseAutoState extends ConsumerState<OverzichtLeaseAuto> {
   }
 
   Widget buildAutoLease(BuildContext context, LeaseAuto leaseAuto) {
-    return SliverToBoxAdapter(
-      child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 200),
-          child: (leaseAuto.statusBerekening != StatusBerekening.berekend)
-              ? SizedBox.shrink()
-              : buildSummary(context, leaseAuto)),
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 200),
+      child: (leaseAuto.statusBerekening != StatusBerekening.berekend)
+          ? const SizedBox.shrink()
+          : buildSummary(context, leaseAuto),
     );
   }
 
@@ -135,32 +134,25 @@ class OverzichtLeaseAutoState extends ConsumerState<OverzichtLeaseAuto> {
       ];
 
       TextStyle textStyleTable =
-          theme.textTheme.bodyText2!.copyWith(fontSize: 16.0);
+          theme.textTheme.bodyMedium!.copyWith(fontSize: 16.0);
 
       final Widget tableOverzicht = DefaultTextStyle(
         style: textStyleTable,
-        child: Table(columnWidths: {
+        child: Table(columnWidths: const {
           0: IntrinsicColumnWidth(),
           1: IntrinsicColumnWidth(),
           2: IntrinsicColumnWidth(),
-          // FixedColumnWidth(calculateWidthFromNumber(
-          //         valueToWidth: columnWidthSummaryValues,
-          //         value: map['registratieBedrag'],
-          //         textStyle: textStyleTable,
-          //         textScaleFactor: textScaleFactor)
-          //     .width
-          // )
         }, children: tableRows),
       );
 
       return Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
         const SizedBox(height: 24.0),
-        Text(
+        const Text(
           'Overzicht',
         ),
-        SizedBox(height: 16.0),
+        const SizedBox(height: 16.0),
         tableOverzicht,
-        SizedBox(height: 8.0),
+        const SizedBox(height: 8.0),
       ]);
     }
   }

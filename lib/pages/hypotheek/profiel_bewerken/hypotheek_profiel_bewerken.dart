@@ -1,30 +1,37 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mortgage_insight/pages/schulden/date_picker.dart';
-import 'package:mortgage_insight/pages/hypotheek/profiel_bewerken/KostenLijst.dart';
-import 'package:mortgage_insight/pages/hypotheek/profiel_bewerken/hypotheek_profiel_model.dart';
-import 'package:mortgage_insight/model/nl/hypotheek/hypotheek.dart';
-import 'package:mortgage_insight/model/nl/hypotheek_container/hypotheek_container.dart';
-import 'package:mortgage_insight/platform_page_format/default_page.dart';
-import 'package:mortgage_insight/my_widgets/simple_widgets.dart';
-import 'package:mortgage_insight/utilities/MyNumberFormat.dart';
 import 'package:go_router/go_router.dart';
-import '../../../layout/transition/scale_size_transition.dart';
-import '../../../model/nl/hypotheek/kosten_hypotheek.dart';
-import '../../../my_widgets/remove_sliver_row_box.dart';
+import 'package:selectable_group_widgets/selectable_group_widgets.dart';
+import 'package:sliver_row_box/sized_sliver_box.dart';
+import 'package:sliver_row_box/sliver_item_row_insert_remove.dart';
+import 'package:sliver_row_box/sliver_row_box.dart';
+import 'package:sliver_row_box/sliver_row_box_controller.dart';
+import 'package:sliver_row_box/sliver_row_box_model.dart';
+import 'package:sliver_row_box/sliver_row_item_background.dart';
+import 'package:mortgage_insight/model/nl/hypotheek/verwerken/profiel_verwerken.dart';
+import 'package:mortgage_insight/my_widgets/selectable_widgets/single_checkbox.dart';
+import 'package:mortgage_insight/my_widgets/simple_widgets.dart';
+import 'package:mortgage_insight/pages/hypotheek/profiel_bewerken/hypotheek_profiel_model.dart';
+import 'package:mortgage_insight/pages/hypotheek/profiel_bewerken/kosten_lijst.dart';
+import 'package:mortgage_insight/platform_page_format/default_page.dart';
+import 'package:mortgage_insight/utilities/match_properties.dart';
+
+import '../../../model/nl/hypotheek/gegevens/extra_of_kosten_lening/extra_of_kosten_lening.dart';
+import '../../../model/nl/hypotheek/gegevens/hypotheek_profiel/hypotheek_profiel.dart';
 import '../../../my_widgets/animated_scale_resize_switcher.dart';
-import '../../../my_widgets/remove_selectable_group.dart';
-import '../../../my_widgets/remove_selectable_popupmenu.dart';
-import '../../../state_manager/state_edit_object.dart';
+import '../../../my_widgets/selectable_popupmenu.dart';
+import '../../../my_widgets/selectable_widgets/selectable_group_themes.dart';
 import '../../../utilities/device_info.dart';
+import 'abstract_hypotheek_profiel_consumer.dart';
 
 const _horizontal = 8.0;
 
 class BewerkHypotheekProfiel extends ConsumerStatefulWidget {
-  BewerkHypotheekProfiel({
-    Key? key,
-  }) : super(key: key);
+  const BewerkHypotheekProfiel({
+    super.key,
+  });
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -33,13 +40,20 @@ class BewerkHypotheekProfiel extends ConsumerStatefulWidget {
 
 class _BewerkHypotheekProfielState
     extends ConsumerState<BewerkHypotheekProfiel> {
-  late HypotheekProfielViewModel nieuwHypotheekProfielViewModel;
-  GlobalKey<FormState> _formKey = GlobalKey();
+  final GlobalKey<FormState> _formKey = GlobalKey();
+  ControllerSliverRowBox<String, Waarde> controllerSliverRowBox =
+      ControllerSliverRowBox();
 
   @override
   void initState() {
-    nieuwHypotheekProfielViewModel = ref.read(editObjectProvider).object;
+    // TODO: implement initState
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    controllerSliverRowBox.dispose();
+    super.dispose();
   }
 
   @override
@@ -50,41 +64,42 @@ class _BewerkHypotheekProfielState
     return DefaultPage(
         title: 'Profiel',
         imageBuilder: (_) => Image(
-            image: AssetImage(
-              'graphics/fit_nieuw_profiel.png',
+            image: const AssetImage(
+              'graphics/profiel.png',
             ),
             color: theme.colorScheme.onSurface),
-        bodyBuilder: ({required BuildContext context, required bool nested}) =>
+        bodyBuilder: (
+                {required BuildContext context,
+                required bool nested,
+                required double topPadding,
+                required double bottomPadding}) =>
             AcceptCanelPanel(
               accept: () {
-                if (_formKey.currentState?.validate() ?? false) {
-                  final hypotheekContainer =
-                      ref.read(hypotheekContainerProvider);
+                // if (_formKey.currentState?.validate() ?? false) {
+                //   final hypotheekContainer =
+                //       ref.read(removeHypotheekContainerProvider);
 
-                  hypotheekContainer.addHypotheekProfiel(
-                      nieuwHypotheekProfielViewModel.profiel);
-
-                  if (nieuwHypotheekProfielViewModel.isNieuw) {
-                    scheduleMicrotask(() {
-                      // TODO: Fix
-                      //   ref.read(routeEditPageProvider.notifier).editState =
-                      //       EditRouteState(
-                      //           route: routeMortgageEdit,
-                      //           object: HypotheekViewModel(
-                      //               inkomenLijst: hypotheekContainer.inkomenLijst(),
-                      //               inkomenLijstPartner: hypotheekContainer
-                      //                   .inkomenLijst(partner: true),
-                      //               profiel: hypotheekContainer
-                      //                   .huidigeHypotheekProfielContainer!.profiel,
-                      //               schuldenLijst:
-                      //                   hypotheekContainer.schuldenContainer.list));
-                    });
-                  } else {
-                    scheduleMicrotask(() {
-                      context.pop();
-                    });
-                  }
-                }
+                //   if (nieuwHypotheekProfielViewModel.isNieuw) {
+                //     scheduleMicrotask(() {
+                //       // TODO: Fix
+                //       //   ref.read(routeEditPageProvider.notifier).editState =
+                //       //       EditRouteState(
+                //       //           route: routeMortgageEdit,
+                //       //           object: HypotheekViewModel(
+                //       //               inkomenLijst: hypotheekContainer.inkomenLijst(),
+                //       //               inkomenLijstPartner: hypotheekContainer
+                //       //                   .inkomenLijst(partner: true),
+                //       //               profiel: hypotheekContainer
+                //       //                   .huidigeHypotheekProfielContainer!.profiel,
+                //       //               schuldenLijst:
+                //       //                   hypotheekContainer.schuldenContainer.list));
+                //     });
+                //   } else {
+                //     scheduleMicrotask(() {
+                //       context.pop();
+                //     });
+                //   }
+                // }
               },
               cancel: () {
                 scheduleMicrotask(() {
@@ -102,165 +117,163 @@ class _BewerkHypotheekProfielState
                           context),
                     ),
                   HypotheekProfielOptiePanel(
-                      nieuwHypotheekProfielViewModel:
-                          nieuwHypotheekProfielViewModel),
+                    controllerSliverRowBox: controllerSliverRowBox,
+                  ),
                   HypotheekProfielEigenWoningReservePanel(
-                      nieuwHypotheekProfielViewModel:
-                          nieuwHypotheekProfielViewModel),
+                      controllerSliverRowBox: controllerSliverRowBox),
                   HypotheekProfielVorigeWoningPanel(
-                      nieuwHypotheekProfielViewModel:
-                          nieuwHypotheekProfielViewModel),
-                  SliverToBoxAdapter(
-                      child: SizedBox(
-                    height: 16.0,
-                  )),
+                    controllerSliverRowBox: controllerSliverRowBox,
+                  ),
                 ]),
               ),
             ));
   }
 }
 
-class HypotheekProfielOptiePanel extends StatefulWidget {
-  final HypotheekProfielViewModel nieuwHypotheekProfielViewModel;
+class HypotheekProfielOptiePanel extends ConsumerStatefulWidget {
+  final ControllerSliverRowBox<String, Waarde> controllerSliverRowBox;
 
-  HypotheekProfielOptiePanel({
-    Key? key,
-    required this.nieuwHypotheekProfielViewModel,
-  }) : super(key: key);
+  const HypotheekProfielOptiePanel({
+    super.key,
+    required this.controllerSliverRowBox,
+  });
 
   @override
-  State<HypotheekProfielOptiePanel> createState() =>
+  ConsumerState<HypotheekProfielOptiePanel> createState() =>
       _HypotheekProfielOptiePanelState();
 }
 
 class _HypotheekProfielOptiePanelState
-    extends State<HypotheekProfielOptiePanel> {
-  late HypotheekProfielViewModel nhpm;
-
-  late TextEditingController _tecOmschrijving =
-      TextEditingController(text: profiel.omschrijving);
-
-  late FocusNode _fnOmschrijving = FocusNode()
-    ..addListener(() {
-      if (!_fnOmschrijving.hasFocus) {
-        _veranderingOmschrijving(_tecOmschrijving.text);
-      }
-    });
-
-  HypotheekProfiel get profiel => nhpm.profiel;
+    extends AbstractHypotheekProfielConsumerState<HypotheekProfielOptiePanel> {
+  late TextEditingController _tecOmschrijving;
+  late FocusNode _fnOmschrijving;
 
   @override
   void initState() {
-    nhpm = widget.nieuwHypotheekProfielViewModel
-      ..updateOptieState = updateState;
+    _tecOmschrijving = TextEditingController(
+        text: toText(
+      (hp) => hp.omschrijving,
+    ));
+
+    _fnOmschrijving = FocusNode()
+      ..addListener(() {
+        if (!_fnOmschrijving.hasFocus) {
+          _veranderingOmschrijving(_tecOmschrijving.text);
+        }
+      });
+
     super.initState();
   }
 
   @override
   void dispose() {
     _tecOmschrijving.dispose();
-    nhpm.updateOptieState = null;
+    _fnOmschrijving.dispose();
     super.dispose();
   }
 
   @override
-  Widget build(BuildContext context) {
+  @override
+  Widget buildHypotheekProfiel(BuildContext context,
+      HypotheekProfielBewerken bewerken, HypotheekProfiel hp) {
     final theme = Theme.of(context);
-    final headline4 = theme.textTheme.headline4;
-
-    Widget erwVorigeWoning;
-
-    if (profiel.doelOverzicht == DoelProfielOverzicht.nieuw) {
-      erwVorigeWoning = _situatie(context, headline4);
-    } else if (profiel.inkomensNormToepassen) {
-      erwVorigeWoning = _erwBestaandeHypotheek(context);
-    } else {
-      erwVorigeWoning = SizedBox.shrink();
-    }
-
-    Widget datumWoningKopen;
-
-    if (profiel.doelOverzicht == DoelProfielOverzicht.nieuw) {
-      datumWoningKopen = Padding(
-          padding: const EdgeInsets.symmetric(horizontal: _horizontal),
-          child: DateWidget(
-              date: nhpm.datumWoningKopen,
-              firstDate: nhpm.beginDatumWoningKopen,
-              lastDate: nhpm.eindDatumWoningKopen,
-              saveDate: _veranderingDatumWoningKopen));
-    } else {
-      datumWoningKopen = SizedBox.shrink();
-    }
+    final headlineMedium = theme.textTheme.headlineMedium;
 
     List<Widget> children = [
-      SizedBox(
+      const SizedBox(
         height: 12.0,
       ),
       OmschrijvingTextField(
         textEditingController: _tecOmschrijving,
         focusNode: _fnOmschrijving,
       ),
-      SizedBox(
+      const SizedBox(
         height: 16.0,
       ),
       Padding(
           padding: const EdgeInsets.symmetric(horizontal: _horizontal),
-          child: Text('Doel', style: headline4)),
-      SizedBox(
+          child: Text('Doel', style: headlineMedium)),
+      const SizedBox(
         height: 4.0,
       ),
-      Padding(
-          padding: const EdgeInsets.symmetric(horizontal: _horizontal),
-          child: SelectableRadioGroup(
-            groupValue: profiel.doelOverzicht,
-            selectableRadioItems: [
-              SelectableRadioItem(
-                text: 'Woning kopen',
-                value: DoelProfielOverzicht.nieuw,
-              ),
-              SelectableRadioItem(
-                text: 'Overzicht bestaande hypotheek(en)',
-                value: DoelProfielOverzicht.bestaand,
-              )
-            ],
-            onChange: _veranderingDoelProfiel,
-          )),
-      AnimatedScaleResizeSwitcher(child: datumWoningKopen),
-      SizedBox(
+      UndefinedSelectableGroup(
+        groups: [
+          MyRadioGroup<DoelHypotheekOverzicht>(
+              list: [
+                RadioSelectable(
+                    text: 'Woning kopen',
+                    value: DoelHypotheekOverzicht.nieuweWoning),
+                RadioSelectable(
+                    text: 'Overzicht bestaande hypotheek(en)',
+                    value: DoelHypotheekOverzicht.huidigeWoning)
+              ],
+              groupValue: hp.doelHypotheekOverzicht,
+              onChange: _veranderingDoelOverzicht)
+        ],
+      ),
+      const SizedBox(
+        height: 16.0,
+      ),
+      Text(
+        'Financieringsnorm',
+        style: headlineMedium,
+      ),
+      const SizedBox(
+        height: 4.0,
+      ),
+      UndefinedSelectableGroup(
+        groups: [
+          MyCheckGroup<String>(
+              list: [
+                CheckSelectable<String>(
+                    identifier: 'inkomen',
+                    text: 'Inkomen',
+                    value: hp.inkomensNormToepassen),
+                CheckSelectable<String>(
+                    identifier: 'woningwaarde',
+                    text: 'Woningwaarde',
+                    value: hp.woningWaardeNormToepassen)
+              ],
+              onChange: (String identifier, bool value) {
+                switch (identifier) {
+                  case 'inkomen':
+                    {
+                      _veranderingInkomensNorm(!value);
+                      break;
+                    }
+                  case 'woningwaarde':
+                    {
+                      _veranderingWoningWaardeNormToepassen(!value);
+                      break;
+                    }
+                }
+              })
+        ],
+      ),
+      const SizedBox(
         height: 16.0,
       ),
       Padding(
-        padding: const EdgeInsets.symmetric(horizontal: _horizontal),
+        padding: const EdgeInsets.symmetric(
+          horizontal: _horizontal,
+        ),
         child: Text(
-          'Financieringsnorm',
-          style: headline4,
+          'Gegevens',
+          style: headlineMedium,
         ),
       ),
-      SizedBox(
+      const SizedBox(
         height: 4.0,
       ),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: _horizontal),
-        child: SelectableCheckGroup(selectableItems: [
-          SelectableCheckItem(
-              text: 'Inkomen',
-              value: profiel.inkomensNormToepassen,
-              changeChecked: _veranderingInkomensNorm),
-          SelectableCheckItem(
-              text: 'Woningwaarde',
-              value: profiel.woningWaardeNormToepassen,
-              changeChecked: _veranderingWoningWaardeNormToepassen)
-        ]),
-      ),
-      AnimatedSwitcher(
-          transitionBuilder: (Widget child, Animation<double> animation) {
-            return FadeTransition(
-              opacity: animation,
-              child: ScaleResizedTransition(scale: animation, child: child),
-            );
-          },
-          duration: const Duration(milliseconds: 200),
-          child: erwVorigeWoning),
+      MyCheckbox(
+          text: 'Starter', value: hp.starter, onChanged: _veranderingStarter),
+      AnimatedScaleResizeSwitcher(
+          child: HypotheekProfielVerwerken.eigenwoningReserveOptie(hp)
+              ? MyCheckbox(
+                  text: 'Eigenwoningreserve',
+                  value: hp.eigenWoningReserve.ewrToepassen,
+                  onChanged: _veranderingEwrToepassen)
+              : const SizedBox.shrink())
     ];
 
     return SliverToBoxAdapter(
@@ -269,95 +282,39 @@ class _HypotheekProfielOptiePanelState
     );
   }
 
-  _situatie(BuildContext context, TextStyle? headline4) {
-    List<Widget> children = [
-      SizedBox(
-        height: 16.0,
-      ),
-      Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: _horizontal,
-        ),
-        child: Text(
-          'Huidige situatie',
-          style: headline4,
-        ),
-      ),
-      SizedBox(
-        height: 4.0,
-      ),
-      Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: _horizontal,
-          ),
-          child: SelectableRadioGroup(selectableRadioItems: [
-            SelectableRadioItem(text: 'Starter', value: Situatie.starter),
-            SelectableRadioItem(
-                text: 'Geen koopwoning', value: Situatie.geenKoopwoning),
-            SelectableRadioItem(text: 'Koopwoning', value: Situatie.koopwoning),
-          ], groupValue: profiel.situatie, onChange: _veranderingSituatie)),
-      AnimatedScaleResizeSwitcher(
-          child: profiel.situatie == Situatie.geenKoopwoning
-              ? Padding(
-                  padding: const EdgeInsets.only(
-                      left: _horizontal + 16.0, top: 4.0, right: _horizontal),
-                  child: SelectableCheckGroup(selectableItems: [
-                    SelectableCheckItem(
-                        text: 'Eigenwoningreserve',
-                        value: profiel.eigenReserveWoning.erwToepassing,
-                        changeChecked: _veranderingEWR)
-                  ]),
-                )
-              : SizedBox.shrink()),
-    ];
-
-    return Column(
-        crossAxisAlignment: CrossAxisAlignment.start, children: children);
+  _veranderingDoelOverzicht(DoelHypotheekOverzicht? doelHypotheekOverzicht) {
+    notifier.verandering(
+        doelHypotheekOverzicht: doelHypotheekOverzicht,
+        controllerSliverRowBox: widget.controllerSliverRowBox);
   }
 
-  _erwBestaandeHypotheek(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(
-          left: _horizontal + 16.0, top: 4.0, right: _horizontal),
-      child: SelectableCheckGroup(selectableItems: [
-        SelectableCheckItem(
-            text: 'Eigenwoningreserve',
-            value: profiel.eigenReserveWoning.erwToepassing,
-            changeChecked: _veranderingEWR)
-      ]),
-    );
-  }
-
-  _veranderingOmschrijving(String value) {
-    nhpm.veranderingOmschrijving(value);
-  }
-
-  _veranderingDoelProfiel(DoelProfielOverzicht? value) {
-    nhpm.veranderingDoelProfiel(value!);
-  }
-
-  _veranderingDatumWoningKopen(DateTime value) {
-    nhpm.veranderingDatumWoningKopen(value);
+  _veranderingOmschrijving(String omschrijving) {
+    notifier.verandering(
+        omschrijving: omschrijving,
+        controllerSliverRowBox: widget.controllerSliverRowBox);
   }
 
   _veranderingInkomensNorm(bool? value) {
-    nhpm.veranderingInkomensNorm(value!);
+    notifier.verandering(
+        inkomensNormToepassen: value,
+        controllerSliverRowBox: widget.controllerSliverRowBox);
   }
 
   _veranderingWoningWaardeNormToepassen(bool? value) {
-    nhpm.veranderingWoningWaardeToepassen(value!);
+    notifier.verandering(
+        woningWaardeNormToepassen: value,
+        controllerSliverRowBox: widget.controllerSliverRowBox);
   }
 
-  _veranderingSituatie(Situatie? value) {
-    nhpm.veranderingSituatie(value!);
+  _veranderingStarter(bool? value) {
+    notifier.verandering(
+        starter: value, controllerSliverRowBox: widget.controllerSliverRowBox);
   }
 
-  _veranderingEWR(bool? value) {
-    nhpm.veranderingERW(value!);
-  }
-
-  updateState() {
-    setState(() {});
+  _veranderingEwrToepassen(bool? value) {
+    notifier.veranderingEwr(
+        ewrToepassing: value!,
+        controllerSliverRowBox: widget.controllerSliverRowBox);
   }
 }
 
@@ -368,87 +325,66 @@ class _HypotheekProfielOptiePanelState
 ///
 ///
 
-class HypotheekProfielEigenWoningReservePanel extends StatefulWidget {
-  final HypotheekProfielViewModel nieuwHypotheekProfielViewModel;
+class HypotheekProfielEigenWoningReservePanel extends ConsumerStatefulWidget {
+  final ControllerSliverRowBox<String, Waarde> controllerSliverRowBox;
 
-  HypotheekProfielEigenWoningReservePanel({
-    Key? key,
-    required this.nieuwHypotheekProfielViewModel,
-  }) : super(key: key);
+  const HypotheekProfielEigenWoningReservePanel({
+    super.key,
+    required this.controllerSliverRowBox,
+  });
 
   @override
-  State<HypotheekProfielEigenWoningReservePanel> createState() =>
+  ConsumerState<HypotheekProfielEigenWoningReservePanel> createState() =>
       HypotheekProfielEigenWoningReservePanelState();
 }
 
 class HypotheekProfielEigenWoningReservePanelState
-    extends State<HypotheekProfielEigenWoningReservePanel> {
-  late HypotheekProfielViewModel nhpm;
-  HypotheekProfiel get profiel => nhpm.profiel;
-
-  late final MyNumberFormat nf = MyNumberFormat(context);
-
+    extends AbstractHypotheekProfielConsumerState<
+        HypotheekProfielEigenWoningReservePanel> {
   TextEditingController? _tecEigenwoningReserve;
 
   TextEditingController get tecEigenwoningReserve {
-    if (_tecEigenwoningReserve == null) {
-      final erw = profiel.eigenReserveWoning.erw;
-      _tecEigenwoningReserve =
-          TextEditingController(text: erw == 0.0 ? '' : nf.parseDblToText(erw));
-    }
+    _tecEigenwoningReserve ??= TextEditingController(
+        text: doubleToText((hp) => hp.eigenWoningReserve.ewr));
     return _tecEigenwoningReserve!;
   }
 
   FocusNode? _fnEigenWoningReserve;
 
   FocusNode get fnEigenWoningReserve {
-    if (_fnEigenWoningReserve == null) {
-      _fnEigenWoningReserve = FocusNode()
-        ..addListener(() {
-          if (!_fnEigenWoningReserve!.hasFocus) {
-            _veranderingEigenWoningReserve(_tecEigenwoningReserve?.text ?? '');
-          }
-        });
-    }
+    _fnEigenWoningReserve ??= FocusNode()
+      ..addListener(() {
+        if (!_fnEigenWoningReserve!.hasFocus) {
+          _veranderingEigenWoningReserve(_tecEigenwoningReserve?.text ?? '');
+        }
+      });
     return _fnEigenWoningReserve!;
   }
 
   TextEditingController? _tecOorspronkelijkeLening;
 
   TextEditingController get tecOorspronkelijkeLening {
-    if (_tecOorspronkelijkeLening == null) {
-      final o = profiel.eigenReserveWoning.oorspronkelijkeHoofdsom;
-      _tecOorspronkelijkeLening =
-          TextEditingController(text: o == 0.0 ? '' : nf.parseDblToText(o));
-    }
+    _tecOorspronkelijkeLening ??= TextEditingController(
+        text: doubleToText(
+            (hp) => hp.eigenWoningReserve.oorspronkelijkeHoofdsom));
     return _tecOorspronkelijkeLening!;
   }
 
   FocusNode? _fnOorspronkelijkeLening;
 
   FocusNode get fnOorspronkelijkeLening {
-    if (_fnOorspronkelijkeLening == null) {
-      _fnOorspronkelijkeLening = FocusNode()
-        ..addListener(() {
-          if (!_fnOorspronkelijkeLening!.hasFocus) {
-            _veranderingOorsprongelijkelLening(
-                _tecOorspronkelijkeLening?.text ?? '');
-          }
-        });
-    }
+    _fnOorspronkelijkeLening ??= FocusNode()
+      ..addListener(() {
+        if (!_fnOorspronkelijkeLening!.hasFocus) {
+          _veranderingOorsprongelijkelLening(
+              _tecOorspronkelijkeLening?.text ?? '');
+        }
+      });
     return _fnOorspronkelijkeLening!;
   }
 
   @override
-  void initState() {
-    nhpm = widget.nieuwHypotheekProfielViewModel
-      ..eigenWoningReservePanel = this;
-    super.initState();
-  }
-
-  @override
   void dispose() {
-    nhpm.eigenWoningReservePanel = null;
     _tecEigenwoningReserve?.dispose();
     _fnEigenWoningReserve?.dispose();
     _tecOorspronkelijkeLening?.dispose();
@@ -457,42 +393,53 @@ class HypotheekProfielEigenWoningReservePanelState
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget buildHypotheekProfiel(BuildContext context,
+      HypotheekProfielBewerken bewerken, HypotheekProfiel hp) {
     return SliverToBoxAdapter(
         child: AnimatedScaleResizeSwitcher(
-            child: profiel.eigenReserveWoning.erwToepassing
-                ? _eigenWoningReserve(context)
-                : SizedBox.shrink()));
+            child: HypotheekProfielVerwerken.eigenwoningReserveZichtbaar(hp)
+                ? _eigenWoningReserve(context, hp)
+                : const SizedBox.shrink()));
   }
 
-  _eigenWoningReserve(BuildContext context) {
+  _eigenWoningReserve(BuildContext context, HypotheekProfiel hp) {
     final theme = Theme.of(context);
-    final headline3 = theme.textTheme.headline3;
-    final erwBerekenen = profiel.eigenReserveWoning.erwBerekenen;
+    final displaySmall = theme.textTheme.displaySmall;
+    final erwBerekenen = hp.eigenWoningReserve.ewrBerekenen;
 
-    final children = [
+    final children = <Widget>[
       Text(
         'Eigenwoningreserve',
-        style: headline3,
+        style: displaySmall,
         textAlign: TextAlign.center,
       ),
-      SizedBox(
+      const SizedBox(
         height: 24.0,
       ),
-      SelectableButtonGroup<bool>(
-        groupValue: erwBerekenen,
-        selectableItems: [
-          SelectableItem<bool>(child: Text('Invullen'), value: false),
-          SelectableItem<bool>(child: Text('berekenen'), value: true)
+      UndefinedSelectableGroup(
+        groups: [
+          MyRadioGroup<bool>(
+              primaryColor: theme.colorScheme.onSecondary,
+              onPrimaryColor: theme.colorScheme.onInverseSurface,
+              list: [
+                RadioSelectable(text: 'Invullen', value: false),
+                RadioSelectable(text: 'Berekenen', value: true)
+              ],
+              groupValue: erwBerekenen,
+              onChange: _eigenWoningReserveBerekenen)
         ],
-        onChange: _eigenWoningReserveBerekenen,
+        matchTargetWrap: [
+          MatchTargetWrap<GroupLayoutProperties>(
+              object: GroupLayoutProperties.horizontal(
+                  options: const SelectableGroupOptions(
+                      space: 4.0,
+                      selectedGroupTheme: SelectedGroupTheme.button))),
+        ],
       ),
-      AnimatedScaleResizeSwitcher(
-        child: erwBerekenen
-            ? _initieleLeningInvullen()
-            : _eigenWoningReserveInvullen(),
-      ),
-      SizedBox(
+      erwBerekenen
+          ? _initieleLeningInvullen(hp)
+          : _eigenWoningReserveInvullen(),
+      const SizedBox(
         height: 8.0,
       ),
     ];
@@ -500,7 +447,7 @@ class HypotheekProfielEigenWoningReservePanelState
     return Padding(
       padding: const EdgeInsets.only(top: 16.0),
       child: Material(
-        color: Color.fromARGB(
+        color: const Color.fromARGB(
             255, 239, 249, 253), //Color.fromARGB(255, 250, 247, 232),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(32),
@@ -513,23 +460,24 @@ class HypotheekProfielEigenWoningReservePanelState
     );
   }
 
-  Widget _initieleLeningInvullen() {
+  Widget _initieleLeningInvullen(HypotheekProfiel hp) {
     return Padding(
-      key: Key('OorspronkelijkeHoofdsom'),
+      key: const Key('OorspronkelijkeHoofdsom'),
       padding: const EdgeInsets.symmetric(horizontal: _horizontal),
       child: TextFormField(
         controller: tecOorspronkelijkeLening,
         focusNode: fnOorspronkelijkeLening,
         decoration: InputDecoration(
             hintText: 'bedrag',
-            labelText: profiel.doelOverzicht == DoelProfielOverzicht.bestaand
-                ? 'Oorspronkelijke lening vorige woning'
-                : 'Oorspronkelijke lening'),
-        keyboardType: TextInputType.numberWithOptions(
+            labelText:
+                hp.doelHypotheekOverzicht == DoelHypotheekOverzicht.nieuweWoning
+                    ? 'Oorspronkelijke lening'
+                    : 'Oorspronkelijke lening vorige woning'),
+        keyboardType: const TextInputType.numberWithOptions(
           signed: true,
           decimal: true,
         ),
-        inputFormatters: [MyNumberFormat(context).numberInputFormat('#.00')],
+        inputFormatters: [nf.numberInputFormat('#.00')],
         validator: (String? value) {
           if (nf.parsToDouble(value) < 0.0) {
             return 'Hoofdsom >= 0.0';
@@ -542,18 +490,18 @@ class HypotheekProfielEigenWoningReservePanelState
 
   Widget _eigenWoningReserveInvullen() {
     return Padding(
-      key: Key('WoningReserve'),
+      key: const Key('WoningReserve'),
       padding: const EdgeInsets.symmetric(horizontal: _horizontal),
       child: TextFormField(
         controller: tecEigenwoningReserve,
         focusNode: _fnEigenWoningReserve,
-        decoration: InputDecoration(
+        decoration: const InputDecoration(
             hintText: 'bedrag', labelText: 'Eigenwoningreserve'),
-        keyboardType: TextInputType.numberWithOptions(
+        keyboardType: const TextInputType.numberWithOptions(
           signed: true,
           decimal: true,
         ),
-        inputFormatters: [MyNumberFormat(context).numberInputFormat('#.00')],
+        inputFormatters: [nf.numberInputFormat('#.00')],
         validator: (String? value) {
           if (nf.parsToDouble(value) < 0.0) {
             return 'Bedrag >= 0.0';
@@ -564,20 +512,22 @@ class HypotheekProfielEigenWoningReservePanelState
     );
   }
 
-  _eigenWoningReserveBerekenen(bool value) {
-    nhpm.eigenWoningReserveBerekenen(value);
+  _eigenWoningReserveBerekenen(bool? value) {
+    notifier.veranderingEwr(
+        ewrBerekenen: value,
+        controllerSliverRowBox: widget.controllerSliverRowBox);
   }
 
-  _veranderingEigenWoningReserve(String value) {
-    nhpm.veranderingEigenWoningReserve(nf.parsToDouble(value));
+  _veranderingEigenWoningReserve(String? value) {
+    notifier.veranderingEwr(
+        ewr: nf.parsToDouble(value),
+        controllerSliverRowBox: widget.controllerSliverRowBox);
   }
 
-  _veranderingOorsprongelijkelLening(String value) {
-    nhpm.veranderingEigenWoningReserve(nf.parsToDouble(value));
-  }
-
-  updateState() {
-    setState(() {});
+  _veranderingOorsprongelijkelLening(String? value) {
+    notifier.veranderingEwr(
+        oorspronkelijkeHoofdsom: nf.parsToDouble(value),
+        controllerSliverRowBox: widget.controllerSliverRowBox);
   }
 }
 
@@ -588,61 +538,66 @@ class HypotheekProfielEigenWoningReservePanelState
 ///
 ///
 
-class HypotheekProfielVorigeWoningPanel extends StatefulWidget {
-  final HypotheekProfielViewModel nieuwHypotheekProfielViewModel;
+class HypotheekProfielVorigeWoningPanel extends ConsumerStatefulWidget {
+  final ControllerSliverRowBox<String, Waarde> controllerSliverRowBox;
 
-  HypotheekProfielVorigeWoningPanel({
-    Key? key,
-    required this.nieuwHypotheekProfielViewModel,
-  }) : super(key: key);
+  const HypotheekProfielVorigeWoningPanel({
+    super.key,
+    required this.controllerSliverRowBox,
+  });
 
   @override
-  State<HypotheekProfielVorigeWoningPanel> createState() =>
+  ConsumerState<HypotheekProfielVorigeWoningPanel> createState() =>
       HypotheekProfielVorigeWoningPanelState();
 }
 
 class HypotheekProfielVorigeWoningPanelState
-    extends State<HypotheekProfielVorigeWoningPanel> {
-  late final MyNumberFormat nf = MyNumberFormat(context);
-  late HypotheekProfielViewModel nhpm;
-  HypotheekProfiel get profiel => nhpm.profiel;
+    extends AbstractHypotheekProfielConsumerState<
+        HypotheekProfielVorigeWoningPanel> {
+  late TextEditingController _tecWoningWaarde;
+  late FocusNode _fnWoningWaarde;
+  late TextEditingController _tecRestSchuldLening;
+  late FocusNode _fnRestSchuldLening;
 
-  late TextEditingController tecWoningWaarde = TextEditingController(
-      text: profiel.vorigeWoningGegevens.woningWaarde == 0.0
-          ? ''
-          : nf.parseDblToText(profiel.vorigeWoningGegevens.woningWaarde));
+  late List<SliverBoxItemState<String>> topList;
+  late List<SliverBoxItemState<Waarde>> bodyList;
+  late List<SliverBoxItemState<String>> bottomList;
 
-  late FocusNode fnWoningWaarde = FocusNode()
-    ..addListener(() {
-      bool f = fnWoningWaarde.hasFocus;
-      if (!f) {
-        _veranderingWoningwaarde(tecWoningWaarde.text);
-      }
-    });
-
-  late TextEditingController tecHypotheek = TextEditingController(
-      text: profiel.vorigeWoningGegevens.lening == 0.0
-          ? ''
-          : nf.parseDblToText(profiel.vorigeWoningGegevens.lening));
-
-  late FocusNode fnHypotheek = FocusNode()
-    ..addListener(() {
-      if (!fnHypotheek.hasFocus) {
-        _veranderingHypotheek(tecHypotheek.text);
-      }
-    });
-
-  late List<SliverBoxItemState<Waarde>> itemList;
+  bool woningGegevensZichtbaar = false;
 
   @override
   void initState() {
-    nhpm = widget.nieuwHypotheekProfielViewModel..vorigeWoningPanel = this;
-    super.initState();
+    _tecWoningWaarde = TextEditingController(
+        text: doubleToText((hp) => hp.vorigeWoningKosten.woningWaarde));
 
-    itemList = profiel.vorigeWoningGegevens.kosten
-        .map((Waarde e) => SliverBoxItemState(
-            key: e.key, insertRemoveAnimation: 1.0, enabled: true, value: e))
-        .toList();
+    _fnWoningWaarde = FocusNode()
+      ..addListener(() {
+        bool f = _fnWoningWaarde.hasFocus;
+        if (!f) {
+          _veranderingWoningwaarde(_tecWoningWaarde.text);
+        }
+      });
+
+    _tecRestSchuldLening = TextEditingController(
+        text: doubleToText((hp) => hp.vorigeWoningKosten.lening));
+
+    _fnRestSchuldLening = FocusNode()
+      ..addListener(() {
+        if (!_fnRestSchuldLening.hasFocus) {
+          _veranderingLening(_tecRestSchuldLening.text);
+        }
+      });
+
+    woningGegevensZichtbaar =
+        HypotheekProfielVerwerken.woningGegevensZichtbaar(hp);
+
+    topList = HypotheekProfielVerwerken.createTop(hp, woningGegevensZichtbaar);
+    bodyList =
+        HypotheekProfielVerwerken.createBody(hp, woningGegevensZichtbaar);
+    bottomList =
+        HypotheekProfielVerwerken.createBottom(hp, woningGegevensZichtbaar);
+
+    super.initState();
   }
 
   @override
@@ -650,75 +605,59 @@ class HypotheekProfielVorigeWoningPanelState
     super.didUpdateWidget(oldWidget);
   }
 
-  bool get woningGegevensZichtbaar =>
-      (profiel.doelOverzicht == DoelProfielOverzicht.nieuw &&
-          profiel.situatie == Situatie.koopwoning) ||
-      profiel.eigenReserveWoning.woningGegevens;
-
   @override
   void dispose() {
-    tecWoningWaarde.dispose();
-    fnWoningWaarde.dispose();
-    tecHypotheek.dispose();
-    fnHypotheek.dispose();
+    _tecWoningWaarde.dispose();
+    _fnWoningWaarde.dispose();
+    _tecRestSchuldLening.dispose();
+    _fnRestSchuldLening.dispose();
 
-    nhpm.vorigeWoningPanel = null;
     super.dispose();
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget buildHypotheekProfiel(BuildContext context,
+      HypotheekProfielBewerken bewerken, HypotheekProfiel hp) {
     return SliverRowBox<String, Waarde>(
-      heightItem: 72.0,
-      visible: woningGegevensZichtbaar,
-      visibleAnimated: true,
-      itemList: itemList,
-      topList: [
-        SliverBoxItemState(
-            key: 'topPadding',
-            insertRemoveAnimation: 1.0,
-            enabled: true,
-            value: 'topPadding'),
-        SliverBoxItemState(
-            key: 'woningTitle',
-            insertRemoveAnimation: 1.0,
-            enabled: true,
-            value: 'woningTitle'),
-        SliverBoxItemState(
-            key: 'woning',
-            insertRemoveAnimation: 1.0,
-            enabled: true,
-            value: 'woning'),
-        SliverBoxItemState(
-            key: 'lening',
-            insertRemoveAnimation: 1.0,
-            enabled: true,
-            value: 'lening'),
-        SliverBoxItemState(
-            key: 'kostenTitle',
-            insertRemoveAnimation: 1.0,
-            enabled: true,
-            value: 'kostenTitle'),
-      ],
-      bottomList: [
-        SliverBoxItemState(
-            key: 'totaleKosten',
-            insertRemoveAnimation: 1.0,
-            enabled: true,
-            value: 'totaleKosten'),
-        SliverBoxItemState(
-            key: 'bottom',
-            insertRemoveAnimation: 1.0,
-            enabled: true,
-            value: 'bottom'),
-      ],
-      buildSliverBoxItem: _buildItem,
-      buildSliverBoxTopBottom: _buildTopBottom,
+      controller: widget.controllerSliverRowBox,
+      bodyList: bodyList,
+      topList: topList,
+      bottomList: bottomList,
+      buildSliverBoxItem: ({
+        required SliverRowBoxModel<String, Waarde> model,
+        Animation? animation,
+        required int index,
+        required int length,
+        required SliverBoxItemState<Waarde> state,
+      }) =>
+          _buildItem(
+              model: model,
+              hp: hp,
+              animation: animation,
+              index: index,
+              length: length,
+              state: state),
+      buildSliverBoxTopBottom: ({
+        required SliverRowBoxModel<String, Waarde> model,
+        Animation? animation,
+        required int index,
+        required int length,
+        required SliverBoxItemState<String> state,
+      }) =>
+          _buildTopBottom(
+              model: model,
+              hp: hp,
+              animation: animation,
+              index: index,
+              length: length,
+              state: state),
     );
   }
 
   Widget _buildItem(
-      {Animation? animation,
+      {required SliverRowBoxModel<String, Waarde> model,
+      required HypotheekProfiel hp,
+      Animation? animation,
       required int index,
       required int length,
       required SliverBoxItemState<Waarde> state}) {
@@ -732,76 +671,83 @@ class HypotheekProfielVorigeWoningPanelState
               waarde: state.value,
             ),
         omschrijvingAanpassen: (String v) => _veranderingOmschrijving(
-              waarde: state.value,
+              state: state,
               text: v,
             ),
         waardeAanpassen: (double value) => _veranderingWaarde(
-              waarde: state.value,
+              state: state,
               value: value,
             ));
 
-    return SliverRowItemBackground(
+    return InsertRemoveVisibleAnimatedSliverRowItem(
+      model: model,
+      animation: animation,
+      key: Key('item_${state.key}'),
+      state: state,
+      child: SliverRowItemBackground(
         key: Key(state.key),
-        backgroundColor: Color.fromARGB(255, 244, 254, 251),
-        radialTop: 0.0,
-        radialbottom: 0.0,
-        child: InsertRemoveVisibleAnimatedSliverRowItem(
-            state: state, child: child, enableAnimation: animation));
+        backgroundColor: const Color.fromARGB(255, 239, 249, 253),
+        child: SizedSliverBox(height: state.height, child: child),
+      ),
+    );
   }
 
-  Widget _buildTopBottom(
-      {Animation? animation,
-      required int index,
-      required int length,
-      required SliverBoxItemState<String> state}) {
+  Widget _buildTopBottom({
+    required SliverRowBoxModel<String, Waarde> model,
+    required HypotheekProfiel hp,
+    Animation? animation,
+    required int index,
+    required int length,
+    required SliverBoxItemState<String> state,
+  }) {
     switch (state.key) {
       case 'topPadding':
         {
-          return SizedBox(
+          return const SizedBox(
             height: 16.0,
           );
         }
       case 'woningTitle':
         {
           final theme = Theme.of(context);
-          final headline3 = theme.textTheme.headline3;
+          final displaySmall = theme.textTheme.displaySmall;
 
           final child = Center(
               child: Text(
-            profiel.doelOverzicht == DoelProfielOverzicht.nieuw &&
-                    profiel.situatie != Situatie.geenKoopwoning
+            hp.doelHypotheekOverzicht == DoelHypotheekOverzicht.nieuweWoning
                 ? 'Huidige Woning'
                 : 'Vorige Woning',
-            style: headline3,
+            style: displaySmall,
             textAlign: TextAlign.center,
           ));
 
-          return SliverRowItemBackground(
-              radialTop: 32.0,
-              key: Key(state.key),
-              backgroundColor: Color.fromARGB(255, 239, 249, 253),
-              child: VisibleAnimatedSliverRowItem(
+          return InsertRemoveVisibleAnimatedSliverRowItem(
+              model: model,
+              animation: animation,
+              key: Key('item_${state.key}'),
+              state: state,
+              child: SliverRowItemBackground(
+                radialTop: 32.0,
+                key: Key(state.key),
+                backgroundColor: const Color.fromARGB(255, 239, 249, 253),
                 child: Padding(
                   padding: const EdgeInsets.only(top: 16.0),
                   child: child,
                 ),
-                enableAnimation: animation,
               ));
         }
       case 'woning':
         {
           final child = TextFormField(
-            controller: tecWoningWaarde,
-            focusNode: fnWoningWaarde,
-            decoration:
-                InputDecoration(hintText: 'Bedrag', labelText: 'Woningwaarde'),
-            keyboardType: TextInputType.numberWithOptions(
+            controller: _tecWoningWaarde,
+            focusNode: _fnWoningWaarde,
+            decoration: const InputDecoration(
+                hintText: 'Bedrag', labelText: 'Woningwaarde'),
+            keyboardType: const TextInputType.numberWithOptions(
               signed: true,
               decimal: true,
             ),
-            inputFormatters: [
-              MyNumberFormat(context).numberInputFormat('#.00')
-            ],
+            inputFormatters: [nf.numberInputFormat('#.00')],
             validator: (String? value) {
               if (nf.parsToDouble(value) == 0.0) {
                 return 'Geen bedrag';
@@ -810,40 +756,46 @@ class HypotheekProfielVorigeWoningPanelState
             },
           );
 
-          return SliverRowItemBackground(
-              key: Key(state.key),
-              backgroundColor: Color.fromARGB(255, 239, 249, 253),
-              child: VisibleAnimatedSliverRowItem(
+          return InsertRemoveVisibleAnimatedSliverRowItem(
+              model: model,
+              animation: animation,
+              key: Key('item_${state.key}'),
+              state: state,
+              child: SliverRowItemBackground(
+                key: Key(state.key),
+                backgroundColor: const Color.fromARGB(255, 239, 249, 253),
                 child: Padding(
                   padding: const EdgeInsets.only(
                       left: 16.0, top: 4.0, right: 16.0, bottom: 2.0),
                   child: child,
                 ),
-                enableAnimation: animation,
               ));
         }
       case 'kostenTitle':
         {
           {
             final theme = Theme.of(context);
-            final headline3 = theme.textTheme.headline3;
+            final displaySmall = theme.textTheme.displaySmall;
 
             final child = Center(
                 child: Text(
               'Kosten',
-              style: headline3,
+              style: displaySmall,
               textAlign: TextAlign.center,
             ));
 
-            return SliverRowItemBackground(
-                key: Key(state.key),
-                backgroundColor: Color.fromARGB(255, 239, 249, 253),
-                child: VisibleAnimatedSliverRowItem(
+            return InsertRemoveVisibleAnimatedSliverRowItem(
+                model: model,
+                animation: animation,
+                key: Key('item_${state.key}'),
+                state: state,
+                child: SliverRowItemBackground(
+                  key: Key(state.key),
+                  backgroundColor: const Color.fromARGB(255, 239, 249, 253),
                   child: Padding(
                     padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
                     child: child,
                   ),
-                  enableAnimation: animation,
                 ));
           }
         }
@@ -851,18 +803,16 @@ class HypotheekProfielVorigeWoningPanelState
       case 'lening':
         {
           final child = TextFormField(
-              key: Key('hypotheekInvullen'),
-              controller: tecHypotheek,
-              focusNode: fnHypotheek,
-              decoration: InputDecoration(
+              key: const Key('hypotheekInvullen'),
+              controller: _tecRestSchuldLening,
+              focusNode: _fnRestSchuldLening,
+              decoration: const InputDecoration(
                   hintText: 'Bedrag', labelText: 'Restschuld lening(en)'),
-              keyboardType: TextInputType.numberWithOptions(
+              keyboardType: const TextInputType.numberWithOptions(
                 signed: true,
                 decimal: true,
               ),
-              inputFormatters: [
-                MyNumberFormat(context).numberInputFormat('#.00')
-              ],
+              inputFormatters: [nf.numberInputFormat('#.00')],
               validator: (String? value) {
                 if (nf.parsToDouble(value) < 0.0) {
                   return 'Bedrag >= 0.0';
@@ -870,73 +820,71 @@ class HypotheekProfielVorigeWoningPanelState
                 return null;
               });
 
-          return SliverRowItemBackground(
-              radialTop: 0,
-              key: Key(state.key),
-              backgroundColor: Color.fromARGB(255, 239, 249, 253),
-              child: VisibleAnimatedSliverRowItem(
+          return InsertRemoveVisibleAnimatedSliverRowItem(
+              model: model,
+              animation: animation,
+              key: Key('item_${state.key}'),
+              state: state,
+              child: SliverRowItemBackground(
+                radialTop: 0,
+                key: Key(state.key),
+                backgroundColor: const Color.fromARGB(255, 239, 249, 253),
                 child: Padding(
                   padding: const EdgeInsets.only(
                       left: 16.0, right: 16.0, bottom: 16.0),
                   child: child,
                 ),
-                enableAnimation: animation,
               ));
         }
       case 'bottom':
         {
-          return SliverRowItemBackground(
-              radialbottom: 32.0,
-              key: Key(state.key),
-              backgroundColor: Color.fromARGB(255, 239, 249, 253),
-              child: VisibleAnimatedSliverRowItem(
+          return InsertRemoveVisibleAnimatedSliverRowItem(
+              model: model,
+              animation: animation,
+              key: Key('item_${state.key}'),
+              state: state,
+              child: SliverRowItemBackground(
+                radialbottom: 32.0,
+                key: Key(state.key),
+                backgroundColor: const Color.fromARGB(255, 239, 249, 253),
                 child: Padding(
                   padding: const EdgeInsets.only(top: 8.0, bottom: 16.0),
                   child: Center(
-                      child: ToevoegenKostenButton(pressed: toevoegKostenItem)),
+                      child: ToevoegenKostenButton(
+                          pressed: () => toevoegKostenItem(hp))),
                 ),
-                enableAnimation: animation,
               ));
         }
       case 'totaleKosten':
         {
           final child = TotaleKostenRowItem(
-            backgroundColor: Color.fromARGB(255, 239, 249, 253),
-            enableAnimation: animation,
-            state: state,
-            totaleKosten: profiel.vorigeWoningGegevens.totaleKosten,
+            backgroundColor: const Color.fromARGB(255, 239, 249, 253),
+            totaleKosten: hp.vorigeWoningKosten.totaleKosten,
           );
 
-          return SliverRowItemBackground(
-              key: Key(state.key),
-              backgroundColor: Color.fromARGB(255, 239, 249, 253),
-              child: VisibleAnimatedSliverRowItem(
+          return InsertRemoveVisibleAnimatedSliverRowItem(
+              model: model,
+              animation: animation,
+              key: Key('item_${state.key}'),
+              state: state,
+              child: SliverRowItemBackground(
+                key: Key(state.key),
+                backgroundColor: const Color.fromARGB(255, 239, 249, 253),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12.0),
                   child: child,
                 ),
-                enableAnimation: animation,
               ));
         }
       default:
         {
-          return Text(':(');
+          return const Text(':(');
         }
     }
   }
 
-  toevoegKostenItem() {
-    List<Waarde> resterend = [];
-    List<Waarde> lijst = profiel.vorigeWoningGegevens.kosten;
-    List<Waarde> suggestieLijst =
-        WoningLeningKostenGegevens.suggestieKostenVorigeWoning();
-
-    for (Waarde w in suggestieLijst) {
-      if (lijst.indexWhere((Waarde aanwezig) => aanwezig.id == w.id) == -1) {
-        resterend.add(w);
-      }
-    }
-    resterend.add(leegKosten);
+  void toevoegKostenItem(HypotheekProfiel hp) {
+    final resterend = HypotheekProfielVerwerken.suggestieKosten(hp);
 
     if (resterend.length == 1) {
       _toevoegenWaardes(resterend);
@@ -955,23 +903,73 @@ class HypotheekProfielVorigeWoningPanelState
   }
 
   _toevoegenWaardes(List<Waarde> lijst) {
-    nhpm.veranderingToevoegenKostenVorigeWoning(lijst);
+    final fhp = hp;
+
+    if (fhp == null) return;
+
+    int index = fhp.vorigeWoningKosten.kosten.fold<int>(
+        1000,
+        (previousValue, element) => previousValue < element.index + 1
+            ? element.index + 1
+            : previousValue);
+
+    lijst = [
+      for (Waarde w in lijst) w.standaard ? w : w.copyWith(index: index++)
+    ];
+
+    final feedback = widget.controllerSliverRowBox.insertGroup(
+        body: (List<SliverBoxItemState<Waarde>> list) {
+      list
+        ..addAll([
+          for (Waarde w in lijst)
+            SliverBoxItemState<Waarde>(
+                single: true,
+                height: 72.0,
+                value: w,
+                key: w.key,
+                status: ItemStatusSliverBox.insert)
+        ])
+        ..sort((a, b) => a.value.index.compareTo(b.value.index));
+    });
+
+    if (feedback == SliverBoxRowRequestFeedBack.accepted) {
+      notifier.veranderingVorigeWoningKosten(toevoegen: lijst);
+    } else {
+      debugPrint('Insertion not accepted, because busy with $feedback');
+    }
+  }
+
+  SliverBoxRowRequestFeedBack _verwijderWaardes(List<Waarde> lijst) {
+    return widget.controllerSliverRowBox.removeGroup(
+        body: (List<SliverBoxItemState<Waarde>> list) {
+      for (SliverBoxItemState<Waarde> state in list) {
+        if (lijst.contains(state.value)) {
+          state
+            ..single = true
+            ..status = ItemStatusSliverBox.remove;
+        }
+      }
+    });
   }
 
   _veranderingWoningwaarde(String value) {
-    nhpm.veranderingWoningWaarde(nf.parsToDouble(value));
+    notifier.veranderingVorigeWoningKosten(
+        woningWaarde: nf.parsToDouble(value));
   }
 
-  _veranderingHypotheek(String value) {
-    nhpm.veranderingHypotheek(nf.parsToDouble(value));
+  _veranderingLening(String value) {
+    notifier.veranderingVorigeWoningKosten(lening: nf.parsToDouble(value));
   }
 
-  _veranderingOmschrijving({required Waarde waarde, required String text}) {
-    nhpm.veranderingWaardepWoning(waarde: waarde, name: text);
+  _veranderingOmschrijving(
+      {required SliverBoxItemState<Waarde> state, required String text}) {
+    state.value =
+        notifier.veranderingWaarde(waarde: state.value, omschrijving: text);
   }
 
-  _veranderingWaarde({required Waarde waarde, required double value}) {
-    nhpm.veranderingWaardepWoning(waarde: waarde, value: value);
+  _veranderingWaarde(
+      {required SliverBoxItemState<Waarde> state, required double value}) {
+    state.value = notifier.veranderingWaarde(waarde: state.value, getal: value);
   }
 
   _veranderingWaardeOpties(
@@ -980,25 +978,27 @@ class HypotheekProfielVorigeWoningPanelState
     switch (iv.identifier) {
       case 'eenheid':
         {
-          nhpm.veranderingWaardepWoning(waarde: state.value, eenheid: iv.value);
+          state.value = notifier.veranderingWaarde(
+              waarde: state.value, eenheid: iv.value);
           break;
         }
-      case 'aftrekken':
+      case 'aftrekbaar':
         {
-          nhpm.veranderingWaardepWoning(
+          state.value = notifier.veranderingWaarde(
               waarde: state.value, aftrekbaar: iv.value);
           break;
         }
       case 'verwijderen':
         {
-          nhpm.veranderingVerwijderenKostenVorigeWoning([state.value]);
-          state.enabled = false;
+          if (_verwijderWaardes([state.value]) ==
+              SliverBoxRowRequestFeedBack.accepted) {
+            state.key = '${state.value.key}_remove';
+            notifier.veranderingVorigeWoningKosten(verwijderen: [state.value]);
+          } else {
+            debugPrint('Remove not accepted');
+          }
           break;
         }
     }
-  }
-
-  updateState() {
-    setState(() {});
   }
 }

@@ -1,7 +1,7 @@
 import 'package:custom_sliver_appbar/title_image_appbar/title_image_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:mortgage_insight/platform_page_format/default_page.dart';
-import 'package:mortgage_insight/platform_page_format/fabProperties.dart';
+import 'package:mortgage_insight/platform_page_format/fab_properties.dart';
 import 'package:mortgage_insight/platform_page_format/page_actions.dart';
 import 'package:mortgage_insight/utilities/device_info.dart';
 
@@ -45,13 +45,14 @@ class TablePageScrollBars extends StatelessWidget {
         action:
             pageActionsToIconButton(context, pageProperties.rightTopActions));
 
-    Widget body = Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-      child: PageActionBottomLayout(
-          leftBottomActions: pageProperties.leftBottomActions,
-          rightBottomActions: pageProperties.rightBottomActions,
-          body: bodyBuilder(context: context, nested: false)),
-    );
+    Widget body = PageActionBottomLayout(
+        leftBottomActions: pageProperties.leftBottomActions,
+        rightBottomActions: pageProperties.rightBottomActions,
+        body: bodyBuilder(
+            context: context,
+            nested: false,
+            topPadding: 8.0,
+            bottomPadding: 8.0));
 
     final titleHeight =
         (isNarrow && (title != null || left != null || right != null))
@@ -67,11 +68,11 @@ class TablePageScrollBars extends StatelessWidget {
           notificationPredicate: (ScrollNotification notification) =>
               notification.depth == notificationDepth,
           title: titleHeight != 0.0 ? title : null,
-          backgroundColor: theme.backgroundColor,
+          backgroundColor: theme.colorScheme.background,
           backgroundColorScrolledUnder: theme.colorScheme.onSurface,
           leftActions: left,
           rightActions: right,
-          titleTextStyle: TextStyle(fontSize: 24.0),
+          titleTextStyle: const TextStyle(fontSize: 24.0),
           titleHeight: titleHeight,
           imageHeight: imageBuilder != null ? 120.0 : 0.0,
           imageBuilder: imageBuilder,
@@ -85,13 +86,13 @@ class TablePageScrollBars extends StatelessWidget {
               Widget? child}) {
             final scrolledUnderColor = scrolledUnder
                 ? theme.colorScheme.surface
-                : theme.bottomAppBarColor;
+                : theme.bottomAppBarTheme.color;
 
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Material(
                   color: scrolledUnderColor,
-                  shape: RoundedRectangleBorder(
+                  shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(8.0))),
                   child: child),
             );

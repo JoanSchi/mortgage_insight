@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mortgage_insight/route_widgets/document/route_widget_mobile.dart';
 
+import '../../pages/schulden/schuld_aanpassen_panel.dart';
 import '../../pages/schulden/schuld_keuze_panel.dart';
 import '../../pages/schulden/schulden_overzicht_panel.dart';
 import '../../pages/hypotheek/bewerken/hypotheek_bewerken.dart';
@@ -104,7 +105,7 @@ class AppRouteStates {
     this.editRouteName = '',
     this.routes = const {},
     this.appLayout = AppLayout.unknown,
-    this.formFactorType = FormFactorType.Unknown,
+    this.formFactorType = FormFactorType.unknown,
   });
 
   AppRouteStates copyWith({
@@ -135,20 +136,20 @@ String _routePage({
 
 AppLayout _appLayoutFromType(FormFactorType type) {
   switch (type) {
-    case FormFactorType.SmallPhone:
-    case FormFactorType.LargePhone:
+    case FormFactorType.smallPhone:
+    case FormFactorType.largePhone:
       {
         return AppLayout.mobile;
       }
-    case FormFactorType.Tablet:
+    case FormFactorType.tablet:
       {
         return AppLayout.tablet;
       }
-    case FormFactorType.Monitor:
+    case FormFactorType.monitor:
       {
         return AppLayout.large;
       }
-    case FormFactorType.Unknown:
+    case FormFactorType.unknown:
       {
         return AppLayout.unknown;
       }
@@ -201,10 +202,6 @@ GoRouterPageBuilder noTransitionPage(
       );
 }
 
-class BlubObserver extends NavigatorObserver {
-  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {}
-}
-
 GoRouter _appRoute(String initialLocation) {
   return GoRouter(
     initialLocation: initialLocation,
@@ -212,7 +209,7 @@ GoRouter _appRoute(String initialLocation) {
       GoRoute(
         path: '/',
         name: 'start',
-        builder: (context, state) => Home(),
+        builder: (context, state) => const Home(),
       ),
       GoRoute(
         path: '/document',
@@ -231,27 +228,32 @@ GoRouter _mobile(String initialLocation) {
       GoRoute(
           path: '/',
           name: 'MobileDocument',
-          builder: (context, state) => MobileDocument(),
+          builder: (context, state) => const MobileDocument(),
           routes: [
             GoRoute(
-              path: '$routeIncomeEdit',
+              path: routeIncomeEdit,
               name: routeIncomeEdit,
-              builder: (context, state) => IncomeEdit(),
+              builder: (context, state) => const IncomeEdit(),
             ),
             GoRoute(
-              path: '$routeDebtsEdit',
+              path: routeDebtsAdd,
+              name: routeDebtsAdd,
+              builder: (context, state) => const SchuldKeuzePanel(),
+            ),
+            GoRoute(
+              path: routeDebtsEdit,
               name: routeDebtsEdit,
-              builder: (context, state) => SchuldKeuzePanel(),
+              builder: (context, state) => const SchuldAanpassenPanel(),
             ),
             GoRoute(
-              path: '$routeNieweHypotheekProfielEdit',
-              name: routeNieweHypotheekProfielEdit,
-              builder: (context, state) => BewerkHypotheekProfiel(),
+              path: routeNieuweHypotheekProfielEdit,
+              name: routeNieuweHypotheekProfielEdit,
+              builder: (context, state) => const BewerkHypotheekProfiel(),
             ),
             GoRoute(
-              path: '$routeMortgageEdit',
+              path: routeMortgageEdit,
               name: routeMortgageEdit,
-              builder: (context, state) => BewerkHypotheek(),
+              builder: (context, state) => const BewerkHypotheek(),
             ),
           ]),
     ],
@@ -297,13 +299,13 @@ GoRouter _page(String initialLocation) {
           path: '/$routeIncome',
           name: routeIncome,
           // builder: (context, state) => MyWidget(),
-          pageBuilder: noTransitionPage(IncomePanel()),
+          pageBuilder: noTransitionPage(const InkomenPanel()),
           routes: [
             GoRoute(
-              path: '$routeIncomeEdit',
+              path: routeIncomeEdit,
               name: routeIncomeEdit,
               pageBuilder: noTransitionPage(
-                IncomeEdit(),
+                const IncomeEdit(),
               ),
             ),
           ]),
@@ -315,10 +317,16 @@ GoRouter _page(String initialLocation) {
           ),
           routes: [
             GoRoute(
-                path: '$routeDebtsEdit',
+                path: routeDebtsAdd,
+                name: routeDebtsAdd,
+                pageBuilder: noTransitionPage(
+                  const SchuldKeuzePanel(),
+                )),
+            GoRoute(
+                path: routeDebtsEdit,
                 name: routeDebtsEdit,
                 pageBuilder: noTransitionPage(
-                  SchuldKeuzePanel(),
+                  const SchuldAanpassenPanel(),
                 )),
           ]),
       GoRoute(
@@ -330,20 +338,20 @@ GoRouter _page(String initialLocation) {
           path: '/$routeMortgage',
           name: routeMortgage,
           pageBuilder: noTransitionPage(
-            HypotheekBlub(),
+            const HypotheekPanel(),
           ),
           routes: [
             GoRoute(
-                path: '$routeNieweHypotheekProfielEdit',
-                name: routeNieweHypotheekProfielEdit,
+                path: routeNieuweHypotheekProfielEdit,
+                name: routeNieuweHypotheekProfielEdit,
                 pageBuilder: noTransitionPage(
-                  BewerkHypotheekProfiel(),
+                  const BewerkHypotheekProfiel(),
                 )),
             GoRoute(
-                path: '$routeMortgageEdit',
+                path: routeMortgageEdit,
                 name: routeMortgageEdit,
                 pageBuilder: noTransitionPage(
-                  BewerkHypotheek(),
+                  const BewerkHypotheek(),
                 )),
           ]),
       GoRoute(
@@ -377,7 +385,7 @@ GoRouter _mediumRoute() {
       GoRoute(
         path: '/',
         name: 'MediumDocument',
-        builder: (context, state) => MediumDocument(),
+        builder: (context, state) => const MediumDocument(),
       ),
     ],
   );
@@ -390,7 +398,7 @@ GoRouter _largeRoute() {
       GoRoute(
         path: '/',
         name: 'LargeDocument',
-        builder: (context, state) => LargeRouteDocument(),
+        builder: (context, state) => const LargeRouteDocument(),
       ),
     ],
   );

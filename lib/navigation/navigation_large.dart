@@ -26,8 +26,8 @@ class _LargeDrawerState extends State<LargeDrawer> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         ConstrainedBox(
-          constraints:
-              BoxConstraints(minWidth: 400, maxWidth: 1100, maxHeight: 128.0),
+          constraints: const BoxConstraints(
+              minWidth: 400, maxWidth: 1100, maxHeight: 128.0),
           child: Row(children: [
             Padding(
               padding:
@@ -52,7 +52,7 @@ class _LargeDrawerState extends State<LargeDrawer> {
                                 fontSize: 36,
                               ),
                               children: <TextSpan>[
-                                TextSpan(
+                                const TextSpan(
                                     text: 'Hypotheek ',
                                     style: TextStyle(
                                         color: Colors.black,
@@ -69,16 +69,16 @@ class _LargeDrawerState extends State<LargeDrawer> {
                       ],
                     ),
                   ),
-                  Container(height: 52.0, child: HorizontalTabBar())
+                  const SizedBox(height: 52.0, child: HorizontalTabBar())
                 ],
               ),
             )
           ]),
         ),
-        Divider(
+        const Divider(
           height: 2.0,
         ),
-        Expanded(
+        const Expanded(
           child: MyRoutePage(),
         )
       ],
@@ -87,6 +87,8 @@ class _LargeDrawerState extends State<LargeDrawer> {
 }
 
 class HorizontalTabBar extends ConsumerStatefulWidget {
+  const HorizontalTabBar({super.key});
+
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
       _HorizontalTabBarState();
@@ -201,13 +203,13 @@ class _LineUnderState extends State<_LineUnder>
         child: widget.child,
         builder: (BuildContext context, Widget? child) {
           return CustomPaint(
-            child: child,
             painter: LinePaint(
                 animationValue: _animationController.value,
                 color: widget.color,
                 strokeWidth: widget.strokeWidth,
                 horizontalPadding: 12.0,
                 bottomPadding: 4.0),
+            child: child,
           );
         });
   }

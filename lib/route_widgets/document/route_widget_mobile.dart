@@ -9,7 +9,7 @@ import 'route_widget_page.dart';
 const double kLeftMobileNavigationBarSize = 64.0;
 
 class MobileDocument extends StatefulWidget {
-  const MobileDocument({Key? key}) : super(key: key);
+  const MobileDocument({super.key});
 
   @override
   State<MobileDocument> createState() => _MobileDocumentState();
@@ -40,8 +40,8 @@ class _MobileDocumentState extends State<MobileDocument> {
                 BottomMobileDrawer(
               drawerModel: drawerModel,
             ),
-            body: MyRoutePage(),
-            scrimeColorEnd: Color.fromARGB(159, 41, 125, 167),
+            body: const MyRoutePage(),
+            scrimeColorEnd: const Color.fromARGB(159, 41, 125, 167),
             minimumSize: 64.0,
             navigationBarSize: 16.0,
           )
@@ -63,8 +63,8 @@ class _MobileDocumentState extends State<MobileDocument> {
                 MobileLeftDrawer(
               drawerModel: drawerModel,
             ),
-            body: MyRoutePage(),
-            scrimeColorEnd: Color.fromARGB(159, 41, 125, 167),
+            body: const MyRoutePage(),
+            scrimeColorEnd: const Color.fromARGB(159, 41, 125, 167),
             minimumSize: 64.0,
             navigationBarSize: 16.0,
           );

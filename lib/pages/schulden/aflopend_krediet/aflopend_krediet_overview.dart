@@ -1,83 +1,46 @@
 import 'package:flutter/material.dart';
-import '../../../model/nl/schulden/remove_schulden.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mortgage_insight/model/nl/schulden/aflopend_krediet_verwerken.dart';
+import 'package:mortgage_insight/pages/schulden/aflopend_krediet/abstract_aflopend_krediet_consumer_state.dart';
 import '../../../model/nl/schulden/schulden.dart';
-import '../../../model/nl/schulden/remove_schulden_aflopend_krediet.dart';
 import '../../../my_widgets/summary_pie_chart/pie_chart.dart';
 import '../../../my_widgets/summary_pie_chart/summary_pie_layout.dart';
-import '../../../utilities/MyNumberFormat.dart';
 import '../../../utilities/value_to_width.dart';
-import 'aflopend_krediet_model.dart';
 
-class OverzichtLening extends StatefulWidget {
-  final AflopendKredietModel? aflopendKredietModel;
-
-  OverzichtLening({Key? key, required this.aflopendKredietModel})
-      : super(key: key);
+class OverzichtLening extends ConsumerStatefulWidget {
+  const OverzichtLening({
+    Key? key,
+  }) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => OverzichtLeningState();
+  ConsumerState<OverzichtLening> createState() => OverzichtLeningState();
 }
 
-class OverzichtLeningState extends State<OverzichtLening> {
-  late MyNumberFormat nf = MyNumberFormat(context);
-  final columnWidthSummaryValues = ValueToWidth<int>(value: 0);
+class OverzichtLeningState
+    extends AbstractAflopendKredietState<OverzichtLening> {
   final widthLegend = ValueToWidth<String>(value: '');
-  AflopendKredietModel? aflopendKredietModel;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (aflopendKredietModel != widget.aflopendKredietModel) {
-      aflopendKredietModel?.removeListener(notify);
-      aflopendKredietModel = widget.aflopendKredietModel?..addListener(notify);
-    }
-  }
-
-  @override
-  void didUpdateWidget(covariant OverzichtLening oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (aflopendKredietModel != widget.aflopendKredietModel) {
-      aflopendKredietModel?.removeListener(notify);
-      aflopendKredietModel = widget.aflopendKredietModel?..addListener(notify);
-    }
-  }
-
-  @override
-  void dispose() {
-    aflopendKredietModel?.removeListener(notify);
-    super.dispose();
-  }
-
-  notify() {
-    setState(() {});
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget buildAflopendKrediet(BuildContext context, AflopendKrediet ak) {
     Widget widget;
 
-    if (aflopendKredietModel == null ||
-        aflopendKredietModel!.ak.berekend != StatusBerekening.berekend) {
-      widget = SizedBox(
+    if (ak.statusBerekening != StatusBerekening.berekend) {
+      widget = const SizedBox(
         height: 1.0,
       );
     } else {
-      widget = buildSummary(context);
+      widget = buildSummary(context, ak);
     }
 
-    return SliverToBoxAdapter(
-      child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 200), child: widget),
-    );
+    return AnimatedSwitcher(
+        duration: const Duration(milliseconds: 200), child: widget);
   }
 
-  Widget buildSummary(BuildContext context) {
-    RemoveAflopendKrediet ak = aflopendKredietModel!.ak;
-
+  Widget buildSummary(BuildContext context, AflopendKrediet ak) {
     final ThemeData theme = Theme.of(context);
     double textScaleFactor = MediaQuery.of(context).textScaleFactor;
 
-    Widget textPadding(String text, {textAlign: TextAlign.left}) {
+    Widget textPadding(String text, {textAlign = TextAlign.left}) {
       return Padding(
           padding: const EdgeInsets.only(top: 2.0, bottom: 2.0),
           child: Text(text, textAlign: textAlign));
@@ -127,8 +90,8 @@ class OverzichtLeningState extends State<OverzichtLening> {
         textPadding(' :'),
         textPadding(
             nf.parseDblToText(
-                ak.berekend == StatusBerekening.berekend
-                    ? ak.interestPercentage()
+                ak.statusBerekening == StatusBerekening.berekend
+                    ? AflopendKredietVerwerken.interestPercentage(ak)
                     : null,
                 format: '#0.0',
                 ifnull: '-'),
@@ -141,33 +104,28 @@ class OverzichtLeningState extends State<OverzichtLening> {
       ])
     ]);
     TextStyle textStyleTable =
-        theme.textTheme.bodyText2!.copyWith(fontSize: 16.0);
+        theme.textTheme.bodyMedium!.copyWith(fontSize: 16.0);
 
     final Widget tableOverzicht = DefaultTextStyle(
       style: textStyleTable,
-      child: Table(columnWidths: {
+      child: Table(columnWidths: const {
         0: IntrinsicColumnWidth(),
         1: IntrinsicColumnWidth(),
-        2: FixedColumnWidth(calculateWidthFromNumber(
-                valueToWidth: columnWidthSummaryValues,
-                value: ak.somAnn,
-                textStyle: textStyleTable,
-                textScaleFactor: textScaleFactor)
-            .width)
+        2: IntrinsicColumnWidth()
       }, children: tableRows),
     );
 
-    final valueToText = (double v) => '${(v * 10).roundToDouble() / 10}%';
+    valueToText(double v) => '${(v * 10).roundToDouble() / 10}%';
 
     final pieces = <PiePiece>[
       PiePiece(
           value: ak.lening / ak.somAnn * 100.0,
           name: 'lening',
-          color: Color(0xFFaad400)),
+          color: const Color(0xFFaad400)),
       PiePiece(
           value: ak.somInterest / ak.somAnn * 100.0,
           name: 'rente',
-          color: Color.fromARGB(255, 8, 10, 0))
+          color: const Color.fromARGB(255, 8, 10, 0))
     ];
 
     calculateWidthFromText(
@@ -179,23 +137,23 @@ class OverzichtLeningState extends State<OverzichtLening> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-        Divider(height: 24.0),
-        Text(
+        const Divider(height: 24.0),
+        const Text(
           'Overzicht',
         ),
-        SizedBox(height: 16.0),
+        const SizedBox(height: 16.0),
         SummaryPieLayout(
           children: [
             SummaryPieDataWidget(
-                child: tableOverzicht, id: SummaryPieID.summary),
+                id: SummaryPieID.summary, child: tableOverzicht),
             SummaryPieDataWidget(
-                child: Container(
+                id: SummaryPieID.pie,
+                child: SizedBox(
                     width: 250,
                     height: 250,
                     child: PieChart(
                       pieces: pieces,
-                    )),
-                id: SummaryPieID.pie),
+                    ))),
             ...pieces
                 .map((PiePiece e) => SummaryPieDataWidget(
                     id: SummaryPieID.legendItem,
@@ -207,90 +165,8 @@ class OverzichtLeningState extends State<OverzichtLening> {
                 .toList()
           ],
         ),
-        SizedBox(height: 8.0),
+        const SizedBox(height: 8.0),
       ]),
     );
   }
 }
-
-
-
-// class PercentagePieChart extends StatelessWidget {
-//   final List<charts.Series<PieItem, String>> seriesList;
-//   final bool animate;
-
-//   PercentagePieChart(this.seriesList, {this.animate = true});
-
-//   factory PercentagePieChart.data({List<PieItem> data = const <PieItem>[]}) {
-//     return new PercentagePieChart(
-//       _createSampleData(data: data),
-//       animate: true,
-//     );
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return new charts.PieChart<String>(
-//       seriesList,
-//       animate: animate,
-//       rtlSpec: charts.RTLSpec(axisDirection: charts.AxisDirection.reversed),
-//       // Add the legend behavior to the chart to turn on legends.
-//       // This example shows how to optionally show measure and provide a custom
-//       // formatter.
-
-//       behaviors: [
-//         charts.DatumLegend(
-//           // Positions for "start" and "end" will be left and right respectively
-//           // for widgets with a build context that has directionality ltr.
-//           // For rtl, "start" and "end" will be right and left respectively.
-//           // Since this example has directionality of ltr, the legend is
-//           // positioned on the right side of the chart.
-//           position: charts.BehaviorPosition.end,
-//           // By default, if the position of the chart is on the left or right of
-//           // the chart, [horizontalFirst] is set to false. This means that the
-//           // legend entries will grow as new rows first instead of a new column.
-//           horizontalFirst: false,
-//           insideJustification: charts.InsideJustification.topStart,
-//           outsideJustification: charts.OutsideJustification.middleDrawArea,
-//           // This defines the padding around each legend entry.
-//           cellPadding: EdgeInsets.only(right: 4.0, bottom: 4.0),
-//           // Set [showMeasures] to true to display measures in series legend.
-//           showMeasures: true,
-//           // Configure the measure value to be shown by default in the legend.
-//           legendDefaultMeasure: charts.LegendDefaultMeasure.firstValue,
-//           // Optionally provide a measure formatter to format the measure value.
-//           // If none is specified the value is formatted as a decimal.
-//           measureFormatter: (num? value) {
-//             return value == null ? '-' : '${value.round()}%';
-//           },
-//         ),
-//       ],
-//       // defaultRenderer: charts.ArcRendererConfig(arcRendererDecorators: [
-//       //   charts.ArcLabelDecorator(
-//       //       labelPosition: charts.ArcLabelPosition.outside)
-//       // ])
-//     );
-//   }
-
-//   static List<charts.Series<PieItem, String>> _createSampleData(
-//       {List<PieItem> data: const <PieItem>[]}) {
-//     return [
-//       new charts.Series<PieItem, String>(
-//         id: 'Totaal',
-//         domainFn: (PieItem item, _) => item.label,
-//         measureFn: (PieItem item, _) => item.percentage,
-//         data: data,
-//         // colorFn: (_, __) => charts.MaterialPalette.lime.shadeDefault,
-//         // seriesColor: charts.ColorUtil.fromDartColor(Colors.amber.shade700),
-//         // labelAccessorFn: (PieItem r, _) => r.label
-//       )
-//     ];
-//   }
-// }
-
-// class PieItem {
-//   final String label;
-//   final double percentage;
-
-//   PieItem(this.label, this.percentage);
-// }

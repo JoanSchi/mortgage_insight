@@ -12,7 +12,7 @@ class MyRoutePage extends ConsumerStatefulWidget {
 }
 
 class _MyRoutePageState extends ConsumerState<MyRoutePage> {
-  late GoRouter? _router =
+  late final GoRouter? _router =
       ref.read(routeDocumentProvider).routes[AppRoutes.page];
 
   @override
@@ -20,7 +20,7 @@ class _MyRoutePageState extends ConsumerState<MyRoutePage> {
     final router = _router;
 
     return router == null
-        ? OhNo(text: 'Page router is not found')
+        ? const OhNo(text: 'Page router is not found')
         : Router(
             backButtonDispatcher: ChildBackButtonDispatcher(
                 Router.of(context).backButtonDispatcher!)

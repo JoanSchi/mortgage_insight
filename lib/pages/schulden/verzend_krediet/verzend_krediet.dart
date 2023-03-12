@@ -1,181 +1,115 @@
-import 'dart:async';
-
+import 'package:date_input_picker/date_input_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mortgage_insight/pages/schulden/verzend_krediet/verzend_krediet_model.dart';
+import 'package:mortgage_insight/model/nl/schulden/verzendkrediet_verwerken.dart';
+import 'package:mortgage_insight/my_widgets/oh_no.dart';
+import 'package:mortgage_insight/my_widgets/selectable_widgets/single_checkbox.dart';
+import 'package:mortgage_insight/pages/schulden/schuld_provider.dart';
 import 'package:mortgage_insight/pages/schulden/verzend_krediet/verzend_krediet_overview.dart';
-import 'package:mortgage_insight/model/nl/schulden/remove_schulden_verzend_krediet.dart';
-import 'package:mortgage_insight/utilities/message_listeners.dart';
+import 'package:selectable_group_widgets/selectable_group_widgets.dart';
 import '../../../model/nl/schulden/schulden.dart';
+import '../../../my_widgets/selectable_widgets/selectable_group_themes.dart';
 import '../../../my_widgets/simple_widgets.dart';
-import '../../../utilities/Kalender.dart';
-import '../../../utilities/MyNumberFormat.dart';
-import '../date_picker.dart';
-import 'package:go_router/go_router.dart';
+import '../../../utilities/kalender.dart';
+import '../../../utilities/my_number_format.dart';
+import '../../../utilities/match_properties.dart';
 
-class VerzendKredietPanel extends ConsumerStatefulWidget {
-  final RemoveVerzendhuisKrediet verzendHuisKrediet;
-  final MessageListener<AcceptCancelBackMessage> messageListener;
+class VerzendKredietPanel extends StatelessWidget {
+  final double topPadding;
+  final double bottomPadding;
 
   const VerzendKredietPanel({
     Key? key,
-    required this.verzendHuisKrediet,
-    required this.messageListener,
+    required this.topPadding,
+    required this.bottomPadding,
   }) : super(key: key);
 
   @override
-  ConsumerState<VerzendKredietPanel> createState() =>
-      _VerzendKredietPanelState();
-}
-
-class _VerzendKredietPanelState extends ConsumerState<VerzendKredietPanel> {
-  late VerzendhuisKredietModel verzendhuisKredietModel =
-      verzendhuisKredietModel =
-          VerzendhuisKredietModel(vk: widget.verzendHuisKrediet);
-
-  final _formKey = GlobalKey<FormState>();
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
-
-  @override
-  void didUpdateWidget(VerzendKredietPanel oldWidget) {
-    if (widget.verzendHuisKrediet != oldWidget.verzendHuisKrediet) {
-      verzendhuisKredietModel.dispose();
-      verzendhuisKredietModel =
-          VerzendhuisKredietModel(vk: widget.verzendHuisKrediet);
-    }
-
-    super.didUpdateWidget(oldWidget);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return MessageListenerWidget(
-      listener: widget.messageListener,
-      onMessage: (AcceptCancelBackMessage message) {
-        switch (message.msg) {
-          case AcceptCancelBack.accept:
-            FocusScope.of(context).unfocus();
-
-            scheduleMicrotask(() {
-              if ((_formKey.currentState?.validate() ?? false) &&
-                  widget.verzendHuisKrediet.berekend ==
-                      StatusBerekening.berekend) {
-                // ref
-                //     .read(hypotheekContainerProvider.notifier)
-                //     .addSchuld(widget.verzendHuisKrediet);
-                scheduleMicrotask(() {
-                  //didpop sets editState of routeEditPageProvider.notifier to null;
-                  context.pop();
-                });
-              }
-            });
-
-            break;
-          case AcceptCancelBack.cancel:
-            //didpop sets editState of routeEditPageProvider.notifier to null;
-            context.pop();
-
-            break;
-          default:
-            break;
-        }
-      },
-      child: Form(
-        key: _formKey,
-        child: CustomScrollView(
-          slivers: [
-            VerzendKredietOptiePanel(
-                verzendhuisKredietModel: verzendhuisKredietModel),
-            OverzichtVerzendHuisKrediet(
-                verzendhuisKredietModel: verzendhuisKredietModel)
-          ],
-        ),
-      ),
-    );
+    return CustomScrollView(slivers: [
+      SliverList(
+          delegate: SliverChildListDelegate.fixed(
+        [
+          SizedBox(
+            height: topPadding,
+          ),
+          const VerzendKredietOptiePanel(),
+          const OverzichtVerzendHuisKrediet(),
+          SizedBox(
+            height: bottomPadding,
+          ),
+        ],
+      ))
+    ]);
   }
 }
 
-class VerzendKredietOptiePanel extends StatefulWidget {
-  final VerzendhuisKredietModel verzendhuisKredietModel;
-
-  VerzendKredietOptiePanel({Key? key, required this.verzendhuisKredietModel})
-      : super(key: key);
+class VerzendKredietOptiePanel extends ConsumerStatefulWidget {
+  const VerzendKredietOptiePanel({
+    Key? key,
+  }) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => VerzendKredietOptiePanelState();
+  ConsumerState<VerzendKredietOptiePanel> createState() =>
+      VerzendKredietOptiePanelState();
 }
 
-class VerzendKredietOptiePanelState extends State<VerzendKredietOptiePanel>
+class VerzendKredietOptiePanelState
+    extends ConsumerState<VerzendKredietOptiePanel>
     with TickerProviderStateMixin {
-  late VerzendhuisKredietModel verzendhuisKredietModel =
-      widget.verzendhuisKredietModel..verzendKredietOptiePanelState = this;
+  VerzendKrediet? get vk => ref
+      .read(schuldProvider)
+      .schuld
+      ?.mapOrNull(verzendKrediet: (VerzendKrediet vk) => vk);
 
-  RemoveVerzendhuisKrediet get vk => verzendhuisKredietModel.vk;
+  SchuldBewerkNotifier get notifier => ref.read(schuldProvider.notifier);
 
   late MyNumberFormat nf = MyNumberFormat(context);
 
-  late TextEditingController _tecOmschrijving =
-      TextEditingController(text: vk.omschrijving);
+  late final TextEditingController _tecOmschrijving =
+      TextEditingController(text: toText((vk) => vk.omschrijving));
 
-  late TextEditingController _tecMaanden =
-      TextEditingController(text: vk.maanden.toString());
+  late final TextEditingController _tecMaanden =
+      TextEditingController(text: intToText((vk) => vk.maanden));
 
-  late TextEditingController _tecBedrag = TextEditingController(
-      text: vk.totaalBedrag == 0.0
-          ? ''
-          : nf.parseDoubleToText(vk.totaalBedrag, '#0.00'));
+  late final TextEditingController _tecBedrag =
+      TextEditingController(text: doubleToText((vk) => vk.totaalBedrag));
 
-  late TextEditingController _tecSlottermijn = TextEditingController(
-      text: vk.slotTermijn == 0.0
-          ? ''
-          : nf.parseDoubleToText(vk.slotTermijn, '#0.00'));
+  late final TextEditingController _tecSlottermijn =
+      TextEditingController(text: doubleToText((vk) => vk.slotTermijn));
 
-  late FocusNode _fnMaanden = FocusNode()
+  late final FocusNode _fnMaanden = FocusNode()
     ..addListener(() {
       if (!_fnMaanden.hasFocus) {
         _veranderingMaandenFromText(_tecMaanden.text);
       }
     });
-  late FocusNode _fnBedrag = FocusNode()
+  late final FocusNode _fnBedrag = FocusNode()
     ..addListener(() {
       if (!_fnBedrag.hasFocus) {
         _veranderingBedrag(_tecBedrag.text);
       }
     });
-  late FocusNode _fnSlottermijn = FocusNode()
+  late final FocusNode _fnSlottermijn = FocusNode()
     ..addListener(() {
       if (!_fnSlottermijn.hasFocus) {
         _veranderingSlottermijn(_tecSlottermijn.text);
       }
     });
-  late FocusNode _fnOmschrijving = FocusNode()
+  late final FocusNode _fnOmschrijving = FocusNode()
     ..addListener(() {
       if (!_fnOmschrijving.hasFocus) {
         _veranderingOmschrijving(_tecOmschrijving.text);
       }
     });
 
-  late AnimationController _slottermijnCheckboxAnimationController =
+  late final AnimationController _slottermijnCheckboxAnimationController =
       AnimationController(
-          value: !vk.isTotalbedrag ? 1 : 0,
+          value: (vk?.vkBedrag ?? VKbedrag.totaal) == VKbedrag.totaal ? 1 : 0,
           vsync: this,
           duration: const Duration(milliseconds: 200));
 
-  late AnimationController _slottermijnEditTextAnimationController =
+  late final AnimationController _slottermijnEditTextAnimationController =
       AnimationController(
           value: _slottermijnEditboxvisible ? 1.0 : 0.0,
           vsync: this,
@@ -193,27 +127,43 @@ class VerzendKredietOptiePanelState extends State<VerzendKredietOptiePanel>
           }
         });
 
-  late AnimationController _afrondenAnimationController = AnimationController(
-    value: vk.isTotalbedrag ? 1.0 : 0.0,
+  late final AnimationController _afrondenAnimationController =
+      AnimationController(
+    value: (vk?.vkBedrag ?? VKbedrag.totaal) == VKbedrag.totaal ? 1.0 : 0.0,
     vsync: this,
-    duration: Duration(milliseconds: 200),
+    duration: const Duration(milliseconds: 200),
   );
-  bool get _slottermijnEditboxvisible =>
-      !vk.isTotalbedrag && vk.heeftSlotTermijn;
 
-  @override
-  void initState() {
-    super.initState();
+  bool get _slottermijnEditboxvisible {
+    final localVk = vk;
+
+    return (localVk != null) &&
+        localVk.vkBedrag == VKbedrag.totaal &&
+        localVk.heeftSlotTermijn;
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  String toText(Function(VerzendKrediet vk) toText) {
+    return ref.read(schuldProvider).schuld?.mapOrNull<String>(
+            verzendKrediet: (VerzendKrediet vk) => toText(vk)) ??
+        '';
   }
 
-  @override
-  void didUpdateWidget(VerzendKredietOptiePanel oldWidget) {
-    super.didUpdateWidget(oldWidget);
+  String doubleToText(double Function(VerzendKrediet vk) doubleToText) {
+    return ref.read(schuldProvider).schuld?.mapOrNull<String>(
+            verzendKrediet: (VerzendKrediet vk) {
+          final value = doubleToText(vk);
+          return value == 0.0 ? '' : nf.parseDblToText(doubleToText(vk));
+        }) ??
+        '';
+  }
+
+  String intToText(int Function(VerzendKrediet vk) intToText) {
+    return ref.read(schuldProvider).schuld?.mapOrNull<String>(
+            verzendKrediet: (VerzendKrediet vk) {
+          final value = intToText(vk);
+          return value == 0.0 ? '' : '$value';
+        }) ??
+        '';
   }
 
   @override
@@ -228,15 +178,64 @@ class VerzendKredietOptiePanelState extends State<VerzendKredietOptiePanel>
     _slottermijnCheckboxAnimationController.dispose();
     _slottermijnEditTextAnimationController.dispose();
     _afrondenAnimationController.dispose();
-    verzendhuisKredietModel.verzendKredietOptiePanelState = null;
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(schuldProvider, changeVerzendKrediet);
+
+    return ref.watch(schuldProvider).schuld?.mapOrNull(
+            verzendKrediet: (VerzendKrediet vk) => _build(context, vk)) ??
+        OhNo(text: 'VerzendKrediet not found!');
+  }
+
+  VerzendKrediet? vkFrom(SchuldBewerken? sb) =>
+      sb?.schuld?.mapOrNull(verzendKrediet: (VerzendKrediet vk) => vk);
+
+  void changeVerzendKrediet(SchuldBewerken? previous, SchuldBewerken next) {
+    VerzendKrediet? nextVK = vkFrom(next);
+
+    if (nextVK == null) {
+      return;
+    }
+
+    VerzendKrediet? previousVK = vkFrom(previous);
+
+    if (nextVK.maanden != int.tryParse(_tecMaanden.text)) {
+      _tecMaanden.text = '${nextVK.maanden}';
+    }
+
+    if (previousVK != null && (previousVK.vkBedrag != nextVK.vkBedrag)) {
+      switch (nextVK.vkBedrag) {
+        case VKbedrag.totaal:
+          {
+            _tecBedrag.text = nf.parseDoubleToText(nextVK.totaalBedrag);
+            break;
+          }
+        case VKbedrag.mnd:
+          {
+            _tecBedrag.text = nf.parseDoubleToText(nextVK.mndBedrag);
+            break;
+          }
+      }
+    }
+
+    if (previousVK != null &&
+        (previousVK.heeftSlotTermijn != nextVK.heeftSlotTermijn ||
+            previousVK.vkBedrag != nextVK.vkBedrag)) {
+      showSlotTermijnEditBox(VerzendKredietVerwerken.showSlottermijn(nextVK));
+
+      if (nextVK.heeftSlotTermijn) {
+        _tecSlottermijn.text = nf.parseDoubleToText(nextVK.slotTermijn);
+      }
+    }
+  }
+
+  Widget _build(BuildContext context, VerzendKrediet vk) {
     final theme = Theme.of(context);
 
-    final dateNow = DateTime.now();
+    final dateNow = DateUtils.dateOnly(DateTime.now());
     final firstDate = DateTime(dateNow.year - 3, 1, 1);
     final lastDate = DateTime(dateNow.year + 10, 12,
         Kalender.dagenPerMaand(jaar: dateNow.year + 10, maand: 12));
@@ -255,15 +254,16 @@ class VerzendKredietOptiePanelState extends State<VerzendKredietOptiePanel>
       Expanded(
         child: TextFormField(
             controller: _tecBedrag,
-            keyboardType: TextInputType.numberWithOptions(
+            keyboardType: const TextInputType.numberWithOptions(
               signed: true,
               decimal: true,
             ),
             inputFormatters: [nf.numberInputFormat('#0.00')],
             focusNode: _fnBedrag,
-            decoration: new InputDecoration(
+            decoration: InputDecoration(
                 hintText: '',
-                labelText: vk.isTotalbedrag ? 'Totaal' : 'Termijn'),
+                labelText:
+                    vk.vkBedrag == VKbedrag.totaal ? 'Totaal' : 'Termijn'),
             validator: (String? text) {
               if (text == null || text.isEmpty || nf.parsToDouble(text) < 1) {
                 return '> 1';
@@ -279,155 +279,150 @@ class VerzendKredietOptiePanelState extends State<VerzendKredietOptiePanel>
       ),
     ];
 
-    if (_slottermijnEditboxvisible) {
-      bedragen.addAll([
-        SizedBox(
-          width: 16.0,
+    bedragen.addAll([
+      SizeTransition(
+        sizeFactor: _slottermijnEditTextAnimationController,
+        axis: Axis.horizontal,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(
+              width: 8.0,
+            ),
+            SizedBox(
+                width: 80.0,
+                child: TextFormField(
+                  controller: _tecSlottermijn,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    signed: true,
+                    decimal: true,
+                  ),
+                  inputFormatters: [
+                    MyNumberFormat(context).numberInputFormat('#0.00')
+                  ],
+                  focusNode: _fnSlottermijn,
+                  decoration: const InputDecoration(
+                      hintText: '', labelText: 'Slottermijn'),
+                  validator: (text) {
+                    if (nf.parsToDouble(text) < 0.0) {
+                      return '>= 0';
+                    }
+                    return null;
+                  },
+                  onSaved: (text) {
+                    if (_fnSlottermijn.hasFocus) {
+                      _veranderingSlottermijn(text);
+                    }
+                  },
+                )),
+          ],
         ),
-        SizeTransition(
-          sizeFactor: _slottermijnEditTextAnimationController,
-          axis: Axis.horizontal,
-          child: SizedBox(
-              width: 90.0,
-              child: TextFormField(
-                controller: _tecSlottermijn,
-                keyboardType: TextInputType.numberWithOptions(
-                  signed: true,
-                  decimal: true,
-                ),
-                inputFormatters: [
-                  MyNumberFormat(context).numberInputFormat('#0.00')
-                ],
-                focusNode: _fnSlottermijn,
-                decoration:
-                    new InputDecoration(hintText: '', labelText: 'Slottermijn'),
-                validator: (text) {
-                  if (text == null ||
-                      text.isEmpty ||
-                      (nf.parsToDouble(text) <= 0)) {
-                    return '>= 0';
-                  }
-                  return null;
-                },
-                onSaved: (text) {
-                  if (_fnSlottermijn.hasFocus) {
-                    _veranderingSlottermijn(text);
-                  }
-                },
-              )),
-        )
-      ]);
-    }
+      )
+    ]);
 
     List<Widget> columnChildren = [
-      Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: OmschrijvingTextField(
-          focusNode: _fnOmschrijving,
-          textEditingController: _tecOmschrijving,
-        ),
+      const SizedBox(
+        height: 6.0,
       ),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0),
-        child: DateWidget(
-          date: vk.beginDatum,
-          firstDate: firstDate,
-          lastDate: lastDate,
-          saveDate: (DateTime? date) {
-            _veranderingDatum(date);
-          },
-          changeDate: (DateTime? date) {
-            _veranderingDatum(date);
-          },
-        ),
+      OmschrijvingTextField(
+        focusNode: _fnOmschrijving,
+        textEditingController: _tecOmschrijving,
       ),
-      SizedBox(
+      DateInputPicker(
+        labelText: 'Datum',
+        date: vk.beginDatum,
+        firstDate: firstDate,
+        lastDate: lastDate,
+        saveDate: (DateTime? date) {
+          _veranderingDatum(date);
+        },
+        changeDate: (DateTime? date) {
+          _veranderingDatum(date);
+        },
+      ),
+      const SizedBox(
         height: 8.0,
       ),
+      UndefinedSelectableGroup(groups: [
+        MyRadioGroup<VKbedrag>(
+          groupValue: vk.vkBedrag,
+          list: [
+            RadioSelectable(text: 'Totaalbedrag', value: VKbedrag.totaal),
+            RadioSelectable(
+                text: 'Termijnbedrag per maand', value: VKbedrag.mnd)
+          ],
+          onChange: _veranderingBedragPerMaandOfTotaal,
+        )
+      ], matchTargetWrap: [
+        MatchTargetWrap<GroupLayoutProperties>(
+            object: GroupLayoutProperties.vertical())
+      ]),
       Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: RadioSimpel<bool>(
-            title: 'Totaalbedrag',
-            value: true,
-            groupValue: vk.isTotalbedrag,
-            onChanged: (bool? value) {
-              _veranderingBedragPerMaandOfTotaal(value);
-            }),
-      ),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: RadioSimpel<bool>(
-            title: 'Termijnbedrag per maand',
-            value: false,
-            groupValue: vk.isTotalbedrag,
-            onChanged: _veranderingBedragPerMaandOfTotaal),
-      ),
-      Padding(
-        padding: const EdgeInsets.only(left: 56.0, right: 16.0),
+        padding: const EdgeInsets.only(left: 32.0),
         child: SizeTransition(
           sizeFactor: _slottermijnCheckboxAnimationController,
-          child: RemoveCheckboxSimpel(
-              title: 'Slottermijn',
+          child: MyCheckbox(
+              text: 'Slottermijn',
               value: vk.heeftSlotTermijn,
-              onChanged:
-                  !vk.isTotalbedrag ? veranderingSlotTermijnOptie : null),
+              enabled: vk.vkBedrag == VKbedrag.mnd,
+              onChanged: veranderingSlotTermijnOptie),
         ),
       ),
       SizeTransition(
         sizeFactor: _afrondenAnimationController,
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Divider(),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              'Termijnbedrag afronden op:',
-            ),
+          const Divider(),
+          const Text(
+            'Termijnbedrag afronden op:',
           ),
-          Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Wrap(spacing: 8.0, children: [
-                ChoiceChip(
-                  key: Key('euros'),
-                  avatar: avatar('#0', vk.decimalen == 0),
-                  label: Text('Euro\'s'),
-                  selected: vk.decimalen == 0,
-                  onSelected: (v) {
-                    _veranderingAfronden(0);
-                  },
-                ),
-                ChoiceChip(
-                  key: Key('10cent'),
-                  avatar: avatar('#0.0', vk.decimalen == 1),
-                  label: Text('10 ct'),
-                  selected: vk.decimalen == 1,
-                  onSelected: (v) {
-                    _veranderingAfronden(1);
-                  },
-                ),
-                ChoiceChip(
-                  key: Key('1cent'),
-                  avatar: avatar('#0.00', vk.decimalen == 2),
-                  label: Text('1 ct'),
-                  selected: vk.decimalen == 2,
-                  onSelected: (v) {
-                    _veranderingAfronden(2);
-                  },
-                ),
-              ])),
+          const SizedBox(
+            height: 8.0,
+          ),
+          Wrap(spacing: 8.0, children: [
+            ChoiceChip(
+              key: const Key('euros'),
+              avatar: avatar('#0', vk.decimalen == 0),
+              label: const Text('Euro\'s'),
+              selected: vk.decimalen == 0,
+              onSelected: (v) {
+                _veranderingAfronden(0);
+              },
+            ),
+            ChoiceChip(
+              key: const Key('10cent'),
+              avatar: avatar('#0.0', vk.decimalen == 1),
+              label: const Text('10 ct'),
+              selected: vk.decimalen == 1,
+              onSelected: (v) {
+                _veranderingAfronden(1);
+              },
+            ),
+            ChoiceChip(
+              key: const Key('1cent'),
+              avatar: avatar('#0.00', vk.decimalen == 2),
+              label: const Text('1 ct'),
+              selected: vk.decimalen == 2,
+              onSelected: (v) {
+                _veranderingAfronden(2);
+              },
+            ),
+          ]),
         ]),
       ),
-      Divider(),
+      const Divider(),
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
         child: Text(
-          vk.isTotalbedrag ? 'Totaalbedrag:' : 'Termijnbedrag per maand:',
+          vk.vkBedrag == VKbedrag.totaal
+              ? 'Totaalbedrag:'
+              : 'Termijnbedrag per maand:',
         ),
       ),
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Row(children: bedragen),
       ),
-      SizedBox(
+      const SizedBox(
         height: 8.0,
       ),
       Row(children: [
@@ -464,12 +459,12 @@ class VerzendKredietOptiePanelState extends State<VerzendKredietOptiePanel>
               },
               keyboardType: TextInputType.number,
             )),
-        SizedBox(width: 16.0),
+        const SizedBox(width: 16.0),
       ]),
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: CheckValidator(
-            key: Key('BedragLooptijd'),
+            key: const Key('BedragLooptijd'),
             initialValue: Kalender.looptijdInTekst(vk.maanden),
             validator: (text) {
               switch (buitenPeriode(_tecMaanden.text)) {
@@ -490,59 +485,51 @@ class VerzendKredietOptiePanelState extends State<VerzendKredietOptiePanel>
       )
     ];
 
-    return SliverToBoxAdapter(
-        child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: columnChildren));
+    return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: columnChildren);
   }
 
   _veranderingOmschrijving(String? text) {
-    verzendhuisKredietModel.veranderingOmschrijving(text ?? '');
+    notifier.veranderingOmschrijving(text ?? '');
   }
 
   _veranderingDatum(DateTime? value) {
-    if (value != null) {
-      verzendhuisKredietModel.veranderingDatum(value);
-    }
+    notifier.veranderingVerzendKrediet(beginDatum: value);
   }
 
   _veranderingAfronden(int decimalen) {
-    verzendhuisKredietModel.veranderingAfronden(decimalen);
+    notifier.veranderingVerzendKrediet(decimalen: decimalen);
   }
 
   _veranderingSlottermijn(String? text) {
-    verzendhuisKredietModel.veranderingSlottermijn(
-        text == null || text.isEmpty ? 0.0 : nf.parsToDouble(text));
+    notifier.veranderingVerzendKrediet(slotBedrag: nf.parsToDouble(text));
   }
 
   _veranderingBedrag(String? text) {
-    verzendhuisKredietModel.veranderingBedrag(
-        text == null || text.isEmpty ? 0.0 : nf.parsToDouble(text));
+    notifier.veranderingVerzendKrediet(bedrag: nf.parsToDouble(text));
   }
 
   veranderingSlotTermijnOptie(bool? value) {
-    assert(value != null, 'Can not be null');
-    verzendhuisKredietModel.veranderingSlotTermijnOptie(value!);
+    notifier.veranderingVerzendKrediet(heeftSlotTermijn: value);
   }
 
-  _veranderingBedragPerMaandOfTotaal(bool? value) {
-    assert(value != null, 'Can not be null');
-
-    verzendhuisKredietModel.veranderingBedragPerMaandOfTotaal(value!);
+  _veranderingBedragPerMaandOfTotaal(VKbedrag? value) {
+    notifier.veranderingVerzendKrediet(vkBedrag: value);
   }
 
   _veranderingMaandenFromText(String? text) {
-    verzendhuisKredietModel.veranderingMaanden(
-        (text == null || text.isEmpty) ? 1 : int.parse(text));
+    notifier.veranderingVerzendKrediet(
+        maanden: text == null || text.isEmpty ? 1 : int.parse(text));
   }
 
   _veranderingMaandenFromSlider(int maanden) {
-    verzendhuisKredietModel.veranderingMaanden(maanden);
+    notifier.veranderingVerzendKrediet(maanden: maanden);
   }
 
-  showSlotTermijnEditBox() {
-    if (!vk.isTotalbedrag && vk.heeftSlotTermijn) {
+  void showSlotTermijnEditBox(bool heeftSlotTermijn) {
+    if (heeftSlotTermijn) {
       _slottermijnEditTextAnimationController.forward();
     } else {
       _slottermijnEditTextAnimationController.reverse();
@@ -550,7 +537,8 @@ class VerzendKredietOptiePanelState extends State<VerzendKredietOptiePanel>
   }
 
   showAfronden() {
-    if (vk.isTotalbedrag) {
+    final localVk = vk;
+    if (localVk != null && localVk.vkBedrag == VKbedrag.totaal) {
       _afrondenAnimationController.forward();
     } else {
       _afrondenAnimationController.reverse();
@@ -559,45 +547,11 @@ class VerzendKredietOptiePanelState extends State<VerzendKredietOptiePanel>
 
   int buitenPeriode(String? text) {
     final m = text == null || text.isEmpty ? 0 : int.parse(text);
-
-    return m < vk.minMaanden
+    final localVk = vk;
+    return localVk == null || m < localVk.minMaanden
         ? -1
-        : vk.maxMaanden < m
+        : localVk.maxMaanden < m
             ? 1
             : 0;
-  }
-
-  setBedrag(double value) {
-    _tecBedrag.text =
-        value == 0.0 ? '' : nf.parseDoubleToText(vk.bedrag, '#0.00');
-  }
-
-  setSlottermijnWaarde(double value) {
-    _tecSlottermijn.text =
-        value == 0.0 ? '' : nf.parseDoubleToText(vk.slotTermijn, '#0.00');
-  }
-
-  setMaanden(int value) {
-    _tecMaanden.text = nf.parseIntToText(value);
-  }
-
-  setBedragPerMaandOfTotaal(bool value) {
-    if (value) {
-      _afrondenAnimationController.forward();
-    } else {
-      _afrondenAnimationController.reverse();
-    }
-
-    if (value) {
-      _slottermijnCheckboxAnimationController.reverse();
-    } else {
-      _slottermijnCheckboxAnimationController.forward();
-    }
-
-    showSlotTermijnEditBox();
-  }
-
-  void refreshState() {
-    setState(() {});
   }
 }

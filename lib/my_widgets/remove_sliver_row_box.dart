@@ -10,7 +10,7 @@ typedef BuildSliverBox<I> = Widget Function(
     required int length,
     required SliverBoxItemState<I> state});
 
-class SliverRowBox<T, I> extends StatefulWidget {
+class RemoveSliverRowBox<T, I> extends StatefulWidget {
   final List<SliverBoxItemState<T>> topList;
   final List<SliverBoxItemState<I>> itemList;
   final List<SliverBoxItemState<T>> bottomList;
@@ -23,7 +23,7 @@ class SliverRowBox<T, I> extends StatefulWidget {
   final EdgeInsets paddingItem;
   final Duration duration;
 
-  const SliverRowBox({
+  const RemoveSliverRowBox({
     Key? key,
     required this.topList,
     required this.itemList,
@@ -39,14 +39,15 @@ class SliverRowBox<T, I> extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<SliverRowBox<T, I>> createState() => _SliverRowBoxState<T, I>();
+  State<RemoveSliverRowBox<T, I>> createState() =>
+      _RemoveSliverRowBoxState<T, I>();
 
-  static _SliverRowBoxState? of<T, I>(BuildContext context) {
-    return context.findAncestorStateOfType<_SliverRowBoxState<T, I>>();
+  static _RemoveSliverRowBoxState? of<T, I>(BuildContext context) {
+    return context.findAncestorStateOfType<_RemoveSliverRowBoxState<T, I>>();
   }
 }
 
-class _SliverRowBoxState<T, I> extends State<SliverRowBox<T, I>>
+class _RemoveSliverRowBoxState<T, I> extends State<RemoveSliverRowBox<T, I>>
     with SingleTickerProviderStateMixin {
   AnimationController? animationController;
   Animation<double>? enableAnimation;
@@ -62,7 +63,7 @@ class _SliverRowBoxState<T, I> extends State<SliverRowBox<T, I>>
     super.didChangeDependencies();
   }
 
-  void didUpdateWidget(SliverRowBox<T, I> oldWidget) {
+  void didUpdateWidget(RemoveSliverRowBox<T, I> oldWidget) {
     checkAnimation();
     if (widget.visibleAnimated) {
       if (widget.visible) {
@@ -332,7 +333,7 @@ class _SliverItemRowAnimationState extends State<SliverItemRowAnimation>
       duration: Duration(milliseconds: 200))
     ..addListener(() {
       if (animation.value == 0.0 && !widget.state.enabled) {
-        SliverRowBox.of(context)?.verwijder(widget.state);
+        RemoveSliverRowBox.of(context)?.verwijder(widget.state);
       } else {
         setState(() {
           widget.state.insertRemoveAnimation = animation.value;

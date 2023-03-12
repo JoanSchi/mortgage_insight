@@ -47,7 +47,7 @@ class PieChart extends StatefulWidget {
   final bool useLine;
   final Widget? child;
 
-  PieChart({
+  const PieChart({
     Key? key,
     this.total = 100.0,
     required this.pieces,
@@ -65,11 +65,12 @@ class PieChart extends StatefulWidget {
 
 class _PieChartState extends State<PieChart>
     with SingleTickerProviderStateMixin {
-  late AnimationController _controller =
-      AnimationController(vsync: this, duration: Duration(milliseconds: 200));
+  late final AnimationController _controller = AnimationController(
+      vsync: this, duration: const Duration(milliseconds: 200));
   late TweenPiece tweenPiece =
       TweenPiece(begin: widget.pieces, end: widget.pieces);
-  late Animation<List<PiePiece>> _animation = tweenPiece.animate(_controller);
+  late final Animation<List<PiePiece>> _animation =
+      tweenPiece.animate(_controller);
 
   @override
   void didUpdateWidget(covariant PieChart oldWidget) {
@@ -102,7 +103,6 @@ class _PieChartState extends State<PieChart>
         animation: _animation,
         builder: (BuildContext context, Widget? child) {
           return CustomPaint(
-            child: widget.child ?? Container(),
             painter: PieChartPainter(
                 total: widget.total,
                 pieces: _animation.value,
@@ -110,6 +110,7 @@ class _PieChartState extends State<PieChart>
                 paddingRatio: widget.paddingRatio,
                 useLine: widget.useLine,
                 strokeWidth: widget.strokeWidth),
+            child: widget.child ?? Container(),
           );
         });
   }
@@ -142,36 +143,36 @@ class PieChartPainter extends CustomPainter {
     final rect =
         Rect.fromLTWH((size.width - d) / 2.0, (size.height - d) / 2.0, d, d);
 
-    final Paint _paint = Paint();
+    final Paint paint = Paint();
 
     if (useLine) {
-      _paint
+      paint
         ..style = PaintingStyle.stroke
         ..strokeWidth = strokeWidth;
     } else {
-      _paint.style = PaintingStyle.fill;
+      paint.style = PaintingStyle.fill;
     }
 
     final center = !useLine;
 
     //Start drawArc at the top
     double anglePosition = math.pi / 2.0 * 3.0;
-    pieces.forEach((PiePiece piece) {
+    for (PiePiece piece in pieces) {
       double angle = math.pi * 2 / total * piece.value;
       canvas.drawArc(
         rect,
         anglePosition,
         angle,
         center,
-        _paint..color = piece.color,
+        paint..color = piece.color,
       );
       anglePosition += angle;
-    });
+    }
   }
 
   @override
   bool shouldRepaint(PieChartPainter oldDelegate) {
-    return this.total != oldDelegate.total || this.pieces != oldDelegate.pieces;
+    return total != oldDelegate.total || pieces != oldDelegate.pieces;
   }
 }
 
@@ -215,6 +216,7 @@ class TweenPiece extends Tween<List<PiePiece>> {
   TweenPiece({required List<PiePiece> begin, required List<PiePiece> end})
       : super(begin: begin, end: end);
 
+  @override
   List<PiePiece> lerp(double t) {
     final List<PiePiece> b = begin as List<PiePiece>;
     final List<PiePiece> e = end as List<PiePiece>;

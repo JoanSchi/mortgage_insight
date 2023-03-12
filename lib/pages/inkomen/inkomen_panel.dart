@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mortgage_insight/model/nl/hypotheek_container/hypotheek_container.dart';
+import 'package:mortgage_insight/model/nl/hypotheek_document/provider/hypotheek_document_provider.dart';
 import 'package:mortgage_insight/platform_page_format/default_page.dart';
-import 'package:mortgage_insight/platform_page_format/fabProperties.dart';
+import 'package:mortgage_insight/platform_page_format/fab_properties.dart';
 import 'package:mortgage_insight/state_manager/routes/routes_app.dart';
 import 'package:mortgage_insight/utilities/device_info.dart';
 import '../../navigation/navigation_page_items.dart';
@@ -15,16 +15,16 @@ enum IncomeCardOptions { edit, delete }
 
 int _tabIndex = 0;
 
-class IncomePanel extends ConsumerStatefulWidget {
-  IncomePanel({Key? key}) : super(key: key);
+class InkomenPanel extends ConsumerStatefulWidget {
+  const InkomenPanel({Key? key}) : super(key: key);
 
   @override
-  _IncomePanelState createState() => _IncomePanelState();
+  ConsumerState<InkomenPanel> createState() => _InkomenPanelState();
 }
 
-class _IncomePanelState extends ConsumerState<IncomePanel>
+class _InkomenPanelState extends ConsumerState<InkomenPanel>
     with TickerProviderStateMixin {
-  late TabController _tabController =
+  late final TabController _tabController =
       TabController(length: 2, vsync: this, initialIndex: _tabIndex)
         ..addListener(() {
           _tabIndex = _tabController.index;
@@ -59,15 +59,17 @@ class _IncomePanelState extends ConsumerState<IncomePanel>
     );
 
     ref.read(inkomenBewerkenProvider.notifier).nieuw(
-        lijst:
-            ref.read(hypotheekContainerProvider).inkomenLijst(partner: partner),
+        lijst: ref
+            .read(hypotheekDocumentProvider)
+            .inkomenOverzicht
+            .lijst(partner: partner),
         partner: partner);
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final deviceScreen = DeviceScreen3.of(context);
+    // final deviceScreen = DeviceScreen3.of(context);
 
     TabBarPageStyle? tabBarPageStyle = theme.extension<TabBarPageStyle>();
 
@@ -89,34 +91,42 @@ class _IncomePanelState extends ConsumerState<IncomePanel>
       ],
     );
 
-    final bodyBuilder =
-        ({required BuildContext context, required bool nested}) => TabBarView(
-              controller: _tabController,
-              children: [
-                LijstInkomenPanel(
-                  nested: nested,
-                ),
-                LijstInkomenPanel(
-                  partner: true,
-                  nested: nested,
-                )
-              ],
-            );
+    bodyBuilder(
+            {required BuildContext context,
+            required bool nested,
+            required double topPadding,
+            required double bottomPadding}) =>
+        TabBarView(
+          controller: _tabController,
+          children: [
+            LijstInkomenPanel(
+              nested: nested,
+              topPadding: topPadding,
+              bottomPadding: bottomPadding,
+            ),
+            LijstInkomenPanel(
+              partner: true,
+              nested: nested,
+              topPadding: topPadding,
+              bottomPadding: bottomPadding,
+            )
+          ],
+        );
 
     return DefaultPage(
       title: 'Inkomen',
       imageBuilder: (_) => Image(
-          image: AssetImage(
+          image: const AssetImage(
             'graphics/wallet.png',
           ),
           color: theme.colorScheme.onSurface),
       bottom: tabBar,
-      matchPageProperties: [
+      matchPageProperties: const [
         MatchPageProperties(
             pageProperties: PageProperties(hasNavigationBar: true))
       ],
       bodyBuilder: bodyBuilder,
-      fabProperties: FabProperties(icon: Icon(Icons.add), onTap: add),
+      fabProperties: FabProperties(icon: const Icon(Icons.add), onTap: add),
       notificationDept: 1,
     );
   }
@@ -125,12 +135,19 @@ class _IncomePanelState extends ConsumerState<IncomePanel>
 class LijstInkomenPanel extends ConsumerStatefulWidget {
   final bool partner;
   final bool nested;
+  final double topPadding;
+  final double bottomPadding;
 
-  LijstInkomenPanel({Key? key, this.partner = false, required this.nested})
+  const LijstInkomenPanel(
+      {Key? key,
+      this.partner = false,
+      required this.nested,
+      required this.topPadding,
+      required this.bottomPadding})
       : super(key: key);
 
   @override
-  _LijstInkomenPanelState createState() => _LijstInkomenPanelState();
+  ConsumerState<LijstInkomenPanel> createState() => _LijstInkomenPanelState();
 }
 
 class _LijstInkomenPanelState extends ConsumerState<LijstInkomenPanel> {
@@ -146,10 +163,8 @@ class _LijstInkomenPanelState extends ConsumerState<LijstInkomenPanel> {
 
   @override
   Widget build(BuildContext context) {
-    final inkomenLijst = ref
-        .watch(hypotheekContainerProvider
-            .select((value) => value.inkomenContainer(widget.partner)))
-        .lijst;
+    final inkomenLijst = ref.watch(hypotheekDocumentProvider.select(
+        (value) => value.inkomenOverzicht.lijst(partner: widget.partner)));
 
     return CustomScrollView(
       key: PageStorageKey<String>('inkomen_partner_${widget.partner}'),
@@ -160,7 +175,7 @@ class _LijstInkomenPanelState extends ConsumerState<LijstInkomenPanel> {
             // above.
             handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
           ),
-        if (inkomenLijst.length > 0)
+        if (inkomenLijst.isNotEmpty)
           SliverGrid(
               gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                 maxCrossAxisExtent: 600.0,
@@ -170,7 +185,7 @@ class _LijstInkomenPanelState extends ConsumerState<LijstInkomenPanel> {
               ),
               delegate: SliverChildBuilderDelegate(
                 (BuildContext context, int index) {
-                  return IncomeCard(
+                  return InkomenCard(
                     inkomenItem: inkomenLijst[index],
                     partner: widget.partner,
                   );

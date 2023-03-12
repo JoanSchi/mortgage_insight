@@ -18,7 +18,7 @@ class MainLayout extends MultiChildRenderObjectWidget {
   @override
   void updateRenderObject(
       BuildContext context, covariant RenderSummaryPieLayout renderObject) {
-    renderObject..innerPadding = innerPadding;
+    renderObject.innerPadding = innerPadding;
   }
 }
 
@@ -142,8 +142,9 @@ class RenderSummaryPieLayout extends RenderBox
 
   @override
   void setupParentData(RenderObject child) {
-    if (child.parentData is! MainLayoutParentData)
+    if (child.parentData is! MainLayoutParentData) {
       child.parentData = MainLayoutParentData();
+    }
   }
 
   @override
@@ -154,8 +155,6 @@ class RenderSummaryPieLayout extends RenderBox
     double topCenter = 0.0;
     double rightCenter = 0.0;
     double bottomCenter = 0.0;
-
-    print('height $height');
 
     layoutChild(RenderBox child) {
       final MainLayoutParentData childParentData =

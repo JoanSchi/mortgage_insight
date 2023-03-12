@@ -1,47 +1,5 @@
 import 'package:flutter/material.dart';
 
-class RadioSimpel<T> extends StatelessWidget {
-  final String title;
-  final ValueChanged<T?> onChanged;
-  final T value;
-  final T groupValue;
-
-  RadioSimpel({
-    required this.title,
-    required this.onChanged,
-    required this.value,
-    required this.groupValue,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(mainAxisSize: MainAxisSize.min, children: [
-      Radio<T>(value: value, groupValue: groupValue, onChanged: onChanged),
-      Text(title)
-    ]);
-  }
-}
-
-class RemoveCheckboxSimpel extends StatelessWidget {
-  final String title;
-  final ValueChanged<bool?>? onChanged;
-  final bool value;
-
-  RemoveCheckboxSimpel({
-    required this.title,
-    required this.onChanged,
-    required this.value,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [Checkbox(value: value, onChanged: onChanged), Text(title)],
-    );
-  }
-}
-
 class OmschrijvingTextField extends StatelessWidget {
   final TextEditingController textEditingController;
   final FocusNode? focusNode;
@@ -67,12 +25,12 @@ class OmschrijvingTextField extends StatelessWidget {
         decoration: InputDecoration(
           labelText: 'Omschrijving',
           floatingLabelBehavior: FloatingLabelBehavior.auto,
-          contentPadding: EdgeInsets.all(32),
+          contentPadding: const EdgeInsets.all(32),
           //border: OutlineInputBorder(),
-          border: _RoundedFillBorder(),
-          labelStyle: theme.textTheme.bodyText1?.copyWith(fontSize: 22),
+          border: const _RoundedFillBorder(),
+          labelStyle: theme.textTheme.bodyLarge?.copyWith(fontSize: 22),
         ),
-        style: theme.textTheme.bodyText1?.copyWith(fontSize: 32));
+        style: theme.textTheme.bodyLarge?.copyWith(fontSize: 32));
   }
 }
 
@@ -87,7 +45,7 @@ class _RoundedFillBorder extends InputBorder {
   bool get isOutline => true;
 
   @override
-  EdgeInsetsGeometry get dimensions => EdgeInsets.all(0.0);
+  EdgeInsetsGeometry get dimensions => const EdgeInsets.all(0.0);
 
   @override
   _RoundedFillBorder scale(double t) => const _RoundedFillBorder();
@@ -111,16 +69,16 @@ class _RoundedFillBorder extends InputBorder {
     double gapPercentage = 0.0,
     TextDirection? textDirection,
   }) {
-    final radial = 32.0;
+    const radial = 32.0;
     canvas.drawRRect(
         RRect.fromRectAndCorners(
           rect,
-          topLeft: Radius.circular(radial),
-          topRight: Radius.circular(radial),
-          bottomLeft: Radius.circular(radial),
-          bottomRight: Radius.circular(radial),
+          topLeft: const Radius.circular(radial),
+          topRight: const Radius.circular(radial),
+          bottomLeft: const Radius.circular(radial),
+          bottomRight: const Radius.circular(radial),
         ),
-        Paint()..color = Color.fromARGB(255, 239, 249, 253));
+        Paint()..color = const Color.fromARGB(255, 239, 249, 253));
   }
 }
 
@@ -132,7 +90,7 @@ class CheckValidator extends FormField<String> {
   CheckValidator(
       {Key? key,
       String? initialValue,
-      this.softWrap: true,
+      this.softWrap = true,
       FormFieldSetter<String>? onSaved,
       FormFieldValidator<String>? validator,
       AutovalidateMode autovalidateMode = AutovalidateMode.disabled,
@@ -148,10 +106,11 @@ class CheckValidator extends FormField<String> {
             enabled: enabled,
             builder: (FormFieldState<String> field) {
               final ThemeData theme = Theme.of(field.context);
-              final color = errorTextColor ?? theme.errorColor;
+              final color = errorTextColor ?? theme.colorScheme.error;
               final TextStyle style = textStyle ??
-                  theme.textTheme.caption!
-                      .copyWith(fontStyle: FontStyle.italic);
+                  theme.textTheme.bodySmall
+                      ?.copyWith(fontStyle: FontStyle.italic) ??
+                  const TextStyle();
 
               return Text(
                   (field.hasError ? field.errorText! : (initialValue ?? '')),

@@ -56,7 +56,7 @@ ThemeData buildTheme() {
       cardColor: backgroundWhite,
       errorColor: errorColor,
       buttonTheme: const ButtonThemeData(
-        colorScheme: _shrineColorScheme,
+        // colorScheme: _shrineColorScheme,
         textTheme: ButtonTextTheme.normal,
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(

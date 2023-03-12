@@ -28,6 +28,8 @@ class BackgroundSliverElement extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
+      painter:
+          BorderPainter(radial: radial, color: color, start: start, end: end),
       child: Padding(
         padding: EdgeInsets.only(
             left: leftPadding,
@@ -36,8 +38,6 @@ class BackgroundSliverElement extends StatelessWidget {
             bottom: end ? endPadding : 0.0),
         child: child,
       ),
-      painter:
-          BorderPainter(radial: radial, color: color, start: start, end: end),
     );
   }
 }
