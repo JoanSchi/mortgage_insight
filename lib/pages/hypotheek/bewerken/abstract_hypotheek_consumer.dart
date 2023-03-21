@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mortgage_insight/model/nl/hypotheek/gegevens/hypotheek/hypotheek.dart';
 import 'package:mortgage_insight/my_widgets/oh_no.dart';
 import 'package:mortgage_insight/utilities/my_number_format.dart';
-import '../../../model/nl/hypotheek/gegevens/hypotheek_profiel/hypotheek_profiel.dart';
+import '../../../model/nl/hypotheek/gegevens/hypotheek_dossier/hypotheek_dossier.dart';
 import 'hypotheek_model.dart';
 
 abstract class AbstractHypotheekConsumerState<T extends ConsumerStatefulWidget>
@@ -41,7 +41,7 @@ abstract class AbstractHypotheekConsumerState<T extends ConsumerStatefulWidget>
   @override
   Widget build(BuildContext context) {
     final bewerken = ref.watch(hypotheekBewerkenProvider);
-    final hp = bewerken.profiel;
+    final hp = bewerken.hypotheekDossier;
     final hypotheek = bewerken.hypotheek;
 
     return (hp != null && hypotheek != null)
@@ -49,6 +49,9 @@ abstract class AbstractHypotheekConsumerState<T extends ConsumerStatefulWidget>
         : const SliverToBoxAdapter(child: OhNo(text: 'Hypotheek not found.'));
   }
 
-  Widget buildHypotheek(BuildContext context, HypotheekBewerken hb,
-      HypotheekProfiel hp, Hypotheek hypotheek);
+  Widget buildHypotheek(
+      BuildContext context,
+      HypotheekBewerken hypotheekBewerken,
+      HypotheekDossier hypotheekDossier,
+      Hypotheek hypotheek);
 }

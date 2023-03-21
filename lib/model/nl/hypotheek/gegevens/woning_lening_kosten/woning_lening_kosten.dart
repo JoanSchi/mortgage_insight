@@ -23,6 +23,7 @@ class WoningLeningKosten with _$WoningLeningKosten {
   double get totaleKosten => kosten.fold(0.0, (double previous, Waarde w) {
         double value;
         switch (w.eenheid) {
+          case Eenheid.percentageTaxatie:
           case Eenheid.percentageWoningWaarde:
             value = woningWaarde / 100.0 * w.getal;
             break;

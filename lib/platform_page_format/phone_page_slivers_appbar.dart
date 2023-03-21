@@ -94,7 +94,7 @@ class PhonePageSliverAppBar extends StatelessWidget {
                   handle:
                       NestedScrollView.sliverOverlapAbsorberHandleFor(context),
                   sliver: TextImageSliverAppBar(
-                      backgroundColor: theme.bottomAppBarTheme.color,
+                      backgroundColor: theme.appBarTheme.backgroundColor,
                       scrolledUnderBackground: theme.colorScheme.surface,
                       minExtent: 56,
                       floatingExtent: 56.0,
@@ -145,7 +145,7 @@ class PhonePageSliverAppBar extends StatelessWidget {
                           Widget? child}) {
                         final scrolledUnderColor = scrolledUnder
                             ? theme.colorScheme.surface
-                            : theme.bottomAppBarTheme.color;
+                            : theme.appBarTheme.backgroundColor;
 
                         return isPortrait
                             ? Material(

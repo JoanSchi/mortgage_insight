@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../hypotheek_document.dart';
+import 'hypotheek_dossier_notifier.dart';
 import 'inkomen_notifier.dart';
 import 'schuld_notifier.dart';
 
@@ -26,7 +27,7 @@ final hypotheekDocumentProvider =
 });
 
 class HypotheekDocumentNotifier extends StateNotifier<HypotheekDocument>
-    with InkomenNotifier, SchuldNotifier {
+    with InkomenNotifier, SchuldNotifier, HypotheekDossierNotifier {
   HypotheekDocumentNotifier(HypotheekDocument document) : super(document);
 
   void saveHypotheekContainer() async {

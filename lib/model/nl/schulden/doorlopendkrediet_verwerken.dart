@@ -53,10 +53,10 @@ class DoorlopendKredietVerwerken {
   }
 
   static DateTime beginBereikEindDatum(DateTime begin) =>
-      Kalender.voegPeriodeToe(begin, maanden: 1);
+      Kalender.voegPeriodeToe(begin, maanden: 1, periodeOpties: PeriodeOpties.volgende);
 
   static DateTime eindBereikEindDatum(DateTime begin) =>
-      Kalender.voegPeriodeToe(begin, jaren: 30);
+      Kalender.voegPeriodeToe(begin, jaren: 30, periodeOpties: PeriodeOpties.eind);
 
   static DateTime eindDatumInbeReik(DateTime begin, DateTime eind) {
     if (eind == DateTime(0)) {

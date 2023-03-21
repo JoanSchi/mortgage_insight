@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:sliver_row_box/sliver_row_box.dart';
 import '../../../../utilities/kalender.dart';
 import '../gegevens/extra_of_kosten_lening/extra_of_kosten_lening.dart';
-import '../gegevens/hypotheek_profiel/hypotheek_profiel.dart';
+import '../gegevens/hypotheek_dossier/hypotheek_dossier.dart';
 
-class HypotheekProfielVerwerken {
+class HypotheekDossierVerwerken {
   static DateTime beginDatumWoningKopen() => DateUtils.dateOnly(DateTime.now());
 
   static DateTime eindDatumWoningKopen() =>
@@ -18,28 +18,28 @@ class HypotheekProfielVerwerken {
   ///
   ///
   ///
-  static bool eigenwoningReserveOptie(HypotheekProfiel? hp) {
-    if (hp == null) return false;
+  static bool eigenwoningReserveOptie(HypotheekDossier? hd) {
+    if (hd == null) return false;
 
-    return !hp.starter &&
-        (hp.inkomensNormToepassen || hp.woningWaardeNormToepassen);
+    return !hd.starter &&
+        (hd.inkomensNormToepassen || hd.woningWaardeNormToepassen);
   }
 
-  static bool eigenwoningReserveZichtbaar(HypotheekProfiel? hp) {
-    if (hp == null) return false;
+  static bool eigenwoningReserveZichtbaar(HypotheekDossier? hd) {
+    if (hd == null) return false;
 
-    return !hp.starter &&
-        (hp.inkomensNormToepassen || hp.woningWaardeNormToepassen) &&
-        hp.eigenWoningReserve.ewrToepassen;
+    return !hd.starter &&
+        (hd.inkomensNormToepassen || hd.woningWaardeNormToepassen) &&
+        hd.eigenWoningReserve.ewrToepassen;
   }
 
-  static bool woningGegevensZichtbaar(HypotheekProfiel? hp) {
-    if (hp == null) return false;
+  static bool woningGegevensZichtbaar(HypotheekDossier? hd) {
+    if (hd == null) return false;
 
-    return !hp.starter &&
-        (hp.inkomensNormToepassen || hp.woningWaardeNormToepassen) &&
-        hp.eigenWoningReserve.ewrToepassen &&
-        hp.eigenWoningReserve.ewrBerekenen;
+    return !hd.starter &&
+        (hd.inkomensNormToepassen || hd.woningWaardeNormToepassen) &&
+        hd.eigenWoningReserve.ewrToepassen &&
+        hd.eigenWoningReserve.ewrBerekenen;
   }
 
   /// SliverBoxRow
@@ -50,7 +50,7 @@ class HypotheekProfielVerwerken {
   ///
 
   static List<SliverBoxItemState<String>> createTop(
-      HypotheekProfiel? hypotheekProfiel, bool zichtbaar) {
+      HypotheekDossier? hypotheekProfiel, bool zichtbaar) {
     if (hypotheekProfiel == null) return [];
 
     ItemStatusSliverBox status =
@@ -76,7 +76,7 @@ class HypotheekProfielVerwerken {
   }
 
   static List<SliverBoxItemState<Waarde>> createBody(
-      HypotheekProfiel? hypotheekProfiel, bool zichtbaar) {
+      HypotheekDossier? hypotheekProfiel, bool zichtbaar) {
     if (hypotheekProfiel == null) return [];
 
     return hypotheekProfiel.vorigeWoningKosten.kosten
@@ -92,7 +92,7 @@ class HypotheekProfielVerwerken {
   }
 
   static List<SliverBoxItemState<String>> createBottom(
-      HypotheekProfiel? hypotheekProfiel, bool zichtbaar) {
+      HypotheekDossier? hypotheekProfiel, bool zichtbaar) {
     if (hypotheekProfiel == null) return [];
 
     ItemStatusSliverBox status =
@@ -115,9 +115,9 @@ class HypotheekProfielVerwerken {
   ///
   ///
 
-  static List<Waarde> suggestieKosten(HypotheekProfiel hp) {
+  static List<Waarde> suggestieKosten(HypotheekDossier hd) {
     List<Waarde> resterend = [];
-    IList<Waarde> lijst = hp.vorigeWoningKosten.kosten;
+    IList<Waarde> lijst = hd.vorigeWoningKosten.kosten;
     List<Waarde> suggestieLijst = suggestieKostenVorigeWoning;
 
     for (Waarde w in suggestieLijst) {

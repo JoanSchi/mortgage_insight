@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../model/nl/hypotheek/gegevens/combi_rest_schuld/combi_rest_schuld.dart';
 import '../../../model/nl/hypotheek/gegevens/hypotheek/hypotheek.dart';
-import '../../../model/nl/hypotheek/gegevens/hypotheek_profiel/hypotheek_profiel.dart';
-import '../../../model/nl/hypotheek/hypotheek.dart';
 import '../../../my_widgets/custom_fitted_box.dart';
 import '../../../my_widgets/summary_pie_chart/pie_chart.dart';
 import '../../../utilities/my_number_format.dart';

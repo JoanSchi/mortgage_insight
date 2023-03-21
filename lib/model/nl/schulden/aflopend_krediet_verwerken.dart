@@ -109,6 +109,7 @@ class AflopendKredietVerwerken {
         termijnBedragMnd: lTermijnBedragMnd,
         maanden: lMaanden,
         betaling: localBetaling,
+        decimalen: lDecimalen,
         error: fout);
   }
 
@@ -154,7 +155,7 @@ class AflopendKredietVerwerken {
               somAnn += termijnBedragMnd;
 
               termijnen.add(AKtermijnAnn(
-                  termijn: Kalender.voegPeriodeToe(beginDatum, maanden: index),
+                  termijn: Kalender.voegPeriodeToe(beginDatum, maanden: index,periodeOpties: PeriodeOpties.volgende),
                   termijnBedrag: termijnBedragMnd,
                   interest: interest,
                   aflossen: aflossen,
@@ -170,7 +171,7 @@ class AflopendKredietVerwerken {
               somInterest += interest;
               somAnn += termijnBedrag;
               termijnen.add(AKtermijnAnn(
-                  termijn: Kalender.voegPeriodeToe(beginDatum, maanden: index),
+                  termijn: Kalender.voegPeriodeToe(beginDatum, maanden: index, periodeOpties: PeriodeOpties.volgende),
                   termijnBedrag: termijnBedrag,
                   interest: interest,
                   aflossen: aflossen,
@@ -235,7 +236,7 @@ class AflopendKredietVerwerken {
                 aflossen: aflossen));
 
             datum = Kalender.voegPeriodeToe(datum,
-                maanden: 1, periodeOpties: PeriodeOpties.eerstedag);
+                maanden: 1, periodeOpties: PeriodeOpties.eersteDag);
           }
 
           do {
@@ -279,7 +280,7 @@ class AflopendKredietVerwerken {
             }
 
             datum = Kalender.voegPeriodeToe(datum,
-                maanden: 1, periodeOpties: PeriodeOpties.eerstedag);
+                maanden: 1, periodeOpties: PeriodeOpties.eersteDag);
 
             if (schuld < 0.01 || index == ak.maxMaanden) {
               volgende = false;

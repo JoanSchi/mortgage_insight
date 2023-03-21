@@ -24,17 +24,41 @@ class VerbouwVerduurzaamKosten with _$VerbouwVerduurzaamKosten {
   double get totaleKosten => kosten.fold(0.0, (double previous, Waarde w) {
         double value;
         switch (w.eenheid) {
-          case Eenheid.percentageWoningWaarde:
+          case Eenheid.percentageTaxatie:
             value = taxatie / 100.0 * w.getal;
             break;
           case Eenheid.bedrag:
             value = w.getal;
             break;
+          case Eenheid.percentageWoningWaarde:
           case Eenheid.percentageLening:
             assert(false,
-                'Eenheid.percentageLening niet geimplementeerd in VerbouwVerduurzaamKosten');
-            value = 0.0; //lening / 100.0 * w.value;
+                '${w.eenheid} niet geimplementeerd in VerbouwVerduurzaamKosten');
+            value = 0.0;
             break;
+        }
+        return previous + value;
+      });
+
+  double get verduurzaamKosten => kosten.fold(0.0, (double previous, Waarde w) {
+        double value;
+        if (w.verduurzamen) {
+          switch (w.eenheid) {
+            case Eenheid.percentageTaxatie:
+              value = taxatie / 100.0 * w.getal;
+              break;
+            case Eenheid.bedrag:
+              value = w.getal;
+              break;
+            case Eenheid.percentageWoningWaarde:
+            case Eenheid.percentageLening:
+              assert(false,
+                  '${w.eenheid} niet geimplementeerd in VerbouwVerduurzaamKosten');
+              value = 0.0;
+              break;
+          }
+        } else {
+          value = 0.0;
         }
         return previous + value;
       });

@@ -2,6 +2,7 @@ import 'package:date_input_picker/date_input_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mortgage_insight/model/nl/schulden/verzendkrediet_verwerken.dart';
+import 'package:mortgage_insight/my_widgets/mortgage_chip.dart';
 import 'package:mortgage_insight/my_widgets/oh_no.dart';
 import 'package:mortgage_insight/my_widgets/selectable_widgets/single_checkbox.dart';
 import 'package:mortgage_insight/pages/schulden/schuld_provider.dart';
@@ -233,22 +234,10 @@ class VerzendKredietOptiePanelState
   }
 
   Widget _build(BuildContext context, VerzendKrediet vk) {
-    final theme = Theme.of(context);
-
     final dateNow = DateUtils.dateOnly(DateTime.now());
     final firstDate = DateTime(dateNow.year - 3, 1, 1);
     final lastDate = DateTime(dateNow.year + 10, 12,
         Kalender.dagenPerMaand(jaar: dateNow.year + 10, maand: 12));
-
-    Widget avatar(String text, bool selected) => CircleAvatar(
-          backgroundColor:
-              selected ? theme.colorScheme.onSecondary : Colors.blueGrey[50],
-          child: Text(
-            text,
-            style: theme.textTheme.bodySmall?.copyWith(
-                fontSize: 8.0, color: selected ? Colors.white : null),
-          ),
-        );
 
     final List<Widget> bedragen = [
       Expanded(
@@ -379,33 +368,30 @@ class VerzendKredietOptiePanelState
             height: 8.0,
           ),
           Wrap(spacing: 8.0, children: [
-            ChoiceChip(
-              key: const Key('euros'),
-              avatar: avatar('#0', vk.decimalen == 0),
-              label: const Text('Euro\'s'),
-              selected: vk.decimalen == 0,
-              onSelected: (v) {
-                _veranderingAfronden(0);
-              },
-            ),
-            ChoiceChip(
-              key: const Key('10cent'),
-              avatar: avatar('#0.0', vk.decimalen == 1),
-              label: const Text('10 ct'),
-              selected: vk.decimalen == 1,
-              onSelected: (v) {
-                _veranderingAfronden(1);
-              },
-            ),
-            ChoiceChip(
-              key: const Key('1cent'),
-              avatar: avatar('#0.00', vk.decimalen == 2),
-              label: const Text('1 ct'),
-              selected: vk.decimalen == 2,
-              onSelected: (v) {
-                _veranderingAfronden(2);
-              },
-            ),
+            MortgageChip(
+                key: const Key('euros'),
+                selected: vk.decimalen == 0,
+                onSelected: (v) {
+                  _veranderingAfronden(0);
+                },
+                text: 'Euro\'s',
+                avatarText: '#0'),
+            MortgageChip(
+                key: const Key('10cent'),
+                selected: vk.decimalen == 1,
+                onSelected: (v) {
+                  _veranderingAfronden(1);
+                },
+                text: '10 ct',
+                avatarText: '#.0'),
+            MortgageChip(
+                key: const Key('1cent'),
+                selected: vk.decimalen == 2,
+                onSelected: (v) {
+                  _veranderingAfronden(2);
+                },
+                text: '1 ct',
+                avatarText: '#.00'),
           ]),
         ]),
       ),

@@ -20,7 +20,7 @@ HypotheekDocument _$HypotheekDocumentFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$HypotheekDocument {
-  HypotheekProfielOverzicht get hypotheekProfielOverzicht =>
+  HypotheekDossierOverzicht get hypotheekDossierOverzicht =>
       throw _privateConstructorUsedError;
   InkomensOverzicht get inkomenOverzicht => throw _privateConstructorUsedError;
   SchuldenOverzicht get schuldenOverzicht => throw _privateConstructorUsedError;
@@ -38,11 +38,11 @@ abstract class $HypotheekDocumentCopyWith<$Res> {
       _$HypotheekDocumentCopyWithImpl<$Res, HypotheekDocument>;
   @useResult
   $Res call(
-      {HypotheekProfielOverzicht hypotheekProfielOverzicht,
+      {HypotheekDossierOverzicht hypotheekDossierOverzicht,
       InkomensOverzicht inkomenOverzicht,
       SchuldenOverzicht schuldenOverzicht});
 
-  $HypotheekProfielOverzichtCopyWith<$Res> get hypotheekProfielOverzicht;
+  $HypotheekDossierOverzichtCopyWith<$Res> get hypotheekDossierOverzicht;
   $InkomensOverzichtCopyWith<$Res> get inkomenOverzicht;
   $SchuldenOverzichtCopyWith<$Res> get schuldenOverzicht;
 }
@@ -60,15 +60,15 @@ class _$HypotheekDocumentCopyWithImpl<$Res, $Val extends HypotheekDocument>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? hypotheekProfielOverzicht = null,
+    Object? hypotheekDossierOverzicht = null,
     Object? inkomenOverzicht = null,
     Object? schuldenOverzicht = null,
   }) {
     return _then(_value.copyWith(
-      hypotheekProfielOverzicht: null == hypotheekProfielOverzicht
-          ? _value.hypotheekProfielOverzicht
-          : hypotheekProfielOverzicht // ignore: cast_nullable_to_non_nullable
-              as HypotheekProfielOverzicht,
+      hypotheekDossierOverzicht: null == hypotheekDossierOverzicht
+          ? _value.hypotheekDossierOverzicht
+          : hypotheekDossierOverzicht // ignore: cast_nullable_to_non_nullable
+              as HypotheekDossierOverzicht,
       inkomenOverzicht: null == inkomenOverzicht
           ? _value.inkomenOverzicht
           : inkomenOverzicht // ignore: cast_nullable_to_non_nullable
@@ -82,10 +82,10 @@ class _$HypotheekDocumentCopyWithImpl<$Res, $Val extends HypotheekDocument>
 
   @override
   @pragma('vm:prefer-inline')
-  $HypotheekProfielOverzichtCopyWith<$Res> get hypotheekProfielOverzicht {
-    return $HypotheekProfielOverzichtCopyWith<$Res>(
-        _value.hypotheekProfielOverzicht, (value) {
-      return _then(_value.copyWith(hypotheekProfielOverzicht: value) as $Val);
+  $HypotheekDossierOverzichtCopyWith<$Res> get hypotheekDossierOverzicht {
+    return $HypotheekDossierOverzichtCopyWith<$Res>(
+        _value.hypotheekDossierOverzicht, (value) {
+      return _then(_value.copyWith(hypotheekDossierOverzicht: value) as $Val);
     });
   }
 
@@ -115,12 +115,12 @@ abstract class _$$_HypotheekDocumentCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {HypotheekProfielOverzicht hypotheekProfielOverzicht,
+      {HypotheekDossierOverzicht hypotheekDossierOverzicht,
       InkomensOverzicht inkomenOverzicht,
       SchuldenOverzicht schuldenOverzicht});
 
   @override
-  $HypotheekProfielOverzichtCopyWith<$Res> get hypotheekProfielOverzicht;
+  $HypotheekDossierOverzichtCopyWith<$Res> get hypotheekDossierOverzicht;
   @override
   $InkomensOverzichtCopyWith<$Res> get inkomenOverzicht;
   @override
@@ -138,15 +138,15 @@ class __$$_HypotheekDocumentCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? hypotheekProfielOverzicht = null,
+    Object? hypotheekDossierOverzicht = null,
     Object? inkomenOverzicht = null,
     Object? schuldenOverzicht = null,
   }) {
     return _then(_$_HypotheekDocument(
-      hypotheekProfielOverzicht: null == hypotheekProfielOverzicht
-          ? _value.hypotheekProfielOverzicht
-          : hypotheekProfielOverzicht // ignore: cast_nullable_to_non_nullable
-              as HypotheekProfielOverzicht,
+      hypotheekDossierOverzicht: null == hypotheekDossierOverzicht
+          ? _value.hypotheekDossierOverzicht
+          : hypotheekDossierOverzicht // ignore: cast_nullable_to_non_nullable
+              as HypotheekDossierOverzicht,
       inkomenOverzicht: null == inkomenOverzicht
           ? _value.inkomenOverzicht
           : inkomenOverzicht // ignore: cast_nullable_to_non_nullable
@@ -163,7 +163,7 @@ class __$$_HypotheekDocumentCopyWithImpl<$Res>
 @JsonSerializable()
 class _$_HypotheekDocument implements _HypotheekDocument {
   const _$_HypotheekDocument(
-      {this.hypotheekProfielOverzicht = const HypotheekProfielOverzicht(),
+      {this.hypotheekDossierOverzicht = const HypotheekDossierOverzicht(),
       this.inkomenOverzicht = const InkomensOverzicht(),
       this.schuldenOverzicht = const SchuldenOverzicht()});
 
@@ -172,7 +172,7 @@ class _$_HypotheekDocument implements _HypotheekDocument {
 
   @override
   @JsonKey()
-  final HypotheekProfielOverzicht hypotheekProfielOverzicht;
+  final HypotheekDossierOverzicht hypotheekDossierOverzicht;
   @override
   @JsonKey()
   final InkomensOverzicht inkomenOverzicht;
@@ -182,7 +182,7 @@ class _$_HypotheekDocument implements _HypotheekDocument {
 
   @override
   String toString() {
-    return 'HypotheekDocument(hypotheekProfielOverzicht: $hypotheekProfielOverzicht, inkomenOverzicht: $inkomenOverzicht, schuldenOverzicht: $schuldenOverzicht)';
+    return 'HypotheekDocument(hypotheekDossierOverzicht: $hypotheekDossierOverzicht, inkomenOverzicht: $inkomenOverzicht, schuldenOverzicht: $schuldenOverzicht)';
   }
 
   @override
@@ -190,9 +190,9 @@ class _$_HypotheekDocument implements _HypotheekDocument {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$_HypotheekDocument &&
-            (identical(other.hypotheekProfielOverzicht,
-                    hypotheekProfielOverzicht) ||
-                other.hypotheekProfielOverzicht == hypotheekProfielOverzicht) &&
+            (identical(other.hypotheekDossierOverzicht,
+                    hypotheekDossierOverzicht) ||
+                other.hypotheekDossierOverzicht == hypotheekDossierOverzicht) &&
             (identical(other.inkomenOverzicht, inkomenOverzicht) ||
                 other.inkomenOverzicht == inkomenOverzicht) &&
             (identical(other.schuldenOverzicht, schuldenOverzicht) ||
@@ -201,7 +201,7 @@ class _$_HypotheekDocument implements _HypotheekDocument {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, hypotheekProfielOverzicht,
+  int get hashCode => Object.hash(runtimeType, hypotheekDossierOverzicht,
       inkomenOverzicht, schuldenOverzicht);
 
   @JsonKey(ignore: true)
@@ -221,7 +221,7 @@ class _$_HypotheekDocument implements _HypotheekDocument {
 
 abstract class _HypotheekDocument implements HypotheekDocument {
   const factory _HypotheekDocument(
-      {final HypotheekProfielOverzicht hypotheekProfielOverzicht,
+      {final HypotheekDossierOverzicht hypotheekDossierOverzicht,
       final InkomensOverzicht inkomenOverzicht,
       final SchuldenOverzicht schuldenOverzicht}) = _$_HypotheekDocument;
 
@@ -229,7 +229,7 @@ abstract class _HypotheekDocument implements HypotheekDocument {
       _$_HypotheekDocument.fromJson;
 
   @override
-  HypotheekProfielOverzicht get hypotheekProfielOverzicht;
+  HypotheekDossierOverzicht get hypotheekDossierOverzicht;
   @override
   InkomensOverzicht get inkomenOverzicht;
   @override

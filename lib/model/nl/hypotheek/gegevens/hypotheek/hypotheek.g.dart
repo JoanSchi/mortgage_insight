@@ -11,12 +11,18 @@ _$$Hypotheek _$$$HypotheekFromJson(Map<String, dynamic> json) => _$$Hypotheek(
       omschrijving: json['omschrijving'] as String,
       optiesHypotheekToevoegen: $enumDecode(
           _$OptiesHypotheekToevoegenEnumMap, json['optiesHypotheekToevoegen']),
-      lening: (json['lening'] as num).toDouble(),
-      gewensteLening: (json['gewensteLening'] as num).toDouble(),
-      maxLeningInkomen: (json['maxLeningInkomen'] as num).toDouble(),
-      maxLeningWoningWaarde: (json['maxLeningWoningWaarde'] as num).toDouble(),
-      maxLeningNgh: (json['maxLeningNgh'] as num?)?.toDouble() ?? 0.0,
-      toepassenNhg: json['toepassenNhg'] as bool? ?? true,
+      lening: (json['lening'] as num?)?.toDouble() ?? 0,
+      gewensteLening: (json['gewensteLening'] as num?)?.toDouble() ?? 0,
+      normInkomen: json['normInkomen'] == null
+          ? const NormInkomen(omschrijving: 'Inkomen')
+          : NormInkomen.fromJson(json['normInkomen'] as Map<String, dynamic>),
+      normWoningwaarde: json['normWoningwaarde'] == null
+          ? const NormWoningwaarde(omschrijving: 'Woningwaarde')
+          : NormWoningwaarde.fromJson(
+              json['normWoningwaarde'] as Map<String, dynamic>),
+      normNhg: json['normNhg'] == null
+          ? const NormNhg(omschrijving: 'NHG')
+          : NormNhg.fromJson(json['normNhg'] as Map<String, dynamic>),
       startDatum: DateTime.parse(json['startDatum'] as String),
       startDatumAflossen: DateTime.parse(json['startDatumAflossen'] as String),
       eindDatum: DateTime.parse(json['eindDatum'] as String),
@@ -31,8 +37,12 @@ _$$Hypotheek _$$$HypotheekFromJson(Map<String, dynamic> json) => _$$Hypotheek(
       boeteVrijPercentage: (json['boeteVrijPercentage'] as num).toDouble(),
       usePeriodeInMaanden: json['usePeriodeInMaanden'] as bool,
       minLening: (json['minLening'] as num).toDouble(),
-      extraAflossen: IList<AflosItem>.fromJson(json['extraAflossen'],
-          (value) => AflosItem.fromJson(value as Map<String, dynamic>)),
+      aanpassenLening: json['aanpassenLening'] == null
+          ? const IListConst([])
+          : IList<LeningAanpassen>.fromJson(
+              json['aanpassenLening'],
+              (value) =>
+                  LeningAanpassen.fromJson(value as Map<String, dynamic>)),
       volgende: json['volgende'] as String? ?? "",
       vorige: json['vorige'] as String? ?? "",
       order: json['order'] == null
@@ -43,15 +53,13 @@ _$$Hypotheek _$$$HypotheekFromJson(Map<String, dynamic> json) => _$$Hypotheek(
           ? const WoningLeningKosten()
           : WoningLeningKosten.fromJson(
               json['woningLeningKosten'] as Map<String, dynamic>),
-      verduurzaamKosten: json['verduurzaamKosten'] == null
+      verbouwVerduurzaamKosten: json['verbouwVerduurzaamKosten'] == null
           ? const VerbouwVerduurzaamKosten()
           : VerbouwVerduurzaamKosten.fromJson(
-              json['verduurzaamKosten'] as Map<String, dynamic>),
+              json['verbouwVerduurzaamKosten'] as Map<String, dynamic>),
       deelsAfgelosteLening: json['deelsAfgelosteLening'] as bool,
       datumDeelsAfgelosteLening:
           DateTime.parse(json['datumDeelsAfgelosteLening'] as String),
-      parallelLeningen: ParallelLeningen.fromJson(
-          json['parallelLeningen'] as Map<String, dynamic>),
       afgesloten: json['afgesloten'] as bool,
       restSchuld: (json['restSchuld'] as num?)?.toDouble() ?? 0.0,
     );
@@ -64,10 +72,9 @@ Map<String, dynamic> _$$$HypotheekToJson(_$$Hypotheek instance) =>
           _$OptiesHypotheekToevoegenEnumMap[instance.optiesHypotheekToevoegen]!,
       'lening': instance.lening,
       'gewensteLening': instance.gewensteLening,
-      'maxLeningInkomen': instance.maxLeningInkomen,
-      'maxLeningWoningWaarde': instance.maxLeningWoningWaarde,
-      'maxLeningNgh': instance.maxLeningNgh,
-      'toepassenNhg': instance.toepassenNhg,
+      'normInkomen': instance.normInkomen,
+      'normWoningwaarde': instance.normWoningwaarde,
+      'normNhg': instance.normNhg,
       'startDatum': instance.startDatum.toIso8601String(),
       'startDatumAflossen': instance.startDatumAflossen.toIso8601String(),
       'eindDatum': instance.eindDatum.toIso8601String(),
@@ -81,7 +88,7 @@ Map<String, dynamic> _$$$HypotheekToJson(_$$Hypotheek instance) =>
       'boeteVrijPercentage': instance.boeteVrijPercentage,
       'usePeriodeInMaanden': instance.usePeriodeInMaanden,
       'minLening': instance.minLening,
-      'extraAflossen': instance.extraAflossen.toJson(
+      'aanpassenLening': instance.aanpassenLening.toJson(
         (value) => value,
       ),
       'volgende': instance.volgende,
@@ -91,11 +98,10 @@ Map<String, dynamic> _$$$HypotheekToJson(_$$Hypotheek instance) =>
         (value) => value,
       ),
       'woningLeningKosten': instance.woningLeningKosten,
-      'verduurzaamKosten': instance.verduurzaamKosten,
+      'verbouwVerduurzaamKosten': instance.verbouwVerduurzaamKosten,
       'deelsAfgelosteLening': instance.deelsAfgelosteLening,
       'datumDeelsAfgelosteLening':
           instance.datumDeelsAfgelosteLening.toIso8601String(),
-      'parallelLeningen': instance.parallelLeningen,
       'afgesloten': instance.afgesloten,
       'restSchuld': instance.restSchuld,
     };

@@ -29,6 +29,7 @@ Map<String, dynamic> _$$_WaardeToJson(_$_Waarde instance) => <String, dynamic>{
     };
 
 const _$EenheidEnumMap = {
+  Eenheid.percentageTaxatie: 'percentageTaxatie',
   Eenheid.percentageWoningWaarde: 'percentageWoningWaarde',
   Eenheid.percentageLening: 'percentageLening',
   Eenheid.bedrag: 'bedrag',

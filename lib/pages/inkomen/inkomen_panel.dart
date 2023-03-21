@@ -71,21 +71,19 @@ class _InkomenPanelState extends ConsumerState<InkomenPanel>
     final theme = Theme.of(context);
     // final deviceScreen = DeviceScreen3.of(context);
 
-    TabBarPageStyle? tabBarPageStyle = theme.extension<TabBarPageStyle>();
+    // TabBarPageStyle? tabBarPageStyle = theme.extension<TabBarPageStyle>();
 
     final tabBar = TabBar(
-      padding: const EdgeInsets.only(left: 4.0, right: 4.0, bottom: 4.0),
+      // padding: const EdgeInsets.only(left: 4.0, right: 4.0, bottom: 4.0),
       controller: _tabController,
-      labelStyle: tabBarPageStyle?.textStyle,
-      indicatorColor: tabBarPageStyle?.indicatorColor,
-      labelColor: tabBarPageStyle?.labelColor,
-      tabs: [
+      // labelStyle: tabBarPageStyle?.textStyle,
+      // indicatorColor: tabBarPageStyle?.indicatorColor,
+      // labelColor: tabBarPageStyle?.labelColor,
+      tabs: const [
         Tab(
-          height: tabBarPageStyle?.height,
           text: 'Inkomen',
         ),
         Tab(
-          height: tabBarPageStyle?.height,
           text: 'Partner',
         )
       ],

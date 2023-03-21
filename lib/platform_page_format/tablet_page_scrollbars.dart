@@ -86,7 +86,7 @@ class TablePageScrollBars extends StatelessWidget {
               Widget? child}) {
             final scrolledUnderColor = scrolledUnder
                 ? theme.colorScheme.surface
-                : theme.bottomAppBarTheme.color;
+                : theme.appBarTheme.backgroundColor;
 
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),

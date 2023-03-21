@@ -8,10 +8,10 @@ part of 'hypotheek_document.dart';
 
 _$_HypotheekDocument _$$_HypotheekDocumentFromJson(Map<String, dynamic> json) =>
     _$_HypotheekDocument(
-      hypotheekProfielOverzicht: json['hypotheekProfielOverzicht'] == null
-          ? const HypotheekProfielOverzicht()
-          : HypotheekProfielOverzicht.fromJson(
-              json['hypotheekProfielOverzicht'] as Map<String, dynamic>),
+      hypotheekDossierOverzicht: json['hypotheekDossierOverzicht'] == null
+          ? const HypotheekDossierOverzicht()
+          : HypotheekDossierOverzicht.fromJson(
+              json['hypotheekDossierOverzicht'] as Map<String, dynamic>),
       inkomenOverzicht: json['inkomenOverzicht'] == null
           ? const InkomensOverzicht()
           : InkomensOverzicht.fromJson(
@@ -25,7 +25,7 @@ _$_HypotheekDocument _$$_HypotheekDocumentFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$$_HypotheekDocumentToJson(
         _$_HypotheekDocument instance) =>
     <String, dynamic>{
-      'hypotheekProfielOverzicht': instance.hypotheekProfielOverzicht,
+      'hypotheekDossierOverzicht': instance.hypotheekDossierOverzicht,
       'inkomenOverzicht': instance.inkomenOverzicht,
       'schuldenOverzicht': instance.schuldenOverzicht,
     };

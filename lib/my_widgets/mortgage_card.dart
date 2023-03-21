@@ -23,7 +23,7 @@ class MoCard extends StatelessWidget {
     this.onTap,
     this.onLongPress,
     this.splashColor = const Color.fromARGB(137, 170, 212, 229),
-    this.highlightColor = const Color.fromARGB(150, 255, 248, 225),
+    this.highlightColor = const Color.fromARGB(149, 152, 169, 72),
   }) : super(key: key);
 
   @override
@@ -74,6 +74,7 @@ class MoCard extends StatelessWidget {
     return Card(
         clipBehavior: Clip.antiAlias,
         color: color,
+        surfaceTintColor: color,
         margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 4.0),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16.0),

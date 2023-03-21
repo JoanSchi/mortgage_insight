@@ -12,6 +12,8 @@ import '../../utilities/device_info.dart';
 import 'schulden_card/schulden_card.dart';
 
 class SchuldenOverzichtPanel extends ConsumerStatefulWidget {
+  const SchuldenOverzichtPanel({super.key});
+
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
       _SchuldenOverzichtPanelState();
@@ -34,7 +36,7 @@ class _SchuldenOverzichtPanelState
         hypotheekDocumentProvider.select((value) => value.schuldenOverzicht));
 
     final lijst = schulden.lijst;
-    final bodyBuilder = (
+    bodyBuilder(
             {required BuildContext context,
             required bool nested,
             required double topPadding,
@@ -48,7 +50,7 @@ class _SchuldenOverzichtPanelState
                       handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
                           context),
                     ),
-                  if (schulden.lijst.length > 0)
+                  if (schulden.lijst.isNotEmpty)
                     SliverGrid(
                         gridDelegate:
                             const SliverGridDelegateWithMaxCrossAxisExtent(
@@ -96,12 +98,12 @@ class _SchuldenOverzichtPanelState
             pageProperties: PageProperties(hasNavigationBar: true))
       ],
       imageBuilder: (_) => Image(
-          image: AssetImage(
+          image: const AssetImage(
             'graphics/schuld.png',
           ),
           color: theme.colorScheme.onSurface),
       bodyBuilder: bodyBuilder,
-      fabProperties: FabProperties(onTap: add, icon: Icon(Icons.add)),
+      fabProperties: FabProperties(onTap: add, icon: const Icon(Icons.add)),
     );
   }
 

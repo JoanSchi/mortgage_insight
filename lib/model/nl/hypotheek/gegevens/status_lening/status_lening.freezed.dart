@@ -245,8 +245,11 @@ mixin _$StatusLening {
   double get lening => throw _privateConstructorUsedError;
   int get periode => throw _privateConstructorUsedError;
   double get rente => throw _privateConstructorUsedError;
+  double get toetsRente => throw _privateConstructorUsedError;
   int get aflosTermijnInMaanden => throw _privateConstructorUsedError;
   HypotheekVorm get hypotheekVorm => throw _privateConstructorUsedError;
+  double get verduurzaamKosten => throw _privateConstructorUsedError;
+  double get verbouwKosten => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -265,8 +268,11 @@ abstract class $StatusLeningCopyWith<$Res> {
       double lening,
       int periode,
       double rente,
+      double toetsRente,
       int aflosTermijnInMaanden,
-      HypotheekVorm hypotheekVorm});
+      HypotheekVorm hypotheekVorm,
+      double verduurzaamKosten,
+      double verbouwKosten});
 }
 
 /// @nodoc
@@ -286,8 +292,11 @@ class _$StatusLeningCopyWithImpl<$Res, $Val extends StatusLening>
     Object? lening = null,
     Object? periode = null,
     Object? rente = null,
+    Object? toetsRente = null,
     Object? aflosTermijnInMaanden = null,
     Object? hypotheekVorm = null,
+    Object? verduurzaamKosten = null,
+    Object? verbouwKosten = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -306,6 +315,10 @@ class _$StatusLeningCopyWithImpl<$Res, $Val extends StatusLening>
           ? _value.rente
           : rente // ignore: cast_nullable_to_non_nullable
               as double,
+      toetsRente: null == toetsRente
+          ? _value.toetsRente
+          : toetsRente // ignore: cast_nullable_to_non_nullable
+              as double,
       aflosTermijnInMaanden: null == aflosTermijnInMaanden
           ? _value.aflosTermijnInMaanden
           : aflosTermijnInMaanden // ignore: cast_nullable_to_non_nullable
@@ -314,6 +327,14 @@ class _$StatusLeningCopyWithImpl<$Res, $Val extends StatusLening>
           ? _value.hypotheekVorm
           : hypotheekVorm // ignore: cast_nullable_to_non_nullable
               as HypotheekVorm,
+      verduurzaamKosten: null == verduurzaamKosten
+          ? _value.verduurzaamKosten
+          : verduurzaamKosten // ignore: cast_nullable_to_non_nullable
+              as double,
+      verbouwKosten: null == verbouwKosten
+          ? _value.verbouwKosten
+          : verbouwKosten // ignore: cast_nullable_to_non_nullable
+              as double,
     ) as $Val);
   }
 }
@@ -331,8 +352,11 @@ abstract class _$$_StatusLeningCopyWith<$Res>
       double lening,
       int periode,
       double rente,
+      double toetsRente,
       int aflosTermijnInMaanden,
-      HypotheekVorm hypotheekVorm});
+      HypotheekVorm hypotheekVorm,
+      double verduurzaamKosten,
+      double verbouwKosten});
 }
 
 /// @nodoc
@@ -350,8 +374,11 @@ class __$$_StatusLeningCopyWithImpl<$Res>
     Object? lening = null,
     Object? periode = null,
     Object? rente = null,
+    Object? toetsRente = null,
     Object? aflosTermijnInMaanden = null,
     Object? hypotheekVorm = null,
+    Object? verduurzaamKosten = null,
+    Object? verbouwKosten = null,
   }) {
     return _then(_$_StatusLening(
       id: null == id
@@ -370,6 +397,10 @@ class __$$_StatusLeningCopyWithImpl<$Res>
           ? _value.rente
           : rente // ignore: cast_nullable_to_non_nullable
               as double,
+      toetsRente: null == toetsRente
+          ? _value.toetsRente
+          : toetsRente // ignore: cast_nullable_to_non_nullable
+              as double,
       aflosTermijnInMaanden: null == aflosTermijnInMaanden
           ? _value.aflosTermijnInMaanden
           : aflosTermijnInMaanden // ignore: cast_nullable_to_non_nullable
@@ -378,6 +409,14 @@ class __$$_StatusLeningCopyWithImpl<$Res>
           ? _value.hypotheekVorm
           : hypotheekVorm // ignore: cast_nullable_to_non_nullable
               as HypotheekVorm,
+      verduurzaamKosten: null == verduurzaamKosten
+          ? _value.verduurzaamKosten
+          : verduurzaamKosten // ignore: cast_nullable_to_non_nullable
+              as double,
+      verbouwKosten: null == verbouwKosten
+          ? _value.verbouwKosten
+          : verbouwKosten // ignore: cast_nullable_to_non_nullable
+              as double,
     ));
   }
 }
@@ -390,8 +429,11 @@ class _$_StatusLening with DiagnosticableTreeMixin implements _StatusLening {
       required this.lening,
       required this.periode,
       required this.rente,
+      required this.toetsRente,
       required this.aflosTermijnInMaanden,
-      required this.hypotheekVorm});
+      required this.hypotheekVorm,
+      required this.verduurzaamKosten,
+      required this.verbouwKosten});
 
   factory _$_StatusLening.fromJson(Map<String, dynamic> json) =>
       _$$_StatusLeningFromJson(json);
@@ -405,13 +447,19 @@ class _$_StatusLening with DiagnosticableTreeMixin implements _StatusLening {
   @override
   final double rente;
   @override
+  final double toetsRente;
+  @override
   final int aflosTermijnInMaanden;
   @override
   final HypotheekVorm hypotheekVorm;
+  @override
+  final double verduurzaamKosten;
+  @override
+  final double verbouwKosten;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'StatusLening(id: $id, lening: $lening, periode: $periode, rente: $rente, aflosTermijnInMaanden: $aflosTermijnInMaanden, hypotheekVorm: $hypotheekVorm)';
+    return 'StatusLening(id: $id, lening: $lening, periode: $periode, rente: $rente, toetsRente: $toetsRente, aflosTermijnInMaanden: $aflosTermijnInMaanden, hypotheekVorm: $hypotheekVorm, verduurzaamKosten: $verduurzaamKosten, verbouwKosten: $verbouwKosten)';
   }
 
   @override
@@ -423,8 +471,11 @@ class _$_StatusLening with DiagnosticableTreeMixin implements _StatusLening {
       ..add(DiagnosticsProperty('lening', lening))
       ..add(DiagnosticsProperty('periode', periode))
       ..add(DiagnosticsProperty('rente', rente))
+      ..add(DiagnosticsProperty('toetsRente', toetsRente))
       ..add(DiagnosticsProperty('aflosTermijnInMaanden', aflosTermijnInMaanden))
-      ..add(DiagnosticsProperty('hypotheekVorm', hypotheekVorm));
+      ..add(DiagnosticsProperty('hypotheekVorm', hypotheekVorm))
+      ..add(DiagnosticsProperty('verduurzaamKosten', verduurzaamKosten))
+      ..add(DiagnosticsProperty('verbouwKosten', verbouwKosten));
   }
 
   @override
@@ -436,16 +487,31 @@ class _$_StatusLening with DiagnosticableTreeMixin implements _StatusLening {
             (identical(other.lening, lening) || other.lening == lening) &&
             (identical(other.periode, periode) || other.periode == periode) &&
             (identical(other.rente, rente) || other.rente == rente) &&
+            (identical(other.toetsRente, toetsRente) ||
+                other.toetsRente == toetsRente) &&
             (identical(other.aflosTermijnInMaanden, aflosTermijnInMaanden) ||
                 other.aflosTermijnInMaanden == aflosTermijnInMaanden) &&
             (identical(other.hypotheekVorm, hypotheekVorm) ||
-                other.hypotheekVorm == hypotheekVorm));
+                other.hypotheekVorm == hypotheekVorm) &&
+            (identical(other.verduurzaamKosten, verduurzaamKosten) ||
+                other.verduurzaamKosten == verduurzaamKosten) &&
+            (identical(other.verbouwKosten, verbouwKosten) ||
+                other.verbouwKosten == verbouwKosten));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, lening, periode, rente,
-      aflosTermijnInMaanden, hypotheekVorm);
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      lening,
+      periode,
+      rente,
+      toetsRente,
+      aflosTermijnInMaanden,
+      hypotheekVorm,
+      verduurzaamKosten,
+      verbouwKosten);
 
   @JsonKey(ignore: true)
   @override
@@ -467,8 +533,11 @@ abstract class _StatusLening implements StatusLening {
       required final double lening,
       required final int periode,
       required final double rente,
+      required final double toetsRente,
       required final int aflosTermijnInMaanden,
-      required final HypotheekVorm hypotheekVorm}) = _$_StatusLening;
+      required final HypotheekVorm hypotheekVorm,
+      required final double verduurzaamKosten,
+      required final double verbouwKosten}) = _$_StatusLening;
 
   factory _StatusLening.fromJson(Map<String, dynamic> json) =
       _$_StatusLening.fromJson;
@@ -482,9 +551,15 @@ abstract class _StatusLening implements StatusLening {
   @override
   double get rente;
   @override
+  double get toetsRente;
+  @override
   int get aflosTermijnInMaanden;
   @override
   HypotheekVorm get hypotheekVorm;
+  @override
+  double get verduurzaamKosten;
+  @override
+  double get verbouwKosten;
   @override
   @JsonKey(ignore: true)
   _$$_StatusLeningCopyWith<_$_StatusLening> get copyWith =>

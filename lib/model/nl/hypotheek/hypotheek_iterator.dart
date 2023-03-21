@@ -1,39 +1,40 @@
 import 'dart:collection';
 
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/foundation.dart';
 
-import 'hypotheek.dart';
+import 'gegevens/hypotheek/hypotheek.dart';
 
 class HypotheekIterateItem extends LinkedListEntry<HypotheekIterateItem> {
-  RemoveHypotheek hypotheek;
+  Hypotheek hypotheek;
   bool last = false;
 
   HypotheekIterateItem(this.hypotheek);
 
-  List<RemoveHypotheek> get parallelHypotheken =>
-      list?.map((e) => e.hypotheek).where((RemoveHypotheek e) {
-        debugPrint(
-            'id e ${e.id} id hypotheek ${hypotheek.id} not equal ${hypotheek != e} ${e.eindDatum.compareTo(hypotheek.startDatum)}');
-        debugPrint('date e ${e.eindDatum}');
-        debugPrint('date hypotheek ${hypotheek.startDatum}');
-        debugPrint(
-            'toevoegen ${e != hypotheek && e.eindDatum.compareTo(hypotheek.startDatum) > 0}');
-        return e != hypotheek &&
+  List<Hypotheek> get parallelHypotheken =>
+      list?.map((e) => e.hypotheek).where((Hypotheek e) {
+        // debugPrint(
+        //     'id e ${e.id} id hypotheek ${hypotheek.id} not equal ${hypotheek != e} ${e.eindDatum.compareTo(hypotheek.startDatum)}');
+        // debugPrint('date e ${e.eindDatum}');
+        // debugPrint('date hypotheek ${hypotheek.startDatum}');
+        // debugPrint(
+        //     'toevoegen ${e != hypotheek && e.eindDatum.compareTo(hypotheek.startDatum) > 0}');
+        return //e != hypotheek &&
             e.eindDatum.compareTo(hypotheek.startDatum) > 0;
       }).toList() ??
       const [];
 }
 
 class HypotheekIterator {
-  List<RemoveHypotheek> eersteHypotheken;
-  Map<String, RemoveHypotheek> hypotheken;
+  IList<Hypotheek> eersteHypotheken;
+  IMap<String, Hypotheek> hypotheken;
 
   HypotheekIterator({required this.eersteHypotheken, required this.hypotheken});
 
-  Iterable<RemoveHypotheek> all() sync* {
+  Iterable<Hypotheek> all() sync* {
     LinkedList<HypotheekIterateItem> linkedList = LinkedList();
 
-    for (RemoveHypotheek h in eersteHypotheken) {
+    for (Hypotheek h in eersteHypotheken) {
       linkedList.add(HypotheekIterateItem(h));
     }
 
@@ -63,10 +64,10 @@ class HypotheekIterator {
     }
   }
 
-  HypotheekIterateItem onlyWithParallel(RemoveHypotheek hypotheek) {
+  HypotheekIterateItem onlyWithParallel(Hypotheek hypotheek) {
     LinkedList<HypotheekIterateItem> linkedList = LinkedList();
 
-    for (RemoveHypotheek h in eersteHypotheken) {
+    for (Hypotheek h in eersteHypotheken) {
       linkedList.add(HypotheekIterateItem(h));
     }
 
@@ -101,12 +102,12 @@ class HypotheekIterator {
     return HypotheekIterateItem(hypotheek);
   }
 
-  Iterable<HypotheekIterateItem> parallel(
-    RemoveHypotheek? vanaf,
+  Iterable<HypotheekIterateItem> parallelMetStartDatum(
+    Hypotheek? vanaf,
   ) sync* {
     LinkedList<HypotheekIterateItem> linkedList = LinkedList();
 
-    for (RemoveHypotheek h in eersteHypotheken) {
+    for (Hypotheek h in eersteHypotheken) {
       linkedList.add(HypotheekIterateItem(h));
     }
 
@@ -144,10 +145,10 @@ class HypotheekIterator {
   }
 
   Iterable<HypotheekIterateItem> parallelTm(
-      {RemoveHypotheek? vanaf, RemoveHypotheek? tm}) sync* {
+      {Hypotheek? vanaf, Hypotheek? tm}) sync* {
     LinkedList<HypotheekIterateItem> linkedList = LinkedList();
 
-    for (RemoveHypotheek h in eersteHypotheken) {
+    for (Hypotheek h in eersteHypotheken) {
       linkedList.add(HypotheekIterateItem(h));
     }
 
@@ -183,6 +184,29 @@ class HypotheekIterator {
         break;
       } else {
         yield entry;
+      }
+    }
+  }
+
+  Iterable<Hypotheek> parallelStartDatum(DateTime startDatum) sync* {
+    for (Hypotheek hypotheek in eersteHypotheken) {
+      //Eerste parallele hypotheek startDatum komt later, daarom overslaan
+      if (hypotheek.startDatum.compareTo(startDatum) < 0) {
+        continue;
+      }
+
+      Hypotheek? h = hypotheek;
+
+      while (h != null) {
+        //Als parallele eindDatum later is dan de startDatum, dan valt startDatum binnen periode van de paralelle hypotheek.
+        if (startDatum.compareTo(h.eindDatum) < 0) {
+          yield h;
+          break;
+        }
+
+        if (h.volgende.isNotEmpty) {
+          h = hypotheken[h.volgende]!;
+        }
       }
     }
   }

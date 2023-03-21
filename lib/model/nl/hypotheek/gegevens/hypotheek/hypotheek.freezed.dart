@@ -26,10 +26,9 @@ mixin _$Hypotheek {
       throw _privateConstructorUsedError;
   double get lening => throw _privateConstructorUsedError;
   double get gewensteLening => throw _privateConstructorUsedError;
-  double get maxLeningInkomen => throw _privateConstructorUsedError;
-  double get maxLeningWoningWaarde => throw _privateConstructorUsedError;
-  double get maxLeningNgh => throw _privateConstructorUsedError;
-  bool get toepassenNhg => throw _privateConstructorUsedError;
+  NormInkomen get normInkomen => throw _privateConstructorUsedError;
+  NormWoningwaarde get normWoningwaarde => throw _privateConstructorUsedError;
+  NormNhg get normNhg => throw _privateConstructorUsedError;
   DateTime get startDatum => throw _privateConstructorUsedError;
   DateTime get startDatumAflossen => throw _privateConstructorUsedError;
   DateTime get eindDatum => throw _privateConstructorUsedError;
@@ -41,17 +40,17 @@ mixin _$Hypotheek {
   double get boeteVrijPercentage => throw _privateConstructorUsedError;
   bool get usePeriodeInMaanden => throw _privateConstructorUsedError;
   double get minLening => throw _privateConstructorUsedError;
-  IList<AflosItem> get extraAflossen => throw _privateConstructorUsedError;
+  IList<LeningAanpassen> get aanpassenLening =>
+      throw _privateConstructorUsedError;
   String get volgende => throw _privateConstructorUsedError;
   String get vorige => throw _privateConstructorUsedError;
   IMap<String, int> get order => throw _privateConstructorUsedError;
   WoningLeningKosten get woningLeningKosten =>
       throw _privateConstructorUsedError;
-  VerbouwVerduurzaamKosten get verduurzaamKosten =>
+  VerbouwVerduurzaamKosten get verbouwVerduurzaamKosten =>
       throw _privateConstructorUsedError;
   bool get deelsAfgelosteLening => throw _privateConstructorUsedError;
   DateTime get datumDeelsAfgelosteLening => throw _privateConstructorUsedError;
-  ParallelLeningen get parallelLeningen => throw _privateConstructorUsedError;
   bool get afgesloten => throw _privateConstructorUsedError;
   double get restSchuld => throw _privateConstructorUsedError;
 
@@ -72,10 +71,9 @@ abstract class $HypotheekCopyWith<$Res> {
       OptiesHypotheekToevoegen optiesHypotheekToevoegen,
       double lening,
       double gewensteLening,
-      double maxLeningInkomen,
-      double maxLeningWoningWaarde,
-      double maxLeningNgh,
-      bool toepassenNhg,
+      NormInkomen normInkomen,
+      NormWoningwaarde normWoningwaarde,
+      NormNhg normNhg,
       DateTime startDatum,
       DateTime startDatumAflossen,
       DateTime eindDatum,
@@ -87,21 +85,19 @@ abstract class $HypotheekCopyWith<$Res> {
       double boeteVrijPercentage,
       bool usePeriodeInMaanden,
       double minLening,
-      IList<AflosItem> extraAflossen,
+      IList<LeningAanpassen> aanpassenLening,
       String volgende,
       String vorige,
       IMap<String, int> order,
       WoningLeningKosten woningLeningKosten,
-      VerbouwVerduurzaamKosten verduurzaamKosten,
+      VerbouwVerduurzaamKosten verbouwVerduurzaamKosten,
       bool deelsAfgelosteLening,
       DateTime datumDeelsAfgelosteLening,
-      ParallelLeningen parallelLeningen,
       bool afgesloten,
       double restSchuld});
 
   $WoningLeningKostenCopyWith<$Res> get woningLeningKosten;
-  $VerbouwVerduurzaamKostenCopyWith<$Res> get verduurzaamKosten;
-  $ParallelLeningenCopyWith<$Res> get parallelLeningen;
+  $VerbouwVerduurzaamKostenCopyWith<$Res> get verbouwVerduurzaamKosten;
 }
 
 /// @nodoc
@@ -122,10 +118,9 @@ class _$HypotheekCopyWithImpl<$Res, $Val extends Hypotheek>
     Object? optiesHypotheekToevoegen = null,
     Object? lening = null,
     Object? gewensteLening = null,
-    Object? maxLeningInkomen = null,
-    Object? maxLeningWoningWaarde = null,
-    Object? maxLeningNgh = null,
-    Object? toepassenNhg = null,
+    Object? normInkomen = freezed,
+    Object? normWoningwaarde = freezed,
+    Object? normNhg = freezed,
     Object? startDatum = null,
     Object? startDatumAflossen = null,
     Object? eindDatum = null,
@@ -137,15 +132,14 @@ class _$HypotheekCopyWithImpl<$Res, $Val extends Hypotheek>
     Object? boeteVrijPercentage = null,
     Object? usePeriodeInMaanden = null,
     Object? minLening = null,
-    Object? extraAflossen = null,
+    Object? aanpassenLening = null,
     Object? volgende = null,
     Object? vorige = null,
     Object? order = null,
     Object? woningLeningKosten = null,
-    Object? verduurzaamKosten = null,
+    Object? verbouwVerduurzaamKosten = null,
     Object? deelsAfgelosteLening = null,
     Object? datumDeelsAfgelosteLening = null,
-    Object? parallelLeningen = null,
     Object? afgesloten = null,
     Object? restSchuld = null,
   }) {
@@ -170,22 +164,18 @@ class _$HypotheekCopyWithImpl<$Res, $Val extends Hypotheek>
           ? _value.gewensteLening
           : gewensteLening // ignore: cast_nullable_to_non_nullable
               as double,
-      maxLeningInkomen: null == maxLeningInkomen
-          ? _value.maxLeningInkomen
-          : maxLeningInkomen // ignore: cast_nullable_to_non_nullable
-              as double,
-      maxLeningWoningWaarde: null == maxLeningWoningWaarde
-          ? _value.maxLeningWoningWaarde
-          : maxLeningWoningWaarde // ignore: cast_nullable_to_non_nullable
-              as double,
-      maxLeningNgh: null == maxLeningNgh
-          ? _value.maxLeningNgh
-          : maxLeningNgh // ignore: cast_nullable_to_non_nullable
-              as double,
-      toepassenNhg: null == toepassenNhg
-          ? _value.toepassenNhg
-          : toepassenNhg // ignore: cast_nullable_to_non_nullable
-              as bool,
+      normInkomen: freezed == normInkomen
+          ? _value.normInkomen
+          : normInkomen // ignore: cast_nullable_to_non_nullable
+              as NormInkomen,
+      normWoningwaarde: freezed == normWoningwaarde
+          ? _value.normWoningwaarde
+          : normWoningwaarde // ignore: cast_nullable_to_non_nullable
+              as NormWoningwaarde,
+      normNhg: freezed == normNhg
+          ? _value.normNhg
+          : normNhg // ignore: cast_nullable_to_non_nullable
+              as NormNhg,
       startDatum: null == startDatum
           ? _value.startDatum
           : startDatum // ignore: cast_nullable_to_non_nullable
@@ -230,10 +220,10 @@ class _$HypotheekCopyWithImpl<$Res, $Val extends Hypotheek>
           ? _value.minLening
           : minLening // ignore: cast_nullable_to_non_nullable
               as double,
-      extraAflossen: null == extraAflossen
-          ? _value.extraAflossen
-          : extraAflossen // ignore: cast_nullable_to_non_nullable
-              as IList<AflosItem>,
+      aanpassenLening: null == aanpassenLening
+          ? _value.aanpassenLening
+          : aanpassenLening // ignore: cast_nullable_to_non_nullable
+              as IList<LeningAanpassen>,
       volgende: null == volgende
           ? _value.volgende
           : volgende // ignore: cast_nullable_to_non_nullable
@@ -250,9 +240,9 @@ class _$HypotheekCopyWithImpl<$Res, $Val extends Hypotheek>
           ? _value.woningLeningKosten
           : woningLeningKosten // ignore: cast_nullable_to_non_nullable
               as WoningLeningKosten,
-      verduurzaamKosten: null == verduurzaamKosten
-          ? _value.verduurzaamKosten
-          : verduurzaamKosten // ignore: cast_nullable_to_non_nullable
+      verbouwVerduurzaamKosten: null == verbouwVerduurzaamKosten
+          ? _value.verbouwVerduurzaamKosten
+          : verbouwVerduurzaamKosten // ignore: cast_nullable_to_non_nullable
               as VerbouwVerduurzaamKosten,
       deelsAfgelosteLening: null == deelsAfgelosteLening
           ? _value.deelsAfgelosteLening
@@ -262,10 +252,6 @@ class _$HypotheekCopyWithImpl<$Res, $Val extends Hypotheek>
           ? _value.datumDeelsAfgelosteLening
           : datumDeelsAfgelosteLening // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      parallelLeningen: null == parallelLeningen
-          ? _value.parallelLeningen
-          : parallelLeningen // ignore: cast_nullable_to_non_nullable
-              as ParallelLeningen,
       afgesloten: null == afgesloten
           ? _value.afgesloten
           : afgesloten // ignore: cast_nullable_to_non_nullable
@@ -288,18 +274,10 @@ class _$HypotheekCopyWithImpl<$Res, $Val extends Hypotheek>
 
   @override
   @pragma('vm:prefer-inline')
-  $VerbouwVerduurzaamKostenCopyWith<$Res> get verduurzaamKosten {
-    return $VerbouwVerduurzaamKostenCopyWith<$Res>(_value.verduurzaamKosten,
-        (value) {
-      return _then(_value.copyWith(verduurzaamKosten: value) as $Val);
-    });
-  }
-
-  @override
-  @pragma('vm:prefer-inline')
-  $ParallelLeningenCopyWith<$Res> get parallelLeningen {
-    return $ParallelLeningenCopyWith<$Res>(_value.parallelLeningen, (value) {
-      return _then(_value.copyWith(parallelLeningen: value) as $Val);
+  $VerbouwVerduurzaamKostenCopyWith<$Res> get verbouwVerduurzaamKosten {
+    return $VerbouwVerduurzaamKostenCopyWith<$Res>(
+        _value.verbouwVerduurzaamKosten, (value) {
+      return _then(_value.copyWith(verbouwVerduurzaamKosten: value) as $Val);
     });
   }
 }
@@ -317,10 +295,9 @@ abstract class _$$$HypotheekCopyWith<$Res> implements $HypotheekCopyWith<$Res> {
       OptiesHypotheekToevoegen optiesHypotheekToevoegen,
       double lening,
       double gewensteLening,
-      double maxLeningInkomen,
-      double maxLeningWoningWaarde,
-      double maxLeningNgh,
-      bool toepassenNhg,
+      NormInkomen normInkomen,
+      NormWoningwaarde normWoningwaarde,
+      NormNhg normNhg,
       DateTime startDatum,
       DateTime startDatumAflossen,
       DateTime eindDatum,
@@ -332,24 +309,21 @@ abstract class _$$$HypotheekCopyWith<$Res> implements $HypotheekCopyWith<$Res> {
       double boeteVrijPercentage,
       bool usePeriodeInMaanden,
       double minLening,
-      IList<AflosItem> extraAflossen,
+      IList<LeningAanpassen> aanpassenLening,
       String volgende,
       String vorige,
       IMap<String, int> order,
       WoningLeningKosten woningLeningKosten,
-      VerbouwVerduurzaamKosten verduurzaamKosten,
+      VerbouwVerduurzaamKosten verbouwVerduurzaamKosten,
       bool deelsAfgelosteLening,
       DateTime datumDeelsAfgelosteLening,
-      ParallelLeningen parallelLeningen,
       bool afgesloten,
       double restSchuld});
 
   @override
   $WoningLeningKostenCopyWith<$Res> get woningLeningKosten;
   @override
-  $VerbouwVerduurzaamKostenCopyWith<$Res> get verduurzaamKosten;
-  @override
-  $ParallelLeningenCopyWith<$Res> get parallelLeningen;
+  $VerbouwVerduurzaamKostenCopyWith<$Res> get verbouwVerduurzaamKosten;
 }
 
 /// @nodoc
@@ -368,10 +342,9 @@ class __$$$HypotheekCopyWithImpl<$Res>
     Object? optiesHypotheekToevoegen = null,
     Object? lening = null,
     Object? gewensteLening = null,
-    Object? maxLeningInkomen = null,
-    Object? maxLeningWoningWaarde = null,
-    Object? maxLeningNgh = null,
-    Object? toepassenNhg = null,
+    Object? normInkomen = freezed,
+    Object? normWoningwaarde = freezed,
+    Object? normNhg = freezed,
     Object? startDatum = null,
     Object? startDatumAflossen = null,
     Object? eindDatum = null,
@@ -383,15 +356,14 @@ class __$$$HypotheekCopyWithImpl<$Res>
     Object? boeteVrijPercentage = null,
     Object? usePeriodeInMaanden = null,
     Object? minLening = null,
-    Object? extraAflossen = null,
+    Object? aanpassenLening = null,
     Object? volgende = null,
     Object? vorige = null,
     Object? order = null,
     Object? woningLeningKosten = null,
-    Object? verduurzaamKosten = null,
+    Object? verbouwVerduurzaamKosten = null,
     Object? deelsAfgelosteLening = null,
     Object? datumDeelsAfgelosteLening = null,
-    Object? parallelLeningen = null,
     Object? afgesloten = null,
     Object? restSchuld = null,
   }) {
@@ -416,22 +388,18 @@ class __$$$HypotheekCopyWithImpl<$Res>
           ? _value.gewensteLening
           : gewensteLening // ignore: cast_nullable_to_non_nullable
               as double,
-      maxLeningInkomen: null == maxLeningInkomen
-          ? _value.maxLeningInkomen
-          : maxLeningInkomen // ignore: cast_nullable_to_non_nullable
-              as double,
-      maxLeningWoningWaarde: null == maxLeningWoningWaarde
-          ? _value.maxLeningWoningWaarde
-          : maxLeningWoningWaarde // ignore: cast_nullable_to_non_nullable
-              as double,
-      maxLeningNgh: null == maxLeningNgh
-          ? _value.maxLeningNgh
-          : maxLeningNgh // ignore: cast_nullable_to_non_nullable
-              as double,
-      toepassenNhg: null == toepassenNhg
-          ? _value.toepassenNhg
-          : toepassenNhg // ignore: cast_nullable_to_non_nullable
-              as bool,
+      normInkomen: freezed == normInkomen
+          ? _value.normInkomen
+          : normInkomen // ignore: cast_nullable_to_non_nullable
+              as NormInkomen,
+      normWoningwaarde: freezed == normWoningwaarde
+          ? _value.normWoningwaarde
+          : normWoningwaarde // ignore: cast_nullable_to_non_nullable
+              as NormWoningwaarde,
+      normNhg: freezed == normNhg
+          ? _value.normNhg
+          : normNhg // ignore: cast_nullable_to_non_nullable
+              as NormNhg,
       startDatum: null == startDatum
           ? _value.startDatum
           : startDatum // ignore: cast_nullable_to_non_nullable
@@ -476,10 +444,10 @@ class __$$$HypotheekCopyWithImpl<$Res>
           ? _value.minLening
           : minLening // ignore: cast_nullable_to_non_nullable
               as double,
-      extraAflossen: null == extraAflossen
-          ? _value.extraAflossen
-          : extraAflossen // ignore: cast_nullable_to_non_nullable
-              as IList<AflosItem>,
+      aanpassenLening: null == aanpassenLening
+          ? _value.aanpassenLening
+          : aanpassenLening // ignore: cast_nullable_to_non_nullable
+              as IList<LeningAanpassen>,
       volgende: null == volgende
           ? _value.volgende
           : volgende // ignore: cast_nullable_to_non_nullable
@@ -496,9 +464,9 @@ class __$$$HypotheekCopyWithImpl<$Res>
           ? _value.woningLeningKosten
           : woningLeningKosten // ignore: cast_nullable_to_non_nullable
               as WoningLeningKosten,
-      verduurzaamKosten: null == verduurzaamKosten
-          ? _value.verduurzaamKosten
-          : verduurzaamKosten // ignore: cast_nullable_to_non_nullable
+      verbouwVerduurzaamKosten: null == verbouwVerduurzaamKosten
+          ? _value.verbouwVerduurzaamKosten
+          : verbouwVerduurzaamKosten // ignore: cast_nullable_to_non_nullable
               as VerbouwVerduurzaamKosten,
       deelsAfgelosteLening: null == deelsAfgelosteLening
           ? _value.deelsAfgelosteLening
@@ -508,10 +476,6 @@ class __$$$HypotheekCopyWithImpl<$Res>
           ? _value.datumDeelsAfgelosteLening
           : datumDeelsAfgelosteLening // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      parallelLeningen: null == parallelLeningen
-          ? _value.parallelLeningen
-          : parallelLeningen // ignore: cast_nullable_to_non_nullable
-              as ParallelLeningen,
       afgesloten: null == afgesloten
           ? _value.afgesloten
           : afgesloten // ignore: cast_nullable_to_non_nullable
@@ -531,12 +495,12 @@ class _$$Hypotheek extends $Hypotheek with DiagnosticableTreeMixin {
       {required this.id,
       required this.omschrijving,
       required this.optiesHypotheekToevoegen,
-      required this.lening,
-      required this.gewensteLening,
-      required this.maxLeningInkomen,
-      required this.maxLeningWoningWaarde,
-      this.maxLeningNgh = 0.0,
-      this.toepassenNhg = true,
+      this.lening = 0,
+      this.gewensteLening = 0,
+      this.normInkomen = const NormInkomen(omschrijving: 'Inkomen'),
+      this.normWoningwaarde =
+          const NormWoningwaarde(omschrijving: 'Woningwaarde'),
+      this.normNhg = const NormNhg(omschrijving: 'NHG'),
       required this.startDatum,
       required this.startDatumAflossen,
       required this.eindDatum,
@@ -548,15 +512,14 @@ class _$$Hypotheek extends $Hypotheek with DiagnosticableTreeMixin {
       required this.boeteVrijPercentage,
       required this.usePeriodeInMaanden,
       required this.minLening,
-      required this.extraAflossen,
+      this.aanpassenLening = const IListConst([]),
       this.volgende = "",
       this.vorige = "",
       this.order = const IMapConst({}),
       this.woningLeningKosten = const WoningLeningKosten(),
-      this.verduurzaamKosten = const VerbouwVerduurzaamKosten(),
+      this.verbouwVerduurzaamKosten = const VerbouwVerduurzaamKosten(),
       required this.deelsAfgelosteLening,
       required this.datumDeelsAfgelosteLening,
-      required this.parallelLeningen,
       required this.afgesloten,
       this.restSchuld = 0.0})
       : super._();
@@ -571,19 +534,20 @@ class _$$Hypotheek extends $Hypotheek with DiagnosticableTreeMixin {
   @override
   final OptiesHypotheekToevoegen optiesHypotheekToevoegen;
   @override
+  @JsonKey()
   final double lening;
   @override
+  @JsonKey()
   final double gewensteLening;
   @override
-  final double maxLeningInkomen;
-  @override
-  final double maxLeningWoningWaarde;
+  @JsonKey()
+  final NormInkomen normInkomen;
   @override
   @JsonKey()
-  final double maxLeningNgh;
+  final NormWoningwaarde normWoningwaarde;
   @override
   @JsonKey()
-  final bool toepassenNhg;
+  final NormNhg normNhg;
   @override
   final DateTime startDatum;
   @override
@@ -608,7 +572,8 @@ class _$$Hypotheek extends $Hypotheek with DiagnosticableTreeMixin {
   @override
   final double minLening;
   @override
-  final IList<AflosItem> extraAflossen;
+  @JsonKey()
+  final IList<LeningAanpassen> aanpassenLening;
   @override
   @JsonKey()
   final String volgende;
@@ -623,13 +588,11 @@ class _$$Hypotheek extends $Hypotheek with DiagnosticableTreeMixin {
   final WoningLeningKosten woningLeningKosten;
   @override
   @JsonKey()
-  final VerbouwVerduurzaamKosten verduurzaamKosten;
+  final VerbouwVerduurzaamKosten verbouwVerduurzaamKosten;
   @override
   final bool deelsAfgelosteLening;
   @override
   final DateTime datumDeelsAfgelosteLening;
-  @override
-  final ParallelLeningen parallelLeningen;
   @override
   final bool afgesloten;
   @override
@@ -638,7 +601,7 @@ class _$$Hypotheek extends $Hypotheek with DiagnosticableTreeMixin {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Hypotheek(id: $id, omschrijving: $omschrijving, optiesHypotheekToevoegen: $optiesHypotheekToevoegen, lening: $lening, gewensteLening: $gewensteLening, maxLeningInkomen: $maxLeningInkomen, maxLeningWoningWaarde: $maxLeningWoningWaarde, maxLeningNgh: $maxLeningNgh, toepassenNhg: $toepassenNhg, startDatum: $startDatum, startDatumAflossen: $startDatumAflossen, eindDatum: $eindDatum, periodeInMaanden: $periodeInMaanden, aflosTermijnInMaanden: $aflosTermijnInMaanden, hypotheekvorm: $hypotheekvorm, termijnen: $termijnen, rente: $rente, boeteVrijPercentage: $boeteVrijPercentage, usePeriodeInMaanden: $usePeriodeInMaanden, minLening: $minLening, extraAflossen: $extraAflossen, volgende: $volgende, vorige: $vorige, order: $order, woningLeningKosten: $woningLeningKosten, verduurzaamKosten: $verduurzaamKosten, deelsAfgelosteLening: $deelsAfgelosteLening, datumDeelsAfgelosteLening: $datumDeelsAfgelosteLening, parallelLeningen: $parallelLeningen, afgesloten: $afgesloten, restSchuld: $restSchuld)';
+    return 'Hypotheek(id: $id, omschrijving: $omschrijving, optiesHypotheekToevoegen: $optiesHypotheekToevoegen, lening: $lening, gewensteLening: $gewensteLening, normInkomen: $normInkomen, normWoningwaarde: $normWoningwaarde, normNhg: $normNhg, startDatum: $startDatum, startDatumAflossen: $startDatumAflossen, eindDatum: $eindDatum, periodeInMaanden: $periodeInMaanden, aflosTermijnInMaanden: $aflosTermijnInMaanden, hypotheekvorm: $hypotheekvorm, termijnen: $termijnen, rente: $rente, boeteVrijPercentage: $boeteVrijPercentage, usePeriodeInMaanden: $usePeriodeInMaanden, minLening: $minLening, aanpassenLening: $aanpassenLening, volgende: $volgende, vorige: $vorige, order: $order, woningLeningKosten: $woningLeningKosten, verbouwVerduurzaamKosten: $verbouwVerduurzaamKosten, deelsAfgelosteLening: $deelsAfgelosteLening, datumDeelsAfgelosteLening: $datumDeelsAfgelosteLening, afgesloten: $afgesloten, restSchuld: $restSchuld)';
   }
 
   @override
@@ -652,10 +615,9 @@ class _$$Hypotheek extends $Hypotheek with DiagnosticableTreeMixin {
           'optiesHypotheekToevoegen', optiesHypotheekToevoegen))
       ..add(DiagnosticsProperty('lening', lening))
       ..add(DiagnosticsProperty('gewensteLening', gewensteLening))
-      ..add(DiagnosticsProperty('maxLeningInkomen', maxLeningInkomen))
-      ..add(DiagnosticsProperty('maxLeningWoningWaarde', maxLeningWoningWaarde))
-      ..add(DiagnosticsProperty('maxLeningNgh', maxLeningNgh))
-      ..add(DiagnosticsProperty('toepassenNhg', toepassenNhg))
+      ..add(DiagnosticsProperty('normInkomen', normInkomen))
+      ..add(DiagnosticsProperty('normWoningwaarde', normWoningwaarde))
+      ..add(DiagnosticsProperty('normNhg', normNhg))
       ..add(DiagnosticsProperty('startDatum', startDatum))
       ..add(DiagnosticsProperty('startDatumAflossen', startDatumAflossen))
       ..add(DiagnosticsProperty('eindDatum', eindDatum))
@@ -667,16 +629,16 @@ class _$$Hypotheek extends $Hypotheek with DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('boeteVrijPercentage', boeteVrijPercentage))
       ..add(DiagnosticsProperty('usePeriodeInMaanden', usePeriodeInMaanden))
       ..add(DiagnosticsProperty('minLening', minLening))
-      ..add(DiagnosticsProperty('extraAflossen', extraAflossen))
+      ..add(DiagnosticsProperty('aanpassenLening', aanpassenLening))
       ..add(DiagnosticsProperty('volgende', volgende))
       ..add(DiagnosticsProperty('vorige', vorige))
       ..add(DiagnosticsProperty('order', order))
       ..add(DiagnosticsProperty('woningLeningKosten', woningLeningKosten))
-      ..add(DiagnosticsProperty('verduurzaamKosten', verduurzaamKosten))
+      ..add(DiagnosticsProperty(
+          'verbouwVerduurzaamKosten', verbouwVerduurzaamKosten))
       ..add(DiagnosticsProperty('deelsAfgelosteLening', deelsAfgelosteLening))
       ..add(DiagnosticsProperty(
           'datumDeelsAfgelosteLening', datumDeelsAfgelosteLening))
-      ..add(DiagnosticsProperty('parallelLeningen', parallelLeningen))
       ..add(DiagnosticsProperty('afgesloten', afgesloten))
       ..add(DiagnosticsProperty('restSchuld', restSchuld));
   }
@@ -695,14 +657,11 @@ class _$$Hypotheek extends $Hypotheek with DiagnosticableTreeMixin {
             (identical(other.lening, lening) || other.lening == lening) &&
             (identical(other.gewensteLening, gewensteLening) ||
                 other.gewensteLening == gewensteLening) &&
-            (identical(other.maxLeningInkomen, maxLeningInkomen) ||
-                other.maxLeningInkomen == maxLeningInkomen) &&
-            (identical(other.maxLeningWoningWaarde, maxLeningWoningWaarde) ||
-                other.maxLeningWoningWaarde == maxLeningWoningWaarde) &&
-            (identical(other.maxLeningNgh, maxLeningNgh) ||
-                other.maxLeningNgh == maxLeningNgh) &&
-            (identical(other.toepassenNhg, toepassenNhg) ||
-                other.toepassenNhg == toepassenNhg) &&
+            const DeepCollectionEquality()
+                .equals(other.normInkomen, normInkomen) &&
+            const DeepCollectionEquality()
+                .equals(other.normWoningwaarde, normWoningwaarde) &&
+            const DeepCollectionEquality().equals(other.normNhg, normNhg) &&
             (identical(other.startDatum, startDatum) ||
                 other.startDatum == startDatum) &&
             (identical(other.startDatumAflossen, startDatumAflossen) ||
@@ -724,22 +683,21 @@ class _$$Hypotheek extends $Hypotheek with DiagnosticableTreeMixin {
             (identical(other.minLening, minLening) ||
                 other.minLening == minLening) &&
             const DeepCollectionEquality()
-                .equals(other.extraAflossen, extraAflossen) &&
+                .equals(other.aanpassenLening, aanpassenLening) &&
             (identical(other.volgende, volgende) ||
                 other.volgende == volgende) &&
             (identical(other.vorige, vorige) || other.vorige == vorige) &&
             (identical(other.order, order) || other.order == order) &&
             (identical(other.woningLeningKosten, woningLeningKosten) ||
                 other.woningLeningKosten == woningLeningKosten) &&
-            (identical(other.verduurzaamKosten, verduurzaamKosten) ||
-                other.verduurzaamKosten == verduurzaamKosten) &&
+            (identical(
+                    other.verbouwVerduurzaamKosten, verbouwVerduurzaamKosten) ||
+                other.verbouwVerduurzaamKosten == verbouwVerduurzaamKosten) &&
             (identical(other.deelsAfgelosteLening, deelsAfgelosteLening) ||
                 other.deelsAfgelosteLening == deelsAfgelosteLening) &&
             (identical(other.datumDeelsAfgelosteLening,
                     datumDeelsAfgelosteLening) ||
                 other.datumDeelsAfgelosteLening == datumDeelsAfgelosteLening) &&
-            (identical(other.parallelLeningen, parallelLeningen) ||
-                other.parallelLeningen == parallelLeningen) &&
             (identical(other.afgesloten, afgesloten) ||
                 other.afgesloten == afgesloten) &&
             (identical(other.restSchuld, restSchuld) ||
@@ -755,10 +713,9 @@ class _$$Hypotheek extends $Hypotheek with DiagnosticableTreeMixin {
         optiesHypotheekToevoegen,
         lening,
         gewensteLening,
-        maxLeningInkomen,
-        maxLeningWoningWaarde,
-        maxLeningNgh,
-        toepassenNhg,
+        const DeepCollectionEquality().hash(normInkomen),
+        const DeepCollectionEquality().hash(normWoningwaarde),
+        const DeepCollectionEquality().hash(normNhg),
         startDatum,
         startDatumAflossen,
         eindDatum,
@@ -770,15 +727,14 @@ class _$$Hypotheek extends $Hypotheek with DiagnosticableTreeMixin {
         boeteVrijPercentage,
         usePeriodeInMaanden,
         minLening,
-        const DeepCollectionEquality().hash(extraAflossen),
+        const DeepCollectionEquality().hash(aanpassenLening),
         volgende,
         vorige,
         order,
         woningLeningKosten,
-        verduurzaamKosten,
+        verbouwVerduurzaamKosten,
         deelsAfgelosteLening,
         datumDeelsAfgelosteLening,
-        parallelLeningen,
         afgesloten,
         restSchuld
       ]);
@@ -802,12 +758,11 @@ abstract class $Hypotheek extends Hypotheek {
       {required final String id,
       required final String omschrijving,
       required final OptiesHypotheekToevoegen optiesHypotheekToevoegen,
-      required final double lening,
-      required final double gewensteLening,
-      required final double maxLeningInkomen,
-      required final double maxLeningWoningWaarde,
-      final double maxLeningNgh,
-      final bool toepassenNhg,
+      final double lening,
+      final double gewensteLening,
+      final NormInkomen normInkomen,
+      final NormWoningwaarde normWoningwaarde,
+      final NormNhg normNhg,
       required final DateTime startDatum,
       required final DateTime startDatumAflossen,
       required final DateTime eindDatum,
@@ -819,15 +774,14 @@ abstract class $Hypotheek extends Hypotheek {
       required final double boeteVrijPercentage,
       required final bool usePeriodeInMaanden,
       required final double minLening,
-      required final IList<AflosItem> extraAflossen,
+      final IList<LeningAanpassen> aanpassenLening,
       final String volgende,
       final String vorige,
       final IMap<String, int> order,
       final WoningLeningKosten woningLeningKosten,
-      final VerbouwVerduurzaamKosten verduurzaamKosten,
+      final VerbouwVerduurzaamKosten verbouwVerduurzaamKosten,
       required final bool deelsAfgelosteLening,
       required final DateTime datumDeelsAfgelosteLening,
-      required final ParallelLeningen parallelLeningen,
       required final bool afgesloten,
       final double restSchuld}) = _$$Hypotheek;
   const $Hypotheek._() : super._();
@@ -846,13 +800,11 @@ abstract class $Hypotheek extends Hypotheek {
   @override
   double get gewensteLening;
   @override
-  double get maxLeningInkomen;
+  NormInkomen get normInkomen;
   @override
-  double get maxLeningWoningWaarde;
+  NormWoningwaarde get normWoningwaarde;
   @override
-  double get maxLeningNgh;
-  @override
-  bool get toepassenNhg;
+  NormNhg get normNhg;
   @override
   DateTime get startDatum;
   @override
@@ -876,7 +828,7 @@ abstract class $Hypotheek extends Hypotheek {
   @override
   double get minLening;
   @override
-  IList<AflosItem> get extraAflossen;
+  IList<LeningAanpassen> get aanpassenLening;
   @override
   String get volgende;
   @override
@@ -886,13 +838,11 @@ abstract class $Hypotheek extends Hypotheek {
   @override
   WoningLeningKosten get woningLeningKosten;
   @override
-  VerbouwVerduurzaamKosten get verduurzaamKosten;
+  VerbouwVerduurzaamKosten get verbouwVerduurzaamKosten;
   @override
   bool get deelsAfgelosteLening;
   @override
   DateTime get datumDeelsAfgelosteLening;
-  @override
-  ParallelLeningen get parallelLeningen;
   @override
   bool get afgesloten;
   @override

@@ -112,7 +112,7 @@ class SchuldBewerkNotifier extends StateNotifier<SchuldBewerken> {
               beginDatum: beginDatum,
               statusBerekening: StatusBerekening.nietBerekend,
               error: '',
-              eindDatumGebruiker: Kalender.voegPeriodeToe(beginDatum, jaren: 1),
+              eindDatumGebruiker: Kalender.voegPeriodeToe(beginDatum, jaren: 1, periodeOpties: PeriodeOpties.eind),
               heeftEindDatum: true,
               bedrag: 0.0,
             ),

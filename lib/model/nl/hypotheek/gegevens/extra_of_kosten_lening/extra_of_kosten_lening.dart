@@ -4,7 +4,12 @@ import 'package:flutter/foundation.dart';
 part 'extra_of_kosten_lening.freezed.dart';
 part 'extra_of_kosten_lening.g.dart';
 
-enum Eenheid { percentageWoningWaarde, percentageLening, bedrag }
+enum Eenheid {
+  percentageTaxatie,
+  percentageWoningWaarde,
+  percentageLening,
+  bedrag
+}
 
 @freezed
 class Waarde with _$Waarde {

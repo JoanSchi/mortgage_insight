@@ -1,12 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:mortgage_insight/model/nl/hypotheek/kosten_hypotheek.dart';
-
 import 'package:mortgage_insight/model/nl/schulden/autolease_verwerken.dart';
-
-import '../../../model/nl/remove_hypotheek_container/remove_hypotheek_container.dart';
 import '../../../model/nl/schulden/schulden.dart';
 import '../../../my_widgets/custom_fitted_box.dart';
 import '../../../my_widgets/mortgage_card.dart';
@@ -116,7 +111,7 @@ class AflopendKredietCard extends StatelessWidget {
               width: 60.0,
               child: Image.asset(
                 'graphics/card_aflopend_krediet.png',
-                color: theme.colorScheme.primaryContainer,
+                color: theme.colorScheme.onSurface,
               )),
           Positioned(
               right: 8.0,
@@ -254,7 +249,7 @@ class DoorlopendKredietCard extends StatelessWidget {
               width: 60.0,
               child: Image.asset(
                 'graphics/card_doorlopend_krediet.png',
-                color: theme.colorScheme.primaryContainer,
+                color: theme.colorScheme.onSurface,
               )),
           // Positioned(
           //     right: 8.0,
@@ -399,7 +394,7 @@ class VerzendKredietCard extends StatelessWidget {
               bottom: 6.0,
               width: 50.0,
               child: Image.asset('graphics/card_verzend_krediet.png',
-                  color: theme.colorScheme.primaryContainer)),
+                  color: theme.colorScheme.onSurface)),
           // Positioned(
           //     right: 8.0,
           //     bottom: 0.0,
@@ -543,7 +538,7 @@ class LeaseAutoCard extends StatelessWidget {
               width: 80.0,
               child: Image.asset(
                 'graphics/card_lease_auto.png',
-                color: theme.colorScheme.primaryContainer,
+                color: theme.colorScheme.onSurface,
               )),
           // Positioned(
           //     right: 8.0,

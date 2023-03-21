@@ -1,3 +1,4 @@
+import 'package:custom_sliver_appbar/shapeborder_appbar/shapeborder_lb_rb_rounded.dart';
 import 'package:date_input_picker/date_input_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,12 +8,13 @@ import 'package:mortgage_insight/pages/schulden/schuld_provider.dart';
 import 'package:mortgage_insight/utilities/my_number_format.dart';
 import 'package:selectable_group_widgets/selectable_group_widgets.dart';
 import '../../../model/nl/schulden/schulden.dart';
+import '../../../my_widgets/mortgage_chip.dart';
 import '../../../utilities/kalender.dart';
 import '../../../my_widgets/simple_widgets.dart';
 import 'abstract_aflopend_krediet_consumer_state.dart';
 
 class AflopendKredietOptiePanel extends ConsumerStatefulWidget {
-  const AflopendKredietOptiePanel();
+  const AflopendKredietOptiePanel({super.key});
 
   @override
   ConsumerState<AflopendKredietOptiePanel> createState() =>
@@ -22,8 +24,9 @@ class AflopendKredietOptiePanel extends ConsumerStatefulWidget {
 class AflopendKredietOptiePanelState
     extends AbstractAflopendKredietState<AflopendKredietOptiePanel>
     with SingleTickerProviderStateMixin {
-  late TextEditingController _textEditingController = TextEditingController(
-      text: toText(
+  late final TextEditingController _textEditingController =
+      TextEditingController(
+          text: toText(
     (ak) => ak.omschrijving,
   ));
 
@@ -38,7 +41,7 @@ class AflopendKredietOptiePanelState
       _gebrokenMaandAlleenRenteAnimationController = AnimationController(
     value: ak?.betaling == AKbetaling.perEerstVolgendeMaand ? 1.0 : 0.0,
     vsync: this,
-    duration: Duration(milliseconds: 300),
+    duration: const Duration(milliseconds: 300),
   );
 
   @override
@@ -75,16 +78,6 @@ class AflopendKredietOptiePanelState
     final lastDate = DateTime(dateNow.year + 10, 12,
         Kalender.dagenPerMaand(jaar: dateNow.year + 10, maand: 12));
 
-    Widget avatar(String text, bool selected) => CircleAvatar(
-          backgroundColor:
-              selected ? theme.colorScheme.onSecondary : Colors.blueGrey[50],
-          child: Text(
-            text,
-            style: theme.textTheme.bodySmall?.copyWith(
-                fontSize: 8.0, color: selected ? Colors.white : null),
-          ),
-        );
-
     final children = <Widget>[
       const SizedBox(
         height: 6.0,
@@ -104,7 +97,7 @@ class AflopendKredietOptiePanelState
       const SizedBox(
         height: 24.0,
       ),
-      Text('Termijn betaling:'),
+      const Text('Termijn betaling:'),
       const SizedBox(
         height: 8.0,
       ),
@@ -131,11 +124,11 @@ class AflopendKredietOptiePanelState
               onChanged: _veranderingEersteGebrokenMaandAlleenRente),
         ),
       ),
-      Divider(),
+      const Divider(),
       const SizedBox(
         height: 12.0,
       ),
-      Text(
+      const Text(
         'Termijnbedrag afronden op:',
       ),
       const SizedBox(
@@ -144,30 +137,30 @@ class AflopendKredietOptiePanelState
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
         child: Wrap(spacing: 8.0, children: [
-          ChoiceChip(
-            key: Key('euros'),
-            avatar: avatar('#0', ak.decimalen == 0),
-            label: Text('Euro\'s'),
+          MortgageChip(
+            key: const Key('euros'),
+            text: 'Euro\'s',
             selected: ak.decimalen == 0,
-            onSelected: (v) {
+            avatarText: '#0',
+            onSelected: (bool? v) {
               _afronden(0);
             },
           ),
-          ChoiceChip(
-            key: Key('10cent'),
-            avatar: avatar('#0.0', ak.decimalen == 1),
-            label: Text('10 ct'),
+          MortgageChip(
+            key: const Key('10cent'),
+            text: '10 ct',
             selected: ak.decimalen == 1,
-            onSelected: (v) {
+            avatarText: '#.0',
+            onSelected: (bool? v) {
               _afronden(1);
             },
           ),
-          ChoiceChip(
-            key: Key('1cent'),
-            avatar: avatar('#0.00', ak.decimalen == 2),
-            label: Text('1 ct'),
+          MortgageChip(
+            key: const Key('1cent'),
+            text: '1 ct',
             selected: ak.decimalen == 2,
-            onSelected: (v) {
+            avatarText: '#.00',
+            onSelected: (bool? v) {
               _afronden(2);
             },
           ),
@@ -445,10 +438,10 @@ class AflopendkredietInvulPanelState
                     MyNumberFormat(context).numberInputFormat('0000')
                   ]),
             ),
-            SizedBox(width: 4.0),
+            const SizedBox(width: 4.0),
           ]),
           CheckValidator(
-              key: Key('Annlening'),
+              key: const Key('Annlening'),
               initialValue: Kalender.looptijdInTekst(ak.maanden),
               validator: (text) {
                 switch (buitenPeriode(ak, _tecMaanden.text)) {

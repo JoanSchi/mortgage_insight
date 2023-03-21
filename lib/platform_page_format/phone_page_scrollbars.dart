@@ -124,7 +124,7 @@ class PhonePageScrollBars extends StatelessWidget {
               Widget? child}) {
             final scrolledUnderColor = scrolledUnder
                 ? theme.colorScheme.surface
-                : theme.bottomAppBarTheme.color;
+                : theme.appBarTheme.backgroundColor;
 
             return isPortrait
                 ? Material(

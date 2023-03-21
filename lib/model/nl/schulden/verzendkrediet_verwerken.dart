@@ -9,7 +9,8 @@ class VerzendKredietVerwerken {
         huidige.compareTo(lEindDatum) > 0) {
       return 0.0;
     } else if (vk.heeftSlotTermijn &&
-        huidige.isAfter(Kalender.voegPeriodeToe(lEindDatum, maanden: -1))) {
+        huidige.isAfter(Kalender.voegPeriodeToe(lEindDatum,
+            maanden: -1, periodeOpties: PeriodeOpties.volgende))) {
       return vk.slotTermijn;
     } else {
       return vk.mndBedrag;
@@ -17,7 +18,8 @@ class VerzendKredietVerwerken {
   }
 
   static DateTime eindDatum(VerzendKrediet vk) =>
-      Kalender.voegPeriodeToe(vk.beginDatum, maanden: vk.maanden);
+      Kalender.voegPeriodeToe(vk.beginDatum,
+          maanden: vk.maanden, periodeOpties: PeriodeOpties.volgende);
 
   static VerzendKrediet veranderen(VerzendKrediet vk,
       {DateTime? beginDatum,

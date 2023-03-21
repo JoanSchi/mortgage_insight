@@ -16,14 +16,15 @@ class InkomensOverzicht with _$InkomensOverzicht {
   const InkomensOverzicht._();
 
   const factory InkomensOverzicht(
-          {@Default(const IListConst([])) IList<Inkomen> inkomen,
-          @Default(const IListConst([])) IList<Inkomen> inkomenPartner}) =
+          {@Default(IListConst([])) IList<Inkomen> inkomen,
+          @Default(IListConst([])) IList<Inkomen> inkomenPartner}) =
       _InkomensOverzicht;
 
   factory InkomensOverzicht.fromJson(Map<String, Object?> json) =>
       _$InkomensOverzichtFromJson(json);
 
-  IList<Inkomen> lijst({required bool partner}) => partner ? inkomenPartner : inkomen;
+  IList<Inkomen> lijst({required bool partner}) =>
+      partner ? inkomenPartner : inkomen;
 }
 
 @freezed

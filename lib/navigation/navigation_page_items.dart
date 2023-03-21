@@ -27,7 +27,7 @@ const routeIncomeEdit = 'routeIncomeEdit';
 const routeDebtsAdd = 'routeDebtsAdd';
 const routeDebtsEdit = 'routeDebtsEdit';
 const routeMortgageEdit = 'routeMortgageEdit';
-const routeNieuweHypotheekProfielEdit = 'routeNieweHypotheekProfielEdit';
+const routeHypotheekDossierEdit = 'routeNieweHypotheekProfielEdit';
 
 class MortgageItems {
   final String imageName;

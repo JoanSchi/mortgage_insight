@@ -26,12 +26,10 @@ mixin _$Termijn {
   DateTime get eindDatum => throw _privateConstructorUsedError;
   HypotheekVorm get hypotheekVorm => throw _privateConstructorUsedError;
   double get rente => throw _privateConstructorUsedError;
-  double get extraAflossenIngevuld => throw _privateConstructorUsedError;
   double get maandRenteBedragRatio => throw _privateConstructorUsedError;
   double get lening => throw _privateConstructorUsedError;
   double get aflossen => throw _privateConstructorUsedError;
   double get extraAflossen => throw _privateConstructorUsedError;
-  double get nettoMaand => throw _privateConstructorUsedError;
   bool get volledigAfgelost => throw _privateConstructorUsedError;
   int get periode => throw _privateConstructorUsedError;
   double get aflossenTotaal => throw _privateConstructorUsedError;
@@ -54,12 +52,10 @@ abstract class $TermijnCopyWith<$Res> {
       DateTime eindDatum,
       HypotheekVorm hypotheekVorm,
       double rente,
-      double extraAflossenIngevuld,
       double maandRenteBedragRatio,
       double lening,
       double aflossen,
       double extraAflossen,
-      double nettoMaand,
       bool volledigAfgelost,
       int periode,
       double aflossenTotaal,
@@ -85,12 +81,10 @@ class _$TermijnCopyWithImpl<$Res, $Val extends Termijn>
     Object? eindDatum = null,
     Object? hypotheekVorm = null,
     Object? rente = null,
-    Object? extraAflossenIngevuld = null,
     Object? maandRenteBedragRatio = null,
     Object? lening = null,
     Object? aflossen = null,
     Object? extraAflossen = null,
-    Object? nettoMaand = null,
     Object? volledigAfgelost = null,
     Object? periode = null,
     Object? aflossenTotaal = null,
@@ -121,10 +115,6 @@ class _$TermijnCopyWithImpl<$Res, $Val extends Termijn>
           ? _value.rente
           : rente // ignore: cast_nullable_to_non_nullable
               as double,
-      extraAflossenIngevuld: null == extraAflossenIngevuld
-          ? _value.extraAflossenIngevuld
-          : extraAflossenIngevuld // ignore: cast_nullable_to_non_nullable
-              as double,
       maandRenteBedragRatio: null == maandRenteBedragRatio
           ? _value.maandRenteBedragRatio
           : maandRenteBedragRatio // ignore: cast_nullable_to_non_nullable
@@ -140,10 +130,6 @@ class _$TermijnCopyWithImpl<$Res, $Val extends Termijn>
       extraAflossen: null == extraAflossen
           ? _value.extraAflossen
           : extraAflossen // ignore: cast_nullable_to_non_nullable
-              as double,
-      nettoMaand: null == nettoMaand
-          ? _value.nettoMaand
-          : nettoMaand // ignore: cast_nullable_to_non_nullable
               as double,
       volledigAfgelost: null == volledigAfgelost
           ? _value.volledigAfgelost
@@ -179,12 +165,10 @@ abstract class _$$_TermijnCopyWith<$Res> implements $TermijnCopyWith<$Res> {
       DateTime eindDatum,
       HypotheekVorm hypotheekVorm,
       double rente,
-      double extraAflossenIngevuld,
       double maandRenteBedragRatio,
       double lening,
       double aflossen,
       double extraAflossen,
-      double nettoMaand,
       bool volledigAfgelost,
       int periode,
       double aflossenTotaal,
@@ -207,12 +191,10 @@ class __$$_TermijnCopyWithImpl<$Res>
     Object? eindDatum = null,
     Object? hypotheekVorm = null,
     Object? rente = null,
-    Object? extraAflossenIngevuld = null,
     Object? maandRenteBedragRatio = null,
     Object? lening = null,
     Object? aflossen = null,
     Object? extraAflossen = null,
-    Object? nettoMaand = null,
     Object? volledigAfgelost = null,
     Object? periode = null,
     Object? aflossenTotaal = null,
@@ -243,10 +225,6 @@ class __$$_TermijnCopyWithImpl<$Res>
           ? _value.rente
           : rente // ignore: cast_nullable_to_non_nullable
               as double,
-      extraAflossenIngevuld: null == extraAflossenIngevuld
-          ? _value.extraAflossenIngevuld
-          : extraAflossenIngevuld // ignore: cast_nullable_to_non_nullable
-              as double,
       maandRenteBedragRatio: null == maandRenteBedragRatio
           ? _value.maandRenteBedragRatio
           : maandRenteBedragRatio // ignore: cast_nullable_to_non_nullable
@@ -262,10 +240,6 @@ class __$$_TermijnCopyWithImpl<$Res>
       extraAflossen: null == extraAflossen
           ? _value.extraAflossen
           : extraAflossen // ignore: cast_nullable_to_non_nullable
-              as double,
-      nettoMaand: null == nettoMaand
-          ? _value.nettoMaand
-          : nettoMaand // ignore: cast_nullable_to_non_nullable
               as double,
       volledigAfgelost: null == volledigAfgelost
           ? _value.volledigAfgelost
@@ -297,12 +271,10 @@ class _$_Termijn extends _Termijn {
       required this.eindDatum,
       required this.hypotheekVorm,
       required this.rente,
-      required this.extraAflossenIngevuld,
       required this.maandRenteBedragRatio,
       required this.lening,
       required this.aflossen,
       required this.extraAflossen,
-      required this.nettoMaand,
       this.volledigAfgelost = false,
       required this.periode,
       required this.aflossenTotaal,
@@ -325,8 +297,6 @@ class _$_Termijn extends _Termijn {
   @override
   final double rente;
   @override
-  final double extraAflossenIngevuld;
-  @override
   final double maandRenteBedragRatio;
   @override
   final double lening;
@@ -334,8 +304,6 @@ class _$_Termijn extends _Termijn {
   final double aflossen;
   @override
   final double extraAflossen;
-  @override
-  final double nettoMaand;
   @override
   @JsonKey()
   final bool volledigAfgelost;
@@ -348,7 +316,7 @@ class _$_Termijn extends _Termijn {
 
   @override
   String toString() {
-    return 'Termijn(startPeriode: $startPeriode, eindPeriode: $eindPeriode, startDatum: $startDatum, eindDatum: $eindDatum, hypotheekVorm: $hypotheekVorm, rente: $rente, extraAflossenIngevuld: $extraAflossenIngevuld, maandRenteBedragRatio: $maandRenteBedragRatio, lening: $lening, aflossen: $aflossen, extraAflossen: $extraAflossen, nettoMaand: $nettoMaand, volledigAfgelost: $volledigAfgelost, periode: $periode, aflossenTotaal: $aflossenTotaal, renteTotaal: $renteTotaal)';
+    return 'Termijn(startPeriode: $startPeriode, eindPeriode: $eindPeriode, startDatum: $startDatum, eindDatum: $eindDatum, hypotheekVorm: $hypotheekVorm, rente: $rente, maandRenteBedragRatio: $maandRenteBedragRatio, lening: $lening, aflossen: $aflossen, extraAflossen: $extraAflossen, volledigAfgelost: $volledigAfgelost, periode: $periode, aflossenTotaal: $aflossenTotaal, renteTotaal: $renteTotaal)';
   }
 
   @override
@@ -367,8 +335,6 @@ class _$_Termijn extends _Termijn {
             (identical(other.hypotheekVorm, hypotheekVorm) ||
                 other.hypotheekVorm == hypotheekVorm) &&
             (identical(other.rente, rente) || other.rente == rente) &&
-            (identical(other.extraAflossenIngevuld, extraAflossenIngevuld) ||
-                other.extraAflossenIngevuld == extraAflossenIngevuld) &&
             (identical(other.maandRenteBedragRatio, maandRenteBedragRatio) ||
                 other.maandRenteBedragRatio == maandRenteBedragRatio) &&
             (identical(other.lening, lening) || other.lening == lening) &&
@@ -376,8 +342,6 @@ class _$_Termijn extends _Termijn {
                 other.aflossen == aflossen) &&
             (identical(other.extraAflossen, extraAflossen) ||
                 other.extraAflossen == extraAflossen) &&
-            (identical(other.nettoMaand, nettoMaand) ||
-                other.nettoMaand == nettoMaand) &&
             (identical(other.volledigAfgelost, volledigAfgelost) ||
                 other.volledigAfgelost == volledigAfgelost) &&
             (identical(other.periode, periode) || other.periode == periode) &&
@@ -397,12 +361,10 @@ class _$_Termijn extends _Termijn {
       eindDatum,
       hypotheekVorm,
       rente,
-      extraAflossenIngevuld,
       maandRenteBedragRatio,
       lening,
       aflossen,
       extraAflossen,
-      nettoMaand,
       volledigAfgelost,
       periode,
       aflossenTotaal,
@@ -430,12 +392,10 @@ abstract class _Termijn extends Termijn {
       required final DateTime eindDatum,
       required final HypotheekVorm hypotheekVorm,
       required final double rente,
-      required final double extraAflossenIngevuld,
       required final double maandRenteBedragRatio,
       required final double lening,
       required final double aflossen,
       required final double extraAflossen,
-      required final double nettoMaand,
       final bool volledigAfgelost,
       required final int periode,
       required final double aflossenTotaal,
@@ -457,8 +417,6 @@ abstract class _Termijn extends Termijn {
   @override
   double get rente;
   @override
-  double get extraAflossenIngevuld;
-  @override
   double get maandRenteBedragRatio;
   @override
   double get lening;
@@ -466,8 +424,6 @@ abstract class _Termijn extends Termijn {
   double get aflossen;
   @override
   double get extraAflossen;
-  @override
-  double get nettoMaand;
   @override
   bool get volledigAfgelost;
   @override

@@ -27,8 +27,11 @@ class StatusLening with _$StatusLening {
     required double lening,
     required int periode,
     required double rente,
+    required double toetsRente,
     required int aflosTermijnInMaanden,
     required HypotheekVorm hypotheekVorm,
+    required double verduurzaamKosten,
+    required double verbouwKosten,
   }) = _StatusLening;
 
   factory StatusLening.fromJson(Map<String, Object?> json) =>

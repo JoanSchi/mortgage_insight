@@ -1,21 +1,11 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:mortgage_insight/model/nl/hypotheek/gegevens/combi_rest_schuld/combi_rest_schuld.dart';
-import 'package:mortgage_insight/model/nl/hypotheek/hypotheek.dart';
-import 'package:mortgage_insight/model/nl/hypotheek/kosten_hypotheek.dart';
-import 'package:mortgage_insight/utilities/kalender.dart';
-
-import '../../../model/nl/hypotheek/financierings_norm/norm.dart';
+import 'package:mortgage_insight/model/nl/hypotheek/verwerken/hypotheek/hypotheek_verwerken.dart';
+import 'package:mortgage_insight/pages/hypotheek/dossier_bewerken/hypotheek_dossier_bewerken.dart';
 import '../../../model/nl/hypotheek/gegevens/hypotheek/hypotheek.dart';
-import '../../../model/nl/hypotheek/gegevens/hypotheek_profiel/hypotheek_profiel.dart';
-import '../../../model/nl/hypotheek/hypotheek_doorbereken.dart';
-import '../../../model/nl/inkomen/inkomen.dart';
-import '../../../model/nl/schulden/schulden.dart';
-import '../../../my_widgets/remove_sliver_row_box.dart';
-import '../../../utilities/my_number.dart';
-import 'hypotheek_bewerken.dart';
+import '../../../model/nl/hypotheek/gegevens/hypotheek_dossier/hypotheek_dossier.dart';
 
 // required String id,
 //     required String omschrijving,
@@ -56,6 +46,46 @@ final hypotheekBewerkenProvider =
 
 class HypotheekBewerkNotifier extends StateNotifier<HypotheekBewerken> {
   HypotheekBewerkNotifier(super.state);
+
+  void nieuw(
+      {required HypotheekDossier hypotheekDossier, Hypotheek? hypotheek}) {
+    final teVerlengenHypotheken =
+        HypotheekVerwerken.teVerlengenHypotheek(hypotheekDossier, hypotheek);
+    final restSchulden = HypotheekVerwerken.restSchuldInventarisatie(
+        hypotheekDossier, hypotheek);
+
+    if (hypotheek == null) {
+    } else {}
+
+    // state = HypotheekBewerken(
+    //     hypotheekDossier: hypotheekDossier,
+    //     teVerlengen: teVerlengenHypotheken,
+    //     restSchulden: restSchulden,
+    //     hypotheek: hypotheek ??
+    //         Hypotheek(
+    //             id: '',
+    //             omschrijving: 'omschrijving',
+    //             optiesHypotheekToevoegen: optiesHypotheekToevoegen,
+    //             lening: lening,
+    //             gewensteLening: gewensteLening,
+    //             maxLeningInkomen: maxLeningInkomen,
+    //             maxLeningWoningWaarde: maxLeningWoningWaarde,
+    //             startDatum: startDatum,
+    //             startDatumAflossen: startDatumAflossen,
+    //             eindDatum: eindDatum,
+    //             periodeInMaanden: periodeInMaanden,
+    //             aflosTermijnInMaanden: aflosTermijnInMaanden,
+    //             hypotheekvorm: hypotheekvorm,
+    //             rente: rente,
+    //             boeteVrijPercentage: boeteVrijPercentage,
+    //             usePeriodeInMaanden: usePeriodeInMaanden,
+    //             minLening: minLening,
+    //             extraAflossen: extraAflossen,
+    //             deelsAfgelosteLening: deelsAfgelosteLening,
+    //             datumDeelsAfgelosteLening: datumDeelsAfgelosteLening,
+    //             parallelLeningen: parallelLeningen,
+    //             afgesloten: afgesloten));
+  }
 
   void verandering({
     String? omschrijving,
@@ -107,28 +137,28 @@ class HypotheekBewerkNotifier extends StateNotifier<HypotheekBewerken> {
 }
 
 class HypotheekBewerken {
-  HypotheekProfiel? profiel;
+  HypotheekDossier? hypotheekDossier;
   Hypotheek? hypotheek;
-  List<Hypotheek> verlengen;
+  List<Hypotheek> teVerlengen;
   Map<DateTime, CombiRestSchuld> restSchulden;
 
   HypotheekBewerken({
-    this.profiel,
+    this.hypotheekDossier,
     this.hypotheek,
-    this.verlengen = const [],
+    this.teVerlengen = const [],
     this.restSchulden = const {},
   });
 
   HypotheekBewerken copyWith({
-    HypotheekProfiel? profiel,
+    HypotheekDossier? hypotheekDossier,
     Hypotheek? hypotheek,
-    List<Hypotheek>? verlengen,
+    List<Hypotheek>? teVerlengen,
     Map<DateTime, CombiRestSchuld>? restSchulden,
   }) {
     return HypotheekBewerken(
-      profiel: profiel ?? this.profiel,
+      hypotheekDossier: hypotheekDossier ?? this.hypotheekDossier,
       hypotheek: hypotheek ?? this.hypotheek,
-      verlengen: verlengen ?? this.verlengen,
+      teVerlengen: teVerlengen ?? this.teVerlengen,
       restSchulden: restSchulden ?? this.restSchulden,
     );
   }
@@ -331,31 +361,31 @@ class HypotheekBewerken {
 //         : _maxTermijnenInJaren;
 //   }
 
-//   void initialiseerTeVerlengenHypotheek() {
-//     zoek(String id) {
-//       if (id == hypotheek.id) return;
+  // void initialiseerTeVerlengenHypotheek() {
+  //   zoek(String id) {
+  //     if (id == hypotheek.id) return;
 
-//       final h = profiel.hypotheken[id];
+  //     final h = profiel.hypotheken[id];
 
-//       assert(h != null,
-//           'By initialiseren te verlengen hypotheken moet zoeken op id niet null opleveren!');
+  //     assert(h != null,
+  //         'By initialiseren te verlengen hypotheken moet zoeken op id niet null opleveren!');
 
-//       if (h == null) return;
+  //     if (h == null) return;
 
-//       if (h.volgende.isEmpty || h.volgende == hypotheek.id) {
-//         if (h.restSchuld > 1.0) {
-//           verlengen.add(h);
-//         }
-//         return;
-//       }
+  //     if (h.volgende.isEmpty || h.volgende == hypotheek.id) {
+  //       if (h.restSchuld > 1.0) {
+  //         verlengen.add(h);
+  //       }
+  //       return;
+  //     }
 
-//       zoek(h.volgende);
-//     }
+  //     zoek(h.volgende);
+  //   }
 
-//     for (RemoveHypotheek h in profiel.eersteHypotheken) {
-//       zoek(h.id);
-//     }
-//   }
+  //   for (RemoveHypotheek h in profiel.eersteHypotheken) {
+  //     zoek(h.id);
+  //   }
+  // }
 
 //   restSchuldInventarisatie() {
 //     profiel.hypotheken.values.forEach((RemoveHypotheek h) {

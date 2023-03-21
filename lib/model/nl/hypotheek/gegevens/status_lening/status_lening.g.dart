@@ -31,8 +31,11 @@ _$_StatusLening _$$_StatusLeningFromJson(Map<String, dynamic> json) =>
       lening: (json['lening'] as num).toDouble(),
       periode: json['periode'] as int,
       rente: (json['rente'] as num).toDouble(),
+      toetsRente: (json['toetsRente'] as num).toDouble(),
       aflosTermijnInMaanden: json['aflosTermijnInMaanden'] as int,
       hypotheekVorm: $enumDecode(_$HypotheekVormEnumMap, json['hypotheekVorm']),
+      verduurzaamKosten: (json['verduurzaamKosten'] as num).toDouble(),
+      verbouwKosten: (json['verbouwKosten'] as num).toDouble(),
     );
 
 Map<String, dynamic> _$$_StatusLeningToJson(_$_StatusLening instance) =>
@@ -41,8 +44,11 @@ Map<String, dynamic> _$$_StatusLeningToJson(_$_StatusLening instance) =>
       'lening': instance.lening,
       'periode': instance.periode,
       'rente': instance.rente,
+      'toetsRente': instance.toetsRente,
       'aflosTermijnInMaanden': instance.aflosTermijnInMaanden,
       'hypotheekVorm': _$HypotheekVormEnumMap[instance.hypotheekVorm]!,
+      'verduurzaamKosten': instance.verduurzaamKosten,
+      'verbouwKosten': instance.verbouwKosten,
     };
 
 const _$HypotheekVormEnumMap = {

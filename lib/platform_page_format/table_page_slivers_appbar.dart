@@ -81,7 +81,7 @@ class TablePageSliverAppBar extends StatelessWidget {
                   handle:
                       NestedScrollView.sliverOverlapAbsorberHandleFor(context),
                   sliver: TextImageSliverAppBar(
-                      backgroundColor: theme.bottomAppBarTheme.color,
+                      backgroundColor: theme.appBarTheme.backgroundColor,
                       scrolledUnderBackground: theme.colorScheme.surface,
                       minExtent: minExtent,
                       floatingExtent: heightTitle + bottomHeight,
@@ -132,7 +132,7 @@ class TablePageSliverAppBar extends StatelessWidget {
                           Widget? child}) {
                         final scrolledUnderColor = scrolledUnder
                             ? theme.colorScheme.surface
-                            : theme.bottomAppBarTheme.color;
+                            : theme.appBarTheme.backgroundColor;
 
                         return Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16.0),

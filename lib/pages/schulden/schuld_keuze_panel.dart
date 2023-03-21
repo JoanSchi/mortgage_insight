@@ -307,7 +307,7 @@ class _SelectedTextButtonState<T> extends State<SelectedTextButton>
                     fontSize: 18.0,
                     color: widget._selected
                         ? Colors.white
-                        : themeData.colorScheme.onSecondary),
+                        : themeData.colorScheme.onSurface),
               ))),
         ));
 
@@ -332,7 +332,7 @@ class BackgroundSelectedTextButton extends CustomPainter {
   BackgroundSelectedTextButton({
     this.color,
     required this.value,
-    this.radial = 16.0,
+    this.radial = 32.0,
   });
 
   @override

@@ -1,35 +1,16 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:async';
-
 import 'package:date_input_picker/date_input_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:mortgage_insight/layout/transition/scale_size_transition.dart';
 import 'package:mortgage_insight/my_widgets/animated_scale_resize_switcher.dart';
-import 'package:mortgage_insight/my_widgets/header_layout.dart';
 import 'package:mortgage_insight/my_widgets/selectable_widgets/single_checkbox.dart';
 import 'package:mortgage_insight/my_widgets/simple_widgets.dart';
-import 'package:mortgage_insight/pages/hypotheek/bewerken/financieringsnorm_tabel.dart';
 import 'package:mortgage_insight/pages/hypotheek/bewerken/hypotheek_verleng_card.dart';
-import 'package:mortgage_insight/pages/hypotheek/bewerken/overzicht_hypotheek.dart';
-import 'package:mortgage_insight/pages/hypotheek/bewerken/overzicht_hypotheek_tabel.dart';
-import 'package:mortgage_insight/pages/hypotheek/profiel_bewerken/kosten_lijst.dart';
-import 'package:mortgage_insight/utilities/my_number_format.dart';
 import 'package:selectable_group_widgets/selectable_group_widgets.dart';
-import 'package:sliver_row_box/sized_sliver_box.dart';
-import 'package:sliver_row_box/sliver_item_row_insert_remove.dart';
-import 'package:sliver_row_box/sliver_row_box.dart';
-import 'package:sliver_row_box/sliver_row_item_background.dart';
-import '../../../model/nl/hypotheek/financierings_norm/norm.dart';
 import '../../../model/nl/hypotheek/gegevens/combi_rest_schuld/combi_rest_schuld.dart';
-import '../../../model/nl/hypotheek/gegevens/extra_of_kosten_lening/extra_of_kosten_lening.dart';
 import '../../../model/nl/hypotheek/gegevens/hypotheek/hypotheek.dart';
-import '../../../model/nl/hypotheek/gegevens/hypotheek_profiel/hypotheek_profiel.dart';
-import '../../../model/nl/hypotheek/hypotheek.dart';
-import '../../../model/nl/hypotheek/kosten_hypotheek.dart';
-import '../../../model/nl/hypotheek/verwerken/hypotheek_verwerken.dart';
-import '../../../my_widgets/selectable_popupmenu.dart';
+import '../../../model/nl/hypotheek/gegevens/hypotheek_dossier/hypotheek_dossier.dart';
+import '../../../model/nl/hypotheek/verwerken/hypotheek/hypotheek_verwerken.dart';
 import '../../../my_widgets/selectable_widgets/selectable_group_themes.dart';
 import '../../../platform_page_format/default_page.dart';
 import '../../../platform_page_format/page_actions.dart';
@@ -38,7 +19,6 @@ import '../../../utilities/device_info.dart';
 import '../../../utilities/match_properties.dart';
 import 'abstract_hypotheek_consumer.dart';
 import 'hypotheek_model.dart';
-import 'verdeling_leningen.dart';
 
 class BewerkHypotheek extends ConsumerStatefulWidget {
   const BewerkHypotheek({super.key});
@@ -251,8 +231,11 @@ class HypotheekBewerkOmschrijvingToevoegOptieState
   }
 
   @override
-  Widget buildHypotheek(BuildContext context, HypotheekBewerken hb,
-      HypotheekProfiel hp, Hypotheek hypotheek) {
+  Widget buildHypotheek(
+      BuildContext context,
+      HypotheekBewerken hypotheekBewerken,
+      HypotheekDossier hypotheekDossier,
+      Hypotheek hypotheek) {
     final theme = Theme.of(context);
     final headlineMedium = theme.textTheme.headlineMedium;
 
@@ -270,7 +253,7 @@ class HypotheekBewerkOmschrijvingToevoegOptieState
       ),
     ];
 
-    if (hb.verlengen.isNotEmpty) {
+    if (hypotheekBewerken.teVerlengen.isNotEmpty) {
       children.addAll([
         const SizedBox(
           height: 8.0,
@@ -336,10 +319,15 @@ class HypotheekBewerkDatumVerlengen extends ConsumerStatefulWidget {
 class HypotheekBewerkDatumVerlengenState
     extends AbstractHypotheekConsumerState<HypotheekBewerkDatumVerlengen> {
   @override
-  Widget buildHypotheek(BuildContext context, HypotheekBewerken hb,
-      HypotheekProfiel hp, Hypotheek hypotheek) {
-    final firstDate = HypotheekVerwerken.eersteKalenderDatum(hp, hypotheek);
-    final lastDate = HypotheekVerwerken.laatsteKalenderDatum(hp, hypotheek);
+  Widget buildHypotheek(
+      BuildContext context,
+      HypotheekBewerken hypotheekBewerken,
+      HypotheekDossier hypotheekDossier,
+      Hypotheek hypotheek) {
+    final firstDate =
+        HypotheekVerwerken.eersteKalenderDatum(hypotheekDossier, hypotheek);
+    final lastDate =
+        HypotheekVerwerken.laatsteKalenderDatum(hypotheekDossier, hypotheek);
     final theme = Theme.of(context);
     final headerlineMedium = theme.textTheme.headlineMedium;
 
@@ -354,7 +342,7 @@ class HypotheekBewerkDatumVerlengenState
         saveDate: _veranderingStartDatum,
       );
 
-      if (hb.restSchulden.isNotEmpty) {
+      if (hypotheekBewerken.restSchulden.isNotEmpty) {
         vorigeOfDatum = Column(children: [
           vorigeOfDatum,
           const SizedBox(
@@ -376,7 +364,7 @@ class HypotheekBewerkDatumVerlengenState
             final w = (width - r * inner + inner) / r;
 
             return Wrap(spacing: 6.0, children: [
-              for (CombiRestSchuld r in hb.restSchulden.values)
+              for (CombiRestSchuld r in hypotheekBewerken.restSchulden.values)
                 SizedBox(
                   width: w,
                   height: w / 3.0 * 2.0,
@@ -404,7 +392,7 @@ class HypotheekBewerkDatumVerlengenState
 
         return Wrap(
             spacing: 6.0,
-            children: hb.verlengen
+            children: hypotheekBewerken.teVerlengen
                 .map((Hypotheek e) => SizedBox(
                       width: w,
                       height: w / 3.0 * 2.0,
@@ -490,7 +478,7 @@ class TermijnPeriodePanelState
 
   int? get maxTermijnenInJaren {
     final hypotheekBewerken = ref.read(hypotheekBewerkenProvider);
-    final hp = hypotheekBewerken.profiel;
+    final hp = hypotheekBewerken.hypotheekDossier;
     final hypotheek = hypotheekBewerken.hypotheek;
 
     return hp != null && hypotheek != null
@@ -523,15 +511,18 @@ class TermijnPeriodePanelState
   }
 
   @override
-  Widget buildHypotheek(BuildContext context, HypotheekBewerken hb,
-      HypotheekProfiel hp, Hypotheek hypotheek) {
+  Widget buildHypotheek(
+      BuildContext context,
+      HypotheekBewerken hypotheekBewerken,
+      HypotheekDossier hypotheekDossier,
+      Hypotheek hypotheek) {
     ref.listen<Hypotheek?>(
         hypotheekBewerkenProvider
             .select((HypotheekBewerken value) => value.hypotheek),
         listen);
 
     final maxTermijnenInJaren =
-        HypotheekVerwerken.maxTermijnenInJaren(hp, hypotheek);
+        HypotheekVerwerken.maxTermijnenInJaren(hypotheekDossier, hypotheek);
 
     List<Widget> children = [
       const SizedBox(

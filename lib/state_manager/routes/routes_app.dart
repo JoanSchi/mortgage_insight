@@ -9,7 +9,7 @@ import '../../pages/schulden/schuld_keuze_panel.dart';
 import '../../pages/schulden/schulden_overzicht_panel.dart';
 import '../../pages/hypotheek/bewerken/hypotheek_bewerken.dart';
 import '../../pages/hypotheek/hypotheek_panel.dart';
-import '../../pages/hypotheek/profiel_bewerken/hypotheek_profiel_bewerken.dart';
+import '../../pages/hypotheek/dossier_bewerken/hypotheek_dossier_bewerken.dart';
 
 import '../../pages/inkomen/inkomen_bewerken/inkomen_bewerken_panel.dart';
 import '../../pages/inkomen/inkomen_panel.dart';
@@ -246,9 +246,9 @@ GoRouter _mobile(String initialLocation) {
               builder: (context, state) => const SchuldAanpassenPanel(),
             ),
             GoRoute(
-              path: routeNieuweHypotheekProfielEdit,
-              name: routeNieuweHypotheekProfielEdit,
-              builder: (context, state) => const BewerkHypotheekProfiel(),
+              path: routeHypotheekDossierEdit,
+              name: routeHypotheekDossierEdit,
+              builder: (context, state) => const BewerkHypotheekDossier(),
             ),
             GoRoute(
               path: routeMortgageEdit,
@@ -342,10 +342,10 @@ GoRouter _page(String initialLocation) {
           ),
           routes: [
             GoRoute(
-                path: routeNieuweHypotheekProfielEdit,
-                name: routeNieuweHypotheekProfielEdit,
+                path: routeHypotheekDossierEdit,
+                name: routeHypotheekDossierEdit,
                 pageBuilder: noTransitionPage(
-                  const BewerkHypotheekProfiel(),
+                  const BewerkHypotheekDossier(),
                 )),
             GoRoute(
                 path: routeMortgageEdit,

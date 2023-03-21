@@ -3,9 +3,10 @@ const _dagenInMaanden = <int>[31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 enum DayOptions { addDays, keepLastDay, keepDayInMonth }
 
 enum PeriodeOpties {
-  tot,
-  tm,
-  eerstedag,
+  volgende,
+  eind,
+  eersteDag,
+  laatsteDag,
 }
 
 class Kalender {
@@ -30,15 +31,13 @@ class Kalender {
   }
 
   static DateTime voegPeriodeToe(DateTime dateTime,
-      {int jaren = 0,
-      int maanden = 0,
-      PeriodeOpties periodeOpties = PeriodeOpties.tot}) {
+      {int jaren = 0, int maanden = 0, required PeriodeOpties periodeOpties}) {
     final huidigeJaar = dateTime.year;
     final huidigeMaand = dateTime.month;
     final huidigeDag = dateTime.day;
 
     switch (periodeOpties) {
-      case PeriodeOpties.tot:
+      case PeriodeOpties.volgende:
         {
           DateTime dt =
               DateTime(huidigeJaar + jaren, huidigeMaand + maanden, 1);
@@ -51,11 +50,19 @@ class Kalender {
 
           return DateTime(huidigeJaar + jaren, huidigeMaand + maanden, dag);
         }
-      case PeriodeOpties.eerstedag:
+      case PeriodeOpties.eersteDag:
         {
           return DateTime(huidigeJaar + jaren, huidigeMaand + maanden, 1);
         }
-      default:
+      case PeriodeOpties.laatsteDag:
+        {
+          return DateTime(
+              huidigeJaar + jaren,
+              huidigeMaand + maanden,
+              dagenPerMaand(
+                  jaar: huidigeJaar + jaren, maand: huidigeMaand + maanden));
+        }
+      case PeriodeOpties.eind:
         {
           DateTime dt =
               DateTime(huidigeJaar + jaren, huidigeMaand + maanden, 1);
@@ -84,6 +91,10 @@ class Kalender {
       return 'Looptijd $jaren jaar en $maanden ${maanden == 1 ? 'maand' : 'maanden'}.';
     }
   }
+
+  static int verschilDagen(DateTime dt1, DateTime dt2) =>
+      (dt1.millisecondsSinceEpoch - dt2.millisecondsSinceEpoch) ~/
+      Duration.millisecondsPerDay;
 }
 
 //DateTime add(DateTime dateTime, {int years: 0, int months: 0, DayOptions dayOptions: DayOptions.ADDDAYS}){

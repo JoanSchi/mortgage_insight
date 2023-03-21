@@ -1,8 +1,8 @@
+import '../gegevens/norm/norm_inkomen/inkomens_op_datum.dart';
 import 'aow_box3_tabel.dart';
 import 'aow_tabel.dart';
 import 'niet_aow_box3_tabel.dart';
 import 'niet_aow_tabel.dart';
-import 'norm_inkomen.dart';
 import 'dart:math' as math;
 
 class FinNormInk {

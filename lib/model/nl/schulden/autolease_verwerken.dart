@@ -61,7 +61,7 @@ class LeaseAutoVerwerken {
       Kalender.voegPeriodeToe(leaseAuto.beginDatum,
           jaren: leaseAuto.jaren,
           maanden: leaseAuto.maanden,
-          periodeOpties: PeriodeOpties.tot);
+          periodeOpties: PeriodeOpties.volgende);
 
   static LeaseAuto verandering(LeaseAuto leaseAuto,
       {DateTime? datum, double? bedrag, int? jaren, int? maanden}) {

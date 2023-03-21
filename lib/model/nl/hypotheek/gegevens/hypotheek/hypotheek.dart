@@ -1,6 +1,6 @@
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
-import '../aflos_item/aflos_item.dart';
-import '../status_lening/status_lening.dart';
+import '../lening_aanpassen/lening_aanpassen.dart';
+import '../norm/norm.dart';
 import '../termijn/termijn.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
@@ -25,12 +25,12 @@ class Hypotheek with _$Hypotheek {
     required String id,
     required String omschrijving,
     required OptiesHypotheekToevoegen optiesHypotheekToevoegen,
-    required double lening,
-    required double gewensteLening,
-    required double maxLeningInkomen,
-    required double maxLeningWoningWaarde,
-    @Default(0.0) double maxLeningNgh,
-    @Default(true) bool toepassenNhg,
+    @Default(0) double lening,
+    @Default(0) double gewensteLening,
+    @Default(NormInkomen(omschrijving: 'Inkomen')) NormInkomen normInkomen,
+    @Default(NormWoningwaarde(omschrijving: 'Woningwaarde'))
+        NormWoningwaarde normWoningwaarde,
+    @Default(NormNhg(omschrijving: 'NHG')) NormNhg normNhg,
     required DateTime startDatum,
     required DateTime startDatumAflossen,
     required DateTime eindDatum,
@@ -42,16 +42,15 @@ class Hypotheek with _$Hypotheek {
     required double boeteVrijPercentage,
     required bool usePeriodeInMaanden,
     required double minLening,
-    required IList<AflosItem> extraAflossen,
+    @Default(IListConst([])) IList<LeningAanpassen> aanpassenLening,
     @Default("") String volgende,
     @Default("") String vorige,
     @Default(IMapConst({})) IMap<String, int> order,
     @Default(WoningLeningKosten()) WoningLeningKosten woningLeningKosten,
     @Default(VerbouwVerduurzaamKosten())
-        VerbouwVerduurzaamKosten verduurzaamKosten,
+        VerbouwVerduurzaamKosten verbouwVerduurzaamKosten,
     required bool deelsAfgelosteLening,
     required DateTime datumDeelsAfgelosteLening,
-    required ParallelLeningen parallelLeningen,
     required bool afgesloten,
     @Default(0.0) double restSchuld,
   }) = $Hypotheek;
