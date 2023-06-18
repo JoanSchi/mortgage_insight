@@ -1,13 +1,29 @@
-import 'package:custom_sliver_appbar/shapeborder_appbar/shapeborder_lb_rb_rounded.dart';
+// Copyright (C) 2023 Joan Schipper
+// 
+// This file is part of mortgage_insight.
+// 
+// mortgage_insight is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// mortgage_insight is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with mortgage_insight.  If not, see <http://www.gnu.org/licenses/>.
+
 import 'package:date_input_picker/date_input_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hypotheek_berekeningen/schulden/gegevens/schulden.dart';
 import 'package:mortgage_insight/my_widgets/selectable_widgets/selectable_group_themes.dart';
 import 'package:mortgage_insight/my_widgets/selectable_widgets/single_checkbox.dart';
 import 'package:mortgage_insight/pages/schulden/schuld_provider.dart';
 import 'package:mortgage_insight/utilities/my_number_format.dart';
 import 'package:selectable_group_widgets/selectable_group_widgets.dart';
-import '../../../model/nl/schulden/schulden.dart';
 import '../../../my_widgets/mortgage_chip.dart';
 import '../../../utilities/kalender.dart';
 import '../../../my_widgets/simple_widgets.dart';
@@ -72,7 +88,6 @@ class AflopendKredietOptiePanelState
   @override
   buildAflopendKrediet(context, AflopendKrediet ak) {
     ref.listen(schuldProvider, changeAfterListen);
-    final theme = Theme.of(context);
     final dateNow = DateUtils.dateOnly(DateTime.now());
     final firstDate = DateTime(2014, 1, 1);
     final lastDate = DateTime(dateNow.year + 10, 12,
@@ -196,7 +211,7 @@ class AflopendKredietOptiePanelState
 }
 
 class AflopendkredietInvulPanel extends ConsumerStatefulWidget {
-  const AflopendkredietInvulPanel();
+  const AflopendkredietInvulPanel({super.key});
 
   @override
   ConsumerState<AflopendkredietInvulPanel> createState() =>
@@ -205,34 +220,34 @@ class AflopendkredietInvulPanel extends ConsumerStatefulWidget {
 
 class AflopendkredietInvulPanelState
     extends AbstractAflopendKredietState<AflopendkredietInvulPanel> {
-  late TextEditingController _tecLening =
+  late final TextEditingController _tecLening =
       TextEditingController(text: doubleToText((ak) => ak.lening));
-  late TextEditingController _tecRente =
+  late final TextEditingController _tecRente =
       TextEditingController(text: doubleToText((ak) => ak.rente));
-  late TextEditingController _tecMaanden =
+  late final TextEditingController _tecMaanden =
       TextEditingController(text: intToText((ak) => ak.maanden));
-  late TextEditingController _tecTermijnbedrag =
+  late final TextEditingController _tecTermijnbedrag =
       TextEditingController(text: doubleToText((ak) => ak.termijnBedragMnd));
 
-  late FocusNode _fnLening = FocusNode()
+  late final FocusNode _fnLening = FocusNode()
     ..addListener(() {
       if (!_fnLening.hasFocus) {
         _veranderingLening(_tecLening.text);
       }
     });
-  late FocusNode _fnRente = FocusNode()
+  late final FocusNode _fnRente = FocusNode()
     ..addListener(() {
       if (!_fnRente.hasFocus) {
         _veranderingRente(_tecRente.text);
       }
     });
-  late FocusNode _fnTermijnBedrag = FocusNode()
+  late final FocusNode _fnTermijnBedrag = FocusNode()
     ..addListener(() {
       if (!_fnTermijnBedrag.hasFocus) {
         _veranderingTermijnBedrag(_tecTermijnbedrag.text);
       }
     });
-  late FocusNode _fnMaanden = FocusNode()
+  late final FocusNode _fnMaanden = FocusNode()
     ..addListener(() {
       if (!_fnMaanden.hasFocus) {
         _veranderingLooptijdTextfield(_tecMaanden.text);
@@ -293,15 +308,15 @@ class AflopendkredietInvulPanelState
               crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(
+                const SizedBox(
                   width: 4.0,
                 ),
                 Flexible(
                   child: TextFormField(
                       controller: _tecLening,
                       focusNode: _fnLening,
-                      key: Key('leenbedrag'),
-                      decoration: new InputDecoration(
+                      key: const Key('leenbedrag'),
+                      decoration: const InputDecoration(
                           hintText: '', labelText: 'Leenbedrag'),
                       validator: (String? text) {
                         if (text == null || text.isEmpty) {
@@ -314,7 +329,7 @@ class AflopendkredietInvulPanelState
                           _veranderingLening(text);
                         }
                       },
-                      keyboardType: TextInputType.numberWithOptions(
+                      keyboardType: const TextInputType.numberWithOptions(
                         signed: true,
                         decimal: true,
                       ),
@@ -323,14 +338,14 @@ class AflopendkredietInvulPanelState
                       ],
                       textInputAction: TextInputAction.next),
                 ),
-                SizedBox(width: 16.0),
+                const SizedBox(width: 16.0),
                 SizedBox(
                   width: 60.0,
                   child: TextFormField(
                       controller: _tecRente,
                       focusNode: _fnRente,
-                      key: Key('Rente'),
-                      decoration: new InputDecoration(
+                      key: const Key('Rente'),
+                      decoration: const InputDecoration(
                           hintText: '< 16%', labelText: 'R. (%)'),
                       validator: (text) {
                         if (text == null || text.isEmpty) {
@@ -343,7 +358,7 @@ class AflopendkredietInvulPanelState
                           _veranderingRente(text);
                         }
                       },
-                      keyboardType: TextInputType.numberWithOptions(
+                      keyboardType: const TextInputType.numberWithOptions(
                         signed: true,
                         decimal: true,
                       ),
@@ -352,14 +367,14 @@ class AflopendkredietInvulPanelState
                       ],
                       textInputAction: TextInputAction.next),
                 ),
-                SizedBox(width: 16.0),
+                const SizedBox(width: 16.0),
                 SizedBox(
                   width: 80.0,
                   child: TextFormField(
                       controller: _tecTermijnbedrag,
                       focusNode: _fnTermijnBedrag,
-                      key: Key('termijnbedrag'),
-                      decoration: new InputDecoration(
+                      key: const Key('termijnbedrag'),
+                      decoration: InputDecoration(
                           hintText: '>= ${ak.minTermijnBedragMnd}',
                           labelText: 'T.b.'),
                       validator: (String? text) {
@@ -373,7 +388,7 @@ class AflopendkredietInvulPanelState
                           _veranderingTermijnBedrag(text);
                         }
                       },
-                      keyboardType: TextInputType.numberWithOptions(
+                      keyboardType: const TextInputType.numberWithOptions(
                         signed: true,
                         decimal: true,
                       ),
@@ -382,12 +397,12 @@ class AflopendkredietInvulPanelState
                       ],
                       textInputAction: TextInputAction.next),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 4.0,
                 )
               ]),
           const Padding(
-            padding: const EdgeInsets.only(left: 8.0, top: 8.0),
+            padding: EdgeInsets.only(left: 8.0, top: 8.0),
             child: Text('R.: Rente, T.b.: Termijnbedrag (mnd)',
                 style: TextStyle(fontStyle: FontStyle.italic)),
           ),
@@ -419,9 +434,9 @@ class AflopendkredietInvulPanelState
               child: TextFormField(
                   controller: _tecMaanden,
                   focusNode: _fnMaanden,
-                  key: Key('Maanden'),
-                  decoration:
-                      new InputDecoration(hintText: '1..120', labelText: 'Mnd'),
+                  key: const Key('Maanden'),
+                  decoration: const InputDecoration(
+                      hintText: '1..120', labelText: 'Mnd'),
                   validator: (String? text) {
                     if (buitenPeriode(ak, text) != 0) {
                       return '*';
@@ -531,7 +546,7 @@ class _AflopendKredietErrorWidgetState
           )
         ]);
       } else {
-        return SizedBox.shrink();
+        return const SizedBox.shrink();
       }
     });
   }

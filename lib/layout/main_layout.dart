@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart';
 
 class MainLayout extends MultiChildRenderObjectWidget {
   final double innerPadding;
-  MainLayout({
+  const MainLayout({
     Key? key,
     List<Widget> children = const <Widget>[],
     this.innerPadding = 12.0,

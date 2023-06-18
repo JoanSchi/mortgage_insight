@@ -11,7 +11,7 @@ enum NumberType {
 
 class MyNumberFormat {
   Locale locale;
-  String language;
+
   late String decimalSep;
   late DecimalOnly decimalOnly;
   final textInputFormatters = <String, TextInputFormatter>{};
@@ -25,11 +25,12 @@ class MyNumberFormat {
 
   MyNumberFormat._internal(BuildContext context)
       : locale = Localizations.localeOf(context),
-        language = 'nl',
         currencyNumberFormat = intl.NumberFormat.currency(locale: 'nl') {
     debugPrint('locale is $locale');
 
-    decimalSep = intl.NumberFormat.decimalPattern(language).symbols.DECIMAL_SEP;
+    decimalSep = intl.NumberFormat.decimalPattern(locale.languageCode)
+        .symbols
+        .DECIMAL_SEP;
     debugPrint('decimal is $decimalSep');
 
     //String pattr = r'\d*\'+decimal_sep+r'?\d*';
@@ -75,7 +76,7 @@ class MyNumberFormat {
       return numberFormats[format]!;
     }
 
-    final numberFormat = intl.NumberFormat(format, language);
+    final numberFormat = intl.NumberFormat(format, locale.languageCode);
 
     numberFormats[format] = numberFormat;
 
@@ -133,7 +134,8 @@ class MyNumberFormat {
     return numberFormat(format).format(number);
   }
 
-  String parseDblToText(double? number, {format = "#0.0#", String ifnull: ''}) {
+  String parseDblToText(double? number,
+      {format = "#0.0#", String ifnull = ''}) {
     return number != null ? numberFormat(format).format(number) : ifnull;
   }
 

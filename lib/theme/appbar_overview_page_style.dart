@@ -44,6 +44,6 @@ class AppBarOverViewPageStyle extends ThemeExtension<AppBarOverViewPageStyle> {
 buildAppBarOverViewPageStyle(FormFactorType formFactorType) {
   return AppBarOverViewPageStyle(
       background: Colors.white,
-      backgroundScrolling: Color(0xFFE8F1F5),
-      color: Color.fromARGB(255, 5, 66, 92));
+      backgroundScrolling: const Color(0xFFE8F1F5),
+      color: const Color.fromARGB(255, 5, 66, 92));
 }

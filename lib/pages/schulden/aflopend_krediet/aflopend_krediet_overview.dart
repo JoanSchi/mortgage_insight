@@ -1,16 +1,33 @@
+// Copyright (C) 2023 Joan Schipper
+//
+// This file is part of mortgage_insight.
+//
+// mortgage_insight is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// mortgage_insight is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with mortgage_insight.  If not, see <http://www.gnu.org/licenses/>.
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mortgage_insight/model/nl/schulden/aflopend_krediet_verwerken.dart';
+import 'package:hypotheek_berekeningen/schulden/gegevens/schulden.dart';
+import 'package:hypotheek_berekeningen/schulden/uitwerken/aflopend_krediet_verwerken.dart';
 import 'package:mortgage_insight/pages/schulden/aflopend_krediet/abstract_aflopend_krediet_consumer_state.dart';
-import '../../../model/nl/schulden/schulden.dart';
 import '../../../my_widgets/summary_pie_chart/pie_chart.dart';
 import '../../../my_widgets/summary_pie_chart/summary_pie_layout.dart';
 import '../../../utilities/value_to_width.dart';
 
 class OverzichtLening extends ConsumerStatefulWidget {
   const OverzichtLening({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   ConsumerState<OverzichtLening> createState() => OverzichtLeningState();

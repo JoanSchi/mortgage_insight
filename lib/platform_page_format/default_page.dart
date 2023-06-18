@@ -9,31 +9,46 @@ import 'phone_page_slivers_appbar.dart';
 import 'table_page_slivers_appbar.dart';
 import 'tablet_page_scrollbars.dart';
 
+typedef GetPageProperties = PageProperties Function(
+    {required bool hasScrollBars,
+    required FormFactorType formFactorType,
+    required Orientation orientation,
+    required double bottom});
+
 typedef BodyBuilder = Widget Function(
+    {required BuildContext context, required EdgeInsets padding});
+
+typedef SliversBuilder = Widget Function(
     {required BuildContext context,
-    required bool nested,
-    required double topPadding,
-    required double bottomPadding});
+    Widget? appBar,
+    required EdgeInsets padding});
 
 class DefaultPage extends StatefulWidget {
-  final BodyBuilder bodyBuilder;
+  final BodyBuilder? bodyBuilder;
+  final SliversBuilder? sliversBuilder;
   final String title;
   final WidgetBuilder? imageBuilder;
   final PreferredSizeWidget? bottom;
-  final List<MatchPageProperties<PageProperties>> matchPageProperties;
+  final GetPageProperties getPageProperties;
+  // final List<MatchPageProperties<PageProperties>> matchPageProperties;
   final FabProperties? fabProperties;
   final int notificationDept;
+  final TabController? tabController;
+  final List<Tab>? tabs;
 
-  const DefaultPage({
-    Key? key,
-    required this.bodyBuilder,
-    this.title = '',
-    this.imageBuilder,
-    this.matchPageProperties = const [],
-    this.bottom,
-    this.fabProperties,
-    this.notificationDept = 0,
-  }) : super(key: key);
+  const DefaultPage(
+      {Key? key,
+      this.bodyBuilder,
+      this.title = '',
+      this.imageBuilder,
+      required this.getPageProperties,
+      this.bottom,
+      this.tabController,
+      this.tabs,
+      this.fabProperties,
+      this.notificationDept = 0,
+      this.sliversBuilder})
+      : super(key: key);
 
   @override
   State<DefaultPage> createState() => DefaultPageState();
@@ -64,38 +79,49 @@ class DefaultPageState extends State<DefaultPage> {
   @override
   Widget build(BuildContext context) {
     final deviceScreen = DeviceScreen3.of(context);
-    final pageProperties = findPageProperties(
-        deviceScreen.formFactorType, deviceScreen.orientation);
 
     if (deviceScreen.hasScrollBars) {
       switch (deviceScreen.formFactorType) {
         case FormFactorType.smallPhone:
         case FormFactorType.largePhone:
           return PhonePageScrollBars(
-              title: widget.title,
-              imageBuilder: widget.imageBuilder,
-              pageProperties: pageProperties,
-              bottom: widget.bottom,
-              fabProperties: widget.fabProperties,
-              notificationDept: widget.notificationDept,
-              bodyBuilder: widget.bodyBuilder);
+            title: widget.title,
+            imageBuilder: widget.imageBuilder,
+            getPageProperties: widget.getPageProperties,
+            bottom: widget.bottom,
+            fabProperties: widget.fabProperties,
+            notificationDept: widget.notificationDept,
+            tabController: widget.tabController,
+            tabs: widget.tabs,
+            bodyBuilder: widget.bodyBuilder,
+            sliversBuilder: widget.sliversBuilder,
+          );
         case FormFactorType.tablet:
           return TablePageScrollBars(
             title: widget.title,
             imageBuilder: widget.imageBuilder,
-            pageProperties: pageProperties,
+            getPageProperties: widget.getPageProperties,
             bottom: widget.bottom,
             fabProperties: widget.fabProperties,
             notificationDepth: widget.notificationDept,
+            tabController: widget.tabController,
+            tabs: widget.tabs,
             bodyBuilder: widget.bodyBuilder,
+            sliversBuilder: widget.sliversBuilder,
           );
 
         case FormFactorType.monitor:
           return MonitorPage(
-            bodyBuilder: widget.bodyBuilder,
-            pageProperties: pageProperties,
+            title: widget.title,
+            imageBuilder: widget.imageBuilder,
+            getPageProperties: widget.getPageProperties,
             fabProperties: widget.fabProperties,
             bottom: widget.bottom,
+            notificationDepth: widget.notificationDept,
+            tabController: widget.tabController,
+            tabs: widget.tabs,
+            bodyBuilder: widget.bodyBuilder,
+            sliversBuilder: widget.sliversBuilder,
           );
         case FormFactorType.unknown:
           return const OhNo(text: 'FormFactorType is Unknown!');
@@ -108,9 +134,12 @@ class DefaultPageState extends State<DefaultPage> {
             bottom: widget.bottom,
             imageBuilder: widget.imageBuilder,
             title: widget.title,
-            pageProperties: pageProperties,
-            bodyBuilder: widget.bodyBuilder,
+            getPageProperties: widget.getPageProperties,
             fabProperties: widget.fabProperties,
+            tabController: widget.tabController,
+            tabs: widget.tabs,
+            bodyBuilder: widget.bodyBuilder,
+            sliversBuilder: widget.sliversBuilder,
           );
 
         case FormFactorType.tablet:
@@ -118,40 +147,30 @@ class DefaultPageState extends State<DefaultPage> {
             bottom: widget.bottom,
             imageBuilder: widget.imageBuilder,
             title: widget.title,
-            pageProperties: pageProperties,
+            getPageProperties: widget.getPageProperties,
             fabProperties: widget.fabProperties,
+            tabController: widget.tabController,
+            tabs: widget.tabs,
             bodyBuilder: widget.bodyBuilder,
+            sliversBuilder: widget.sliversBuilder,
           );
         case FormFactorType.monitor:
           return MonitorPage(
-            bodyBuilder: widget.bodyBuilder,
+            title: widget.title,
+            imageBuilder: widget.imageBuilder,
+            getPageProperties: widget.getPageProperties,
+            fabProperties: widget.fabProperties,
             bottom: widget.bottom,
+            notificationDepth: widget.notificationDept,
+            tabController: widget.tabController,
+            tabs: widget.tabs,
+            bodyBuilder: widget.bodyBuilder,
+            sliversBuilder: widget.sliversBuilder,
           );
         case FormFactorType.unknown:
           return const OhNo(text: 'FormFactorType is Unknown!');
       }
     }
-  }
-
-  PageProperties findPageProperties(
-      FormFactorType type, Orientation orientation) {
-    int latestMatchPoints = -1;
-    PageProperties? latestPageProperties;
-
-    for (MatchPageProperties f in widget.matchPageProperties) {
-      final matchPoints = f.matchPoints(type, orientation);
-
-      if (matchPoints > latestMatchPoints) {
-        if (matchPoints == MatchPageProperties.maxPoints) {
-          return f.pageProperties;
-        } else {
-          latestMatchPoints = matchPoints;
-          latestPageProperties = f.pageProperties;
-        }
-      }
-    }
-
-    return latestPageProperties ?? const PageProperties();
   }
 }
 

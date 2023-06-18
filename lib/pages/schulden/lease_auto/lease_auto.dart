@@ -1,41 +1,55 @@
+// Copyright (C) 2023 Joan Schipper
+//
+// This file is part of mortgage_insight.
+//
+// mortgage_insight is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// mortgage_insight is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with mortgage_insight.  If not, see <http://www.gnu.org/licenses/>.
+
 import 'package:date_input_picker/date_input_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hypotheek_berekeningen/schulden/gegevens/schulden.dart';
 import 'package:mortgage_insight/my_widgets/oh_no.dart';
 import 'package:mortgage_insight/my_widgets/simple_widgets.dart';
 import 'package:mortgage_insight/pages/schulden/schuld_provider.dart';
-import '../../../model/nl/schulden/schulden.dart';
+
 import '../../../utilities/my_number_format.dart';
 import 'lease_auto_overzicht.dart';
 
 class LeaseAutoPanel extends StatelessWidget {
-  final double topPadding;
-  final double bottomPadding;
+  final EdgeInsets padding;
+  final Widget? appBar;
 
-  const LeaseAutoPanel(
-      {Key? key, required this.topPadding, required this.bottomPadding})
-      : super(key: key);
+  const LeaseAutoPanel({super.key, required this.padding, this.appBar});
 
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(slivers: [
-      SliverList(
-          delegate: SliverChildListDelegate.fixed([
-        SizedBox(
-          height: topPadding,
-        ),
-        LeasAutoInvulPanel(),
-        OverzichtLeaseAuto(),
-        SizedBox(
-          height: bottomPadding,
-        ),
-      ])),
+      if (appBar != null) appBar!,
+      SliverPadding(
+        padding: padding,
+        sliver: const SliverList(
+            delegate: SliverChildListDelegate.fixed([
+          LeasAutoInvulPanel(),
+          OverzichtLeaseAuto(),
+        ])),
+      ),
     ]);
   }
 }
 
 class LeasAutoInvulPanel extends ConsumerStatefulWidget {
-  LeasAutoInvulPanel();
+  const LeasAutoInvulPanel({super.key});
 
   @override
   LeasAutoInvulPanelState createState() {
@@ -124,7 +138,7 @@ class LeasAutoInvulPanelState extends ConsumerState<LeasAutoInvulPanel> {
     return ref.watch(schuldProvider.select((value) => value.schuld))?.mapOrNull(
             leaseAuto: (LeaseAuto leaseAuto) =>
                 buildLeaseAuto(context, leaseAuto)) ??
-        OhNo(text: 'AutoLease is null!');
+        const OhNo(text: 'AutoLease is null!');
   }
 
   buildLeaseAuto(BuildContext context, LeaseAuto leaseAuto) {
@@ -186,7 +200,7 @@ class LeasAutoInvulPanelState extends ConsumerState<LeasAutoInvulPanel> {
               child: TextFormField(
                   controller: _tecJaren,
                   focusNode: _fnJaren,
-                  key: Key('jaar'),
+                  key: const Key('jaar'),
                   decoration: const InputDecoration(
                       hintText: 'Jaren', labelText: 'Periode (J)'),
                   validator: (String? text) {

@@ -45,7 +45,7 @@ class Kalender {
               dagenPerMaand(jaar: dt.year, maand: dt.month);
 
           final dag = huidigeDag > aantalDagenInNieuweMaand
-              ? aantalDagenInNieuweMaand + 1
+              ? aantalDagenInNieuweMaand
               : huidigeDag;
 
           return DateTime(huidigeJaar + jaren, huidigeMaand + maanden, dag);
@@ -62,7 +62,7 @@ class Kalender {
               dagenPerMaand(
                   jaar: huidigeJaar + jaren, maand: huidigeMaand + maanden));
         }
-      case PeriodeOpties.eind:
+      default:
         {
           DateTime dt =
               DateTime(huidigeJaar + jaren, huidigeMaand + maanden, 1);
@@ -70,7 +70,7 @@ class Kalender {
               dagenPerMaand(jaar: dt.year, maand: dt.month);
 
           final dag = huidigeDag - 1 > aantalDagenInNieuweMaand
-              ? aantalDagenInNieuweMaand
+              ? aantalDagenInNieuweMaand - 1
               : huidigeDag - 1;
 
           return DateTime(huidigeJaar + jaren, huidigeMaand + maanden, dag);
@@ -92,74 +92,18 @@ class Kalender {
     }
   }
 
-  static int verschilDagen(DateTime dt1, DateTime dt2) =>
-      (dt1.millisecondsSinceEpoch - dt2.millisecondsSinceEpoch) ~/
-      Duration.millisecondsPerDay;
-}
+  static int aantalDagen(DateTime dt1, DateTime dt2) =>
+      (dt2.millisecondsSinceEpoch - dt1.millisecondsSinceEpoch).abs() ~/
+          Duration.millisecondsPerDay +
+      1;
 
-//DateTime add(DateTime dateTime, {int years: 0, int months: 0, DayOptions dayOptions: DayOptions.ADDDAYS}){
-//  final currentYear = dateTime.year;
-//  final currentMonth = dateTime.month;
-//  final currentDay = dateTime.day;
-//
-////  bool lastDay = dagenPerMaand(jaar: currentYear, maand: currentMonth) == currentDay;
-//
-////  int newYear;
-////  int newMonth;
-////  int newDay = currentDay + day;
-//
-////  if( month > 0){
-////    newYear = currentYear + (currentMonth + month)~/12;
-////    newMonth = (currentMonth + month)%12;
-////  }else if(month < 0){
-////    newYear = currentYear - (month)~/12;
-////    int left = currentMonth - (month)%12;
-////
-////    if(left > 0){
-////      newMonth = left;
-////    }else{
-////      newYear--;
-////      newMonth = 12 - left;
-////    }
-////
-////  }else{
-////    newYear = currentYear;
-////    newMonth = currentMonth;
-////  }
-//
-//
-//  switch(dayOptions){
-//
-//    case DayOptions.KEEP_LASTDAY:{
-//      int aantalDagenInMaand = dagenPerMaand(jaar: currentYear, maand: currentMonth);
-//
-//      DateTime dt =  DateTime(currentYear + years, currentMonth + months, 1);
-//
-//      final aantalDagenInNieuweMaand = dagenPerMaand(jaar: dt.year, maand: dt.month);
-//
-//      int day =  aantalDagenInMaand == currentDay ? aantalDagenInNieuweMaand : ((aantalDagenInNieuweMaand < currentDay) ? aantalDagenInNieuweMaand : currentDay);
-//
-//      return DateTime(currentYear + years, currentMonth + months, day);
-//
-//    }
-//
-//    case DayOptions.KEEP_DAY_IN_MONTH:{
-//      int aantalDagenInMaand = dagenPerMaand(jaar: currentYear, maand: currentMonth);
-//
-//      DateTime dt =  DateTime(currentYear + years, currentMonth + months, 1);
-//
-//      final aantalDagenInNieuweMaand = dagenPerMaand(jaar: dt.year, maand: dt.month);
-//
-//      int day = (aantalDagenInNieuweMaand + days) > aantalDagenInMaand
-//            ? aantalDagenInMaand
-//            : aantalDagenInNieuweMaand + days;
-//
-//
-//      return DateTime(currentYear + years, currentMonth + months, day);
-//  }
-//    default:
-//      return DateTime(currentYear + years, currentMonth + months, currentDay+ days);
-//  }
-//
-//
-//}
+  static int verschilDagen(DateTime dt1, DateTime dt2) =>
+      (dt2.millisecondsSinceEpoch - dt1.millisecondsSinceEpoch) ~/
+      Duration.millisecondsPerDay;
+
+  static int maandDelta(DateTime startDatum, DateTime eindDatum) {
+    return (eindDatum.year - startDatum.year) * 12 +
+        eindDatum.month -
+        startDatum.month;
+  }
+}

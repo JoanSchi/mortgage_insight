@@ -54,14 +54,14 @@ buildTabBarOverviewPageStyle(FormFactorType formFactorType) {
     case FormFactorType.tablet:
     case FormFactorType.unknown:
       return TabBarPageStyle(
-        indicatorColor: Color(0xFF5a92a9),
+        indicatorColor: const Color(0xFF5a92a9),
       );
 
     case FormFactorType.monitor:
       return TabBarPageStyle(
         height: 64.0,
-        textStyle: TextStyle(fontSize: 24.0),
-        indicatorColor: Color(0xFF5a92a9),
+        textStyle: const TextStyle(fontSize: 24.0),
+        indicatorColor: const Color(0xFF5a92a9),
       );
   }
 }

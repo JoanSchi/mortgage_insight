@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import '../../model/nl/hypotheek/gegevens/hypotheek/hypotheek.dart';
-import '../../model/nl/hypotheek/gegevens/hypotheek_dossier/hypotheek_dossier.dart';
+import 'package:hypotheek_berekeningen/hypotheek/gegevens/hypotheek/hypotheek.dart';
+import 'package:hypotheek_berekeningen/hypotheek/gegevens/hypotheek_dossier/hypotheek_dossier.dart';
 import '../../my_widgets/animated_checkmark.dart';
 import '../../my_widgets/mortgage_card.dart';
 import '../../my_widgets/summary_pie_chart/pie_chart.dart';
 import '../../utilities/my_number_format.dart';
 
 class DossierCard extends StatelessWidget {
-  final int geselecteerd;
+  final String geselecteerd;
   final HypotheekDossier hd;
   final VoidCallback selecteren;
   final VoidCallback verwijderen;
@@ -24,7 +24,7 @@ class DossierCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final omschrijving = hd.omschrijving.isEmpty ? '${hd.id}' : hd.omschrijving;
+    final omschrijving = hd.omschrijving.isEmpty ? hd.id : hd.omschrijving;
 
     bool selected = geselecteerd == hd.id;
 
@@ -79,7 +79,7 @@ class DossierCard extends StatelessWidget {
     );
   }
 
-  void selecteerDossier(int? id) {
+  void selecteerDossier(String? id) {
     selecteren();
   }
 
@@ -136,19 +136,20 @@ class HypotheekDossierCenter extends StatelessWidget {
       }
     }
 
-    for (Hypotheek h in hd.eersteHypotheken) {
-      if (h.lening == 0.0) {
+    for (String id in hd.eersteHypotheken) {
+      Hypotheek? hypotheek = hd.hypotheken[id];
+      if (hypotheek == null || hypotheek.lening == 0.0) {
         continue;
       }
 
-      somLening += h.lening;
+      somLening += hypotheek.lening;
 
-      if (!voegSomToe(h)) {
+      if (!voegSomToe(hypotheek)) {
         break;
       }
 
-      Hypotheek vorige = h;
-      Hypotheek? volgende = hd.hypotheken[h.volgende];
+      Hypotheek vorige = hypotheek;
+      Hypotheek? volgende = hd.hypotheken[hypotheek.volgende];
 
       while (volgende != null) {
         if (vorige.restSchuld < volgende.lening) {

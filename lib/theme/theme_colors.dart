@@ -20,7 +20,7 @@ const hypotheekLightColorScheme = ColorScheme(
   onErrorContainer: Color(0xFF410002),
   background: Colors.white, // Color(0xFFFFFBFF),
   onBackground: Color(0xFF1C1B1E),
-  surface: Color.fromARGB(255, 246, 250, 253),
+  surface: Color.fromARGB(255, 248, 253, 255),
   //onSurface: Text, icons
   onSurface: Color.fromARGB(255, 3, 50, 71),
   surfaceVariant: Color(0xFFE7E0EB),

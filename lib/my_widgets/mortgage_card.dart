@@ -23,18 +23,20 @@ class MoCard extends StatelessWidget {
     this.onTap,
     this.onLongPress,
     this.splashColor = const Color.fromARGB(137, 170, 212, 229),
-    this.highlightColor = const Color.fromARGB(149, 152, 169, 72),
+    this.highlightColor = const Color.fromARGB(136, 111, 152, 169),
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     Widget card = Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
         children: [
           if (top != null) ...[
             top!,
-            const Divider(
+            Divider(
+              color: theme.primaryColor,
               height: 4.0,
               indent: 5.0,
               endIndent: 5.0,
@@ -44,7 +46,8 @@ class MoCard extends StatelessWidget {
             child: body,
           ),
           if (bottom != null) ...[
-            const Divider(
+            Divider(
+              color: theme.primaryColor,
               height: 4.0,
               indent: 5.0,
               endIndent: 5.0,
@@ -97,7 +100,7 @@ class MoCardMenuItem {
   MoCardMenuItem.edit({
     this.action = 'edit',
     this.icon = const Icon(Icons.edit),
-    this.text = const Text('Bewerken'),
+    this.text = const Text('Aanpassen'),
   });
 
   MoCardMenuItem.delete({

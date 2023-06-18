@@ -1,14 +1,29 @@
+// Copyright (C) 2023 Joan Schipper
+// 
+// This file is part of mortgage_insight.
+// 
+// mortgage_insight is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// mortgage_insight is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with mortgage_insight.  If not, see <http://www.gnu.org/licenses/>.
+
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mortgage_insight/model/nl/schulden/aflopend_krediet_verwerken.dart';
-import 'package:mortgage_insight/model/nl/schulden/autolease_verwerken.dart';
-import 'package:mortgage_insight/model/nl/schulden/doorlopendkrediet_verwerken.dart';
-import 'package:mortgage_insight/model/nl/schulden/schulden.dart';
-import 'package:mortgage_insight/model/nl/schulden/verzendkrediet_verwerken.dart';
-import 'package:mortgage_insight/model/settings/table_month_options.dart';
-
+import 'package:hypotheek_berekeningen/schulden/gegevens/schulden.dart';
+import 'package:hypotheek_berekeningen/schulden/uitwerken/aflopend_krediet_verwerken.dart';
+import 'package:hypotheek_berekeningen/schulden/uitwerken/autolease_verwerken.dart';
+import 'package:hypotheek_berekeningen/schulden/uitwerken/doorlopendkrediet_verwerken.dart';
+import 'package:hypotheek_berekeningen/schulden/uitwerken/verzendkrediet_verwerken.dart';
 import '../../utilities/kalender.dart';
 
 class SchuldBewerken {
@@ -60,29 +75,12 @@ class SchuldBewerkNotifier extends StateNotifier<SchuldBewerken> {
       case SchuldenCategorie.aflopendKrediet:
         setSchuld(
             schuld: AflopendKrediet(
-              id: -1,
+              id: '',
               omschrijving: 'AK',
               categorie: SchuldenCategorie.aflopendKrediet,
               beginDatum: beginDatum,
               betaling: AKbetaling.ingangsdatum,
               decimalen: 2,
-              tableMonthOptions: const TableMonthOptions(
-                  monthsVisible: IListConst([
-                    true,
-                    true,
-                    true,
-                    true,
-                    true,
-                    true,
-                    true,
-                    true,
-                    true,
-                    true,
-                    true,
-                    true
-                  ]),
-                  deviate: true,
-                  startEnd: true),
               defaultAflossenPerMaand: 0.0,
               lening: 0.0,
               maanden: 12,
@@ -106,13 +104,14 @@ class SchuldBewerkNotifier extends StateNotifier<SchuldBewerken> {
       case SchuldenCategorie.doorlopendKrediet:
         setSchuld(
             schuld: DoorlopendKrediet(
-              id: -1,
+              id: '',
               categorie: SchuldenCategorie.doorlopendKrediet,
               omschrijving: 'DK',
               beginDatum: beginDatum,
               statusBerekening: StatusBerekening.nietBerekend,
               error: '',
-              eindDatumGebruiker: Kalender.voegPeriodeToe(beginDatum, jaren: 1, periodeOpties: PeriodeOpties.eind),
+              eindDatumGebruiker: Kalender.voegPeriodeToe(beginDatum,
+                  jaren: 1, periodeOpties: PeriodeOpties.eind),
               heeftEindDatum: true,
               bedrag: 0.0,
             ),
@@ -121,7 +120,7 @@ class SchuldBewerkNotifier extends StateNotifier<SchuldBewerken> {
       case SchuldenCategorie.verzendhuiskrediet:
         setSchuld(
             schuld: VerzendKrediet(
-                id: -1,
+                id: '',
                 categorie: SchuldenCategorie.verzendhuiskrediet,
                 omschrijving: 'VK',
                 beginDatum: beginDatum,
@@ -141,7 +140,7 @@ class SchuldBewerkNotifier extends StateNotifier<SchuldBewerken> {
       case SchuldenCategorie.autolease:
         setSchuld(
             schuld: LeaseAuto(
-                id: -1,
+                id: '',
                 categorie: SchuldenCategorie.autolease,
                 omschrijving: 'Lease Auto',
                 beginDatum: beginDatum,

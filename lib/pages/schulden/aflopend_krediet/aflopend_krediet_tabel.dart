@@ -1,16 +1,25 @@
-import 'package:flextable/FlexTable/body_layout.dart';
-import 'package:flextable/FlexTable/data_flexfable.dart';
-import 'package:flextable/FlexTable/table_bottombar.dart';
-import 'package:flextable/FlexTable/table_line.dart';
-import 'package:flextable/FlexTable/table_model.dart';
-import 'package:flextable/FlexTable/table_multi_panel_portview.dart';
-import 'package:flextable/sliver_to_viewportbox.dart';
-import 'package:flutter/gestures.dart';
+// Copyright (C) 2023 Joan Schipper
+// 
+// This file is part of mortgage_insight.
+// 
+// mortgage_insight is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// mortgage_insight is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with mortgage_insight.  If not, see <http://www.gnu.org/licenses/>.
+
+import 'package:flextable/flextable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hypotheek_berekeningen/schulden/gegevens/schulden.dart';
 import 'package:intl/intl.dart';
-import 'package:flextable/FlexTable/TableItems/Cells.dart';
-import 'package:mortgage_insight/model/nl/schulden/schulden.dart';
 import 'package:mortgage_insight/pages/schulden/aflopend_krediet/abstract_aflopend_krediet_consumer_state.dart';
 import 'dart:math' as math;
 import '../../../utilities/date.dart';
@@ -39,6 +48,7 @@ class _DebtTableState
     extends AbstractAflopendKredietState<AflopendKredietTabel> {
   late DateFormat df = DateFormat.yMd(localeToString(context));
   Map<String, WidthColumn> map = {};
+  FlexTableController flexTableController = FlexTableController();
 
   // TextToWidth _textToWidthDate = TextToWidth();
   // ValueToWidth _numberToWidthLening = ValueToWidth();
@@ -56,34 +66,29 @@ class _DebtTableState
     TextStyle textStyle = theme.textTheme.bodyMedium!;
     double textScaleFactor = MediaQuery.of(context).textScaleFactor;
 
-    TableModel? tableModel = makeTableModel(
+    FlexTableModel? tableModel = makeTableModel(
         ak: ak, textScaleFactor: textScaleFactor, style: textStyle);
 
     if (tableModel == null) {
       return _buildEmpty();
     }
 
-    final touch = ScrollConfiguration.of(context)
-        .dragDevices
-        .contains(PointerDeviceKind.touch);
-
     return DefaultTextStyle(
         style: textStyle,
-        child: SliverToViewPortBox(
-            delegate: FlexTableToViewPortBoxDelegate(
-                flexTable: FlexTable(
-          maxWidth: 980,
-          findSliverScrollPosition: true,
-          tableModel: tableModel,
-          alignment: Alignment.topCenter,
-          sidePanelWidget: [
-            if (!touch)
-              (tableModel) => FlexTableLayoutParentDataWidget(
-                  tableLayoutPosition: const FlexTableLayoutPosition.bottom(),
-                  child: TableBottomBar(
-                      tableModel: tableModel, maxWidthSlider: 200.0))
-          ],
-        ))));
+        child: FlexTableToSliverBox(
+            flexTableController: flexTableController,
+            child: FlexTable(
+              flexTableController: flexTableController,
+              flexTableModel: tableModel,
+
+              // sidePanelWidget: [
+              //   if (!touch)
+              //     (tableModel) => FlexTableLayoutParentDataWidget(
+              //         tableLayoutPosition: const FlexTableLayoutPosition.bottom(),
+              //         child: TableBottomBar(
+              //             tableModel: tableModel, maxWidthSlider: 200.0))
+              // ],
+            )));
   }
 
   _buildEmpty() {
@@ -92,7 +97,7 @@ class _DebtTableState
     );
   }
 
-  TableModel? makeTableModel(
+  FlexTableModel? makeTableModel(
       {required AflopendKrediet ak,
       required TextStyle style,
       double textScaleFactor = 1.0,
@@ -104,7 +109,7 @@ class _DebtTableState
     }
     int rows = 0;
     int columns = 5;
-    final data = DataFlexTable();
+    final data = FlexTableDataModel();
 
     rows = aantalTermijnen + 3;
     columns = 7;
@@ -328,7 +333,7 @@ class _DebtTableState
       return widthColumn.width + padding * 2.0;
     }
 
-    return TableModel(
+    return FlexTableModel(
         scrollLockX: true,
         scrollLockY: true,
         defaultWidthCell: 90.0,
@@ -345,47 +350,47 @@ class _DebtTableState
           AutoFreezeArea(startIndex: 0, freezeIndex: 2, endIndex: rows - 1)
         ],
         specificWidth: [
-          PropertiesRange(min: columnWidthIndex++, length: 2.0),
-          PropertiesRange(
+          RangeProperties(min: columnWidthIndex++, length: 2.0),
+          RangeProperties(
               min: columnWidthIndex++,
               length: calculateColumnWidth(
                 'datum',
                 'Datum',
                 '00-00-0000',
               )),
-          PropertiesRange(
+          RangeProperties(
               min: columnWidthIndex++,
               length: calculateColumnWidth(
                 'lening',
                 'lening',
                 ak.lening,
               )),
-          PropertiesRange(
+          RangeProperties(
               min: columnWidthIndex++,
               length: calculateColumnWidth(
                 'termijnbedrag',
                 'T.b.',
                 ak.termijnBedragMnd,
               )),
-          PropertiesRange(
+          RangeProperties(
               min: columnWidthIndex++,
               length: calculateColumnWidth(
                 'Interest',
                 'Rente',
                 interestToCalculateWidth,
               )),
-          PropertiesRange(
+          RangeProperties(
               min: columnWidthIndex++,
               length: calculateColumnWidth(
                 'aflossen',
                 'Afl.',
                 aflossenToCalculateWidth,
               )),
-          PropertiesRange(min: columnWidthIndex++, length: 2.0)
+          RangeProperties(min: columnWidthIndex++, length: 2.0)
         ],
         specificHeight: [
-          PropertiesRange(min: 0, max: 0, length: 2.0),
-          PropertiesRange(min: rows - 1, max: rows - 1, length: 2.0)
+          RangeProperties(min: 0, max: 0, length: 2.0),
+          RangeProperties(min: rows - 1, max: rows - 1, length: 2.0)
         ],
         dataTable: data);
   }

@@ -18,7 +18,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.17.0 <3.0.1"
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   flutter:
@@ -37,23 +37,24 @@ dependencies:
     path: ../flextable
   ltrb_navigation_drawer:
     path: ../ltrb_navigation_drawer
-  shared_preferences: ^2.0.15
-  go_router: ^6.0.0
+  shared_preferences: ^2.1.2
   custom_sliver_appbar:
     path: ../custom_sliver_appbar
   date_input_picker:
     path: ../date_input_picker
   selectable_group_widgets:
     path: ../selectable_group_widgets
-  sliver_row_box:
-    path: ../sliver_row_box
+  animated_sliver_box:
+    path: ../animated_sliver_box
   # selectable_popupmenu:
   #   path: ../selectable_popupmenu
   freezed_annotation: ^2.2.0
-  json_annotation: ^4.8.0
-  fast_immutable_collections: ^9.0.0
-  intl: ^0.17.0
-
+  json_annotation: ^4.8.1
+  fast_immutable_collections: ^9.1.5
+  intl: ^0.18.0
+  hypotheek_berekeningen:
+   path: ../hypotheek_berekeningen
+  beamer: ^1.5.5
   
 
 dev_dependencies:
@@ -61,7 +62,7 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^2.0.1
   build_runner: ^2.3.3
-  freezed: ^2.3.2
+  freezed: ^2.3.4
   json_serializable: ^6.6.1
     
     

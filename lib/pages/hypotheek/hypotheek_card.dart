@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../model/nl/hypotheek/gegevens/hypotheek/hypotheek.dart';
+import 'package:hypotheek_berekeningen/hypotheek/gegevens/hypotheek/hypotheek.dart';
 import '../../my_widgets/custom_fitted_box.dart';
 import '../../my_widgets/mortgage_card.dart';
 import '../../utilities/my_number_format.dart';

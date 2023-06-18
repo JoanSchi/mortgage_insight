@@ -20,29 +20,29 @@ class DeviceOS {
   static bool get isMobileOrWeb => isMobile || isWeb;
 }
 
-class DeviceScreen {
-  // Get the device form factor as best we can.
-  // Otherwise we will use the screen size to determine which class we fall into.
-  static FormFactorType of(BuildContext context) {
-    double shortestSide = MediaQuery.of(context).size.shortestSide;
-    if (shortestSide <= 300) return FormFactorType.smallPhone;
-    if (shortestSide <= 600) return FormFactorType.largePhone;
-    if (shortestSide <= 900) return FormFactorType.tablet;
-    return FormFactorType.monitor;
-  }
+// class DeviceScreen {
+//   // Get the device form factor as best we can.
+//   // Otherwise we will use the screen size to determine which class we fall into.
+//   static FormFactorType of(BuildContext context) {
+//     double shortestSide = MediaQuery.of(context).size.shortestSide;
+//     if (shortestSide <= 300) return FormFactorType.smallPhone;
+//     if (shortestSide <= 600) return FormFactorType.largePhone;
+//     if (shortestSide <= 900) return FormFactorType.tablet;
+//     return FormFactorType.monitor;
+//   }
 
-  // Shortcuts for various mobile device types
-  static bool isPhone(BuildContext context) =>
-      isSmallPhone(context) || isLargePhone(context);
-  static bool isTablet(BuildContext context) =>
-      of(context) == FormFactorType.tablet;
-  static bool isMonitor(BuildContext context) =>
-      of(context) == FormFactorType.monitor;
-  static bool isSmallPhone(BuildContext context) =>
-      of(context) == FormFactorType.smallPhone;
-  static bool isLargePhone(BuildContext context) =>
-      of(context) == FormFactorType.largePhone;
-}
+//   // Shortcuts for various mobile device types
+//   static bool isPhone(BuildContext context) =>
+//       MediaQuery.of(context).size.shortestSide <= 600.0;
+//   static bool isTablet(BuildContext context) =>
+//       of(context) == FormFactorType.tablet;
+//   static bool isMonitor(BuildContext context) =>
+//       of(context) == FormFactorType.monitor;
+//   static bool isSmallPhone(BuildContext context) =>
+//       of(context) == FormFactorType.smallPhone;
+//   static bool isLargePhone(BuildContext context) =>
+//       of(context) == FormFactorType.largePhone;
+// }
 
 class DeviceScreen3 {
   final MediaQueryData mediaQuery;
@@ -53,11 +53,6 @@ class DeviceScreen3 {
   EdgeInsets get padding => mediaQuery.padding;
   EdgeInsets get viewInsets => mediaQuery.viewInsets;
   double get topPadding => mediaQuery.padding.top;
-
-  /// See scrollable -> sroll_configuration -> buildScrollbar
-  ///
-  /// The platform is used to decide if scrollbar is visible
-  ///
 
   bool get hasScrollBars {
     switch (theme.platform) {
@@ -75,14 +70,6 @@ class DeviceScreen3 {
   DeviceScreen3.of(BuildContext context)
       : mediaQuery = MediaQuery.of(context),
         theme = Theme.of(context);
-
-  // FormFactorType get formFactorType {
-  //   double shortestSide = size.shortestSide;
-  //   if (shortestSide <= 300) return FormFactorType.SmallPhone;
-  //   if (shortestSide <= 600) return FormFactorType.LargePhone;
-  //   if (shortestSide <= 900) return FormFactorType.Tablet;
-  //   return FormFactorType.Monitor;
-  // }
 
   FormFactorType get formFactorType {
     switch (platform) {
@@ -103,6 +90,12 @@ class DeviceScreen3 {
     }
   }
 
+  bool get formTypeFactorIsPhone {
+    final type = formFactorType;
+    return type == FormFactorType.smallPhone ||
+        type == FormFactorType.largePhone;
+  }
+
   FormFactorType get formFactorTypeByShortestSide {
     double shortestSide = size.shortestSide;
     if (shortestSide <= 300) return FormFactorType.smallPhone;
@@ -116,7 +109,10 @@ class DeviceScreen3 {
 
   bool get isPortrait => size.width < size.height;
 
-  bool get isTabletWidthNarrow => size.width < 900.0;
+  bool get isTabletWidthNarrow => size.width <= 900.0;
 
-  bool get wrapSelectionWidgets => size.width > 500.0;
+  bool get wrapSelectionWidgets =>
+      size.height < size.width &&
+      (formFactorType == FormFactorType.smallPhone ||
+          formFactorType == FormFactorType.largePhone);
 }

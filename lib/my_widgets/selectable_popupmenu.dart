@@ -87,7 +87,8 @@ class GroupPopupMenuItem<I, V> extends SelectablePopupMenuItem<I, V> {
       GroupPopupMenuItemState<I, V>();
 
   @override
-  bool represents(_) => groupValueNotifier.value == identifierAndValue.value;
+  bool represents(SelectedMenuPopupIdentifierValue<I, V>? value) =>
+      groupValueNotifier.value == identifierAndValue.value;
 }
 
 abstract class SelectablePopupMenuItem<I, V>

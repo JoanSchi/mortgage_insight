@@ -1,73 +1,64 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:beamer/beamer.dart';
 import 'package:date_input_picker/date_input_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+import 'package:hypotheek_berekeningen/inkomen/gegevens/inkomen.dart';
 import 'package:intl/intl.dart';
-import 'package:mortgage_insight/model/nl/hypotheek_document/provider/hypotheek_document_provider.dart';
+import 'package:mortgage_insight/model/nl/provider/hypotheek_document_provider.dart';
 import 'package:selectable_group_widgets/selectable_group_widgets.dart';
 import 'package:mortgage_insight/layout/transition/scale_size_transition.dart';
 import 'package:mortgage_insight/platform_page_format/page_actions.dart';
 import 'package:mortgage_insight/utilities/my_number_format.dart';
 import 'package:mortgage_insight/utilities/date.dart';
-import 'package:mortgage_insight/utilities/message_listeners.dart';
-import '../../../model/nl/inkomen/inkomen.dart';
 import '../../../my_widgets/selectable_widgets/selectable_group_themes.dart';
 import '../../../my_widgets/selectable_widgets/single_checkbox.dart';
+import '../../../platform_page_format/default_match_page_properties.dart';
 import '../../../platform_page_format/default_page.dart';
-import '../../../platform_page_format/page_properties.dart';
 import '../../../utilities/device_info.dart';
 import 'inkomen_bewerken_model.dart';
-import 'inkomen_bewerken.dart';
+import 'inkomen_bewerken_view_state.dart';
 
-class IncomeEdit extends ConsumerStatefulWidget {
-  const IncomeEdit({Key? key}) : super(key: key);
+class InkomenBewerken extends ConsumerStatefulWidget {
+  const InkomenBewerken({super.key});
 
   @override
-  ConsumerState<IncomeEdit> createState() => IncomeEditState();
+  ConsumerState<InkomenBewerken> createState() => IncomeEditState();
 }
 
-class UpdateInkomenBrutoTextField {
-  final PeriodeInkomen periodeInkomen;
-  final bool pensioen;
-  UpdateInkomenBrutoTextField({
-    required this.periodeInkomen,
-    required this.pensioen,
-  });
-
-  @override
-  bool operator ==(covariant UpdateInkomenBrutoTextField other) {
-    if (identical(this, other)) return true;
-
-    return other.periodeInkomen == periodeInkomen && other.pensioen == pensioen;
-  }
-
-  @override
-  int get hashCode => periodeInkomen.hashCode ^ pensioen.hashCode;
-}
-
-class IncomeEditState extends ConsumerState<IncomeEdit> {
-  final MessageListener<AcceptCancelBackMessage> _messageListeners =
-      MessageListener<AcceptCancelBackMessage>();
+class IncomeEditState extends ConsumerState<InkomenBewerken> {
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     bool partner = ref.watch(
-        inkomenBewerkenProvider.select((value) => value.inkomen.partner));
+        inkomenBewerkenViewProvider.select((value) => value.inkomen.partner));
     final theme = Theme.of(context);
 
     final save = PageActionItem(
         text: 'Opslaan',
         icon: Icons.done,
-        voidCallback: () => _messageListeners
-            .invoke(AcceptCancelBackMessage(msg: AcceptCancelBack.accept)));
+        voidCallback: () {
+          if (_formKey.currentState?.validate() ?? false) {
+            _formKey.currentState!.save();
+
+            final bewerkenProvider = ref.read(inkomenBewerkenViewProvider);
+
+            ref.read(hypotheekDocumentProvider.notifier).inkomenToevoegen(
+                  oldDate: bewerkenProvider.origineleDatum,
+                  newItem: bewerkenProvider.inkomen,
+                );
+
+            Beamer.of(context, root: true).popToNamed('/document/inkomen');
+          }
+        });
 
     final cancel = PageActionItem(
         text: 'Annuleren',
         icon: Icons.arrow_back,
-        voidCallback: () => _messageListeners
-            .invoke(AcceptCancelBackMessage(msg: AcceptCancelBack.cancel)));
+        voidCallback: () =>
+            Beamer.of(context, root: true).popToNamed('/document/inkomen'));
 
     return DefaultPage(
       title: 'Inkomen',
@@ -76,54 +67,49 @@ class IncomeEditState extends ConsumerState<IncomeEdit> {
             partner ? 'graphics/persons.png' : 'graphics/person.png',
           ),
           color: theme.colorScheme.onSurface),
-      matchPageProperties: [
-        MatchPageProperties(
-            pageProperties: PageProperties(rightBottomActions: [cancel, save])),
-        MatchPageProperties(
-          types: {FormFactorType.smallPhone, FormFactorType.largePhone},
-          orientations: {Orientation.landscape},
-          pageProperties:
-              PageProperties(leftTopActions: [cancel], rightTopActions: [save]),
-        )
-      ],
-      bodyBuilder: (
+      getPageProperties: (
+              {required hasScrollBars,
+              required formFactorType,
+              required orientation,
+              required bottom}) =>
+          hypotheekPageProperties(
+              hasScrollBars: hasScrollBars,
+              formFactorType: formFactorType,
+              orientation: orientation,
+              bottom: bottom,
+              leftTopActions: [cancel],
+              rightTopActions: [save]),
+      sliversBuilder: (
               {required BuildContext context,
-              required bool nested,
-              required double topPadding,
-              required double bottomPadding}) =>
-          IncomeFieldForm(
-        messageListeners: _messageListeners,
-        nested: nested,
-        topPadding: topPadding,
-        bottomPadding: bottomPadding,
-      ),
+              Widget? appBar,
+              required EdgeInsets padding}) =>
+          Form(
+              key: _formKey,
+              child: IncomeFieldForm(
+                padding: padding,
+                appBar: appBar,
+              )),
     );
   }
 }
 
 class IncomeFieldForm extends ConsumerStatefulWidget {
-  final MessageListener<AcceptCancelBackMessage> messageListeners;
-  final bool nested;
-  final double topPadding;
-  final double bottomPadding;
+  final EdgeInsets padding;
+  final Widget? appBar;
 
   const IncomeFieldForm({
     Key? key,
-    required this.messageListeners,
-    required this.nested,
-    required this.topPadding,
-    required this.bottomPadding,
+    required this.padding,
+    required this.appBar,
   }) : super(key: key);
 
   @override
   IncomeFieldFormState createState() => IncomeFieldFormState();
 }
 
-DateTime firstSelectableDate = DateTime(2000, 1);
-DateTime lastSelectableDate = DateTime(2070, 12);
-
 class IncomeFieldFormState extends ConsumerState<IncomeFieldForm> {
-  final _formKey = GlobalKey<FormState>();
+  DateTime firstSelectableDate = DateTime(2000, 1);
+  DateTime lastSelectableDate = DateTime(2070, 12);
   late final TextEditingController _brutoInkomenController =
       TextEditingController(text: firstTextInkomen());
 
@@ -132,14 +118,14 @@ class IncomeFieldFormState extends ConsumerState<IncomeFieldForm> {
   late final TextInputFormatter bedragFilter =
       FilteringTextInputFormatter.allow(RegExp(r'^[0-9]+([.|,][0-9]{0,2})?'));
 
-  InkomenBewerken get _read => ref.read(inkomenBewerkenProvider);
+  InkomenBewerkenViewState get _read => ref.read(inkomenBewerkenViewProvider);
 
-  InkomenBewerkenNotifier get _notifier {
-    return ref.read(inkomenBewerkenProvider.notifier);
+  InkomenBewerkenViewModelNotifier get _notifier {
+    return ref.read(inkomenBewerkenViewProvider.notifier);
   }
 
   String firstTextInkomen() {
-    final InkomenBewerken r = _read;
+    final InkomenBewerkenViewState r = _read;
     if (r.origineleDatum == DateTime(0)) {
       return '';
     } else {
@@ -173,7 +159,7 @@ class IncomeFieldFormState extends ConsumerState<IncomeFieldForm> {
 
   @override
   Widget build(BuildContext context) {
-    InkomenBewerken bewerken = ref.watch(inkomenBewerkenProvider);
+    InkomenBewerkenViewState bewerken = ref.watch(inkomenBewerkenViewProvider);
 
     final theme = DeviceScreen3.of(context);
     bool formatWithUnfocus;
@@ -198,9 +184,6 @@ class IncomeFieldFormState extends ConsumerState<IncomeFieldForm> {
     String monthFormat = 'M-y';
 
     List<Widget> children = [
-      SizedBox(
-        height: widget.topPadding,
-      ),
       DateInputPicker(
           additionalDividers: const ['/', '.', '-'],
           formatWithUnfocus: formatWithUnfocus,
@@ -314,41 +297,18 @@ class IncomeFieldFormState extends ConsumerState<IncomeFieldForm> {
           );
         },
       ),
-      SizedBox(
-        height: widget.bottomPadding,
-      ),
     ];
 
-    final formField = Form(
-        key: _formKey,
-        child: CustomScrollView(
-          slivers: [
-            if (widget.nested)
-              SliverOverlapInjector(
-                // This is the flip side of the SliverOverlapAbsorber
-                // above.
-                handle:
-                    NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-              ),
-            SliverList(delegate: SliverChildListDelegate.fixed(children))
-          ],
-        ));
-
-    return MessageListenerWidget<AcceptCancelBackMessage>(
-        listener: widget.messageListeners,
-        onMessage: (AcceptCancelBackMessage message) {
-          switch (message.msg) {
-            case AcceptCancelBack.accept:
-              save();
-              break;
-            case AcceptCancelBack.cancel:
-              cancel();
-              break;
-            case AcceptCancelBack.back:
-              break;
-          }
-        },
-        child: formField);
+    final appBar = widget.appBar;
+    return CustomScrollView(
+      slivers: [
+        if (appBar != null) appBar,
+        SliverPadding(
+            padding: widget.padding,
+            sliver:
+                SliverList(delegate: SliverChildListDelegate.fixed(children)))
+      ],
+    );
   }
 
   _veranderingDatum(DateTime? value) {
@@ -384,22 +344,5 @@ class IncomeFieldFormState extends ConsumerState<IncomeFieldForm> {
     } else {
       return 'Bedrag in ##.00';
     }
-  }
-
-  save() {
-    if (_formKey.currentState?.validate() ?? false) {
-      _formKey.currentState!.save();
-
-      ref.read(hypotheekDocumentProvider.notifier).inkomenToevoegen(
-            oldDate: _read.origineleDatum,
-            newItem: _read.inkomen,
-          );
-
-      context.pop();
-    }
-  }
-
-  cancel() {
-    context.pop();
   }
 }

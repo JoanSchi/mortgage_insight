@@ -3,38 +3,61 @@ import 'package:flutter/material.dart';
 import 'package:mortgage_insight/platform_page_format/default_page.dart';
 import 'package:mortgage_insight/platform_page_format/fab_properties.dart';
 import 'package:mortgage_insight/platform_page_format/page_actions.dart';
+import 'package:mortgage_insight/platform_page_format/tab_bar.dart';
 import 'package:mortgage_insight/utilities/device_info.dart';
 
+import '../my_widgets/oh_no.dart';
 import 'page_bottom_actions_layout.dart';
 import 'page_properties.dart';
 
 class TablePageScrollBars extends StatelessWidget {
   final String? title;
   final WidgetBuilder? imageBuilder;
-  final PageProperties pageProperties;
+  final GetPageProperties getPageProperties;
   final PreferredSizeWidget? bottom;
-  final BodyBuilder bodyBuilder;
+  final BodyBuilder? bodyBuilder;
+  final SliversBuilder? sliversBuilder;
   final int notificationDepth;
-
   final FabProperties? fabProperties;
+  final TabController? tabController;
+  final List<Tab>? tabs;
 
   const TablePageScrollBars({
-    Key? key,
+    super.key,
     this.title,
     this.imageBuilder,
-    PageProperties? pageProperties,
+    required this.getPageProperties,
     this.bottom,
     this.fabProperties,
     required this.notificationDepth,
-    required this.bodyBuilder,
-  })  : pageProperties = pageProperties ?? const PageProperties(),
-        super(key: key);
+    this.bodyBuilder,
+    this.sliversBuilder,
+    this.tabController,
+    this.tabs,
+  });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final deviceScreen = DeviceScreen3.of(context);
     final isNarrow = deviceScreen.isTabletWidthNarrow;
+    final topPadding = deviceScreen.topPadding;
+
+    PreferredSizeWidget? preferredWidget =
+        (tabController != null && tabs != null)
+            ? MyTabBar(
+                formFactorType: deviceScreen.formFactorType,
+                controller: tabController,
+                tabs: tabs!)
+            : bottom;
+
+    final bottomHeight = preferredWidget?.preferredSize.height ?? 0.0;
+
+    final pageProperties = getPageProperties(
+        hasScrollBars: true,
+        formFactorType: deviceScreen.formFactorType,
+        orientation: deviceScreen.orientation,
+        bottom: bottomHeight);
 
     final Widget? left = buildActionRow(
         context: context,
@@ -45,15 +68,6 @@ class TablePageScrollBars extends StatelessWidget {
         action:
             pageActionsToIconButton(context, pageProperties.rightTopActions));
 
-    Widget body = PageActionBottomLayout(
-        leftBottomActions: pageProperties.leftBottomActions,
-        rightBottomActions: pageProperties.rightBottomActions,
-        body: bodyBuilder(
-            context: context,
-            nested: false,
-            topPadding: 8.0,
-            bottomPadding: 8.0));
-
     final titleHeight =
         (isNarrow && (title != null || left != null || right != null))
             ? 56.0
@@ -62,22 +76,44 @@ class TablePageScrollBars extends StatelessWidget {
     final floatingActionButton =
         fabProperties == null ? null : Fab(fabProperties: fabProperties!);
 
+    const padding = EdgeInsets.all(8.0);
+
+    Widget body = bodyBuilder?.call(context: context, padding: padding) ??
+        sliversBuilder?.call(context: context, padding: padding) ??
+        const OhNo(text: 'No body');
+
+    body = PageActionBottomLayout(
+        leftBottomActions: pageProperties.leftBottomActions,
+        rightBottomActions: pageProperties.rightBottomActions,
+        body: body);
+
     return Scaffold(
+      // appBar: AppBar(
+      //   actions: [
+      //     IconButton(
+      //         onPressed: () {
+      //           print('blub');
+      //         },
+      //         icon: Icon(Icons.free_breakfast))
+      //   ],
+      // ),
       appBar: TitleImageAppBar(
-          orientation: isNarrow ? Orientation.portrait : Orientation.landscape,
+          orientation: Orientation.landscape,
           notificationPredicate: (ScrollNotification notification) =>
               notification.depth == notificationDepth,
-          title: titleHeight != 0.0 ? title : null,
+          title: isNarrow ? title : null,
           backgroundColor: theme.colorScheme.background,
           backgroundColorScrolledUnder: theme.colorScheme.onSurface,
           leftActions: left,
           rightActions: right,
           titleTextStyle: const TextStyle(fontSize: 24.0),
           titleHeight: titleHeight,
-          imageHeight: imageBuilder != null ? 120.0 : 0.0,
+          imageHeight: imageBuilder != null
+              ? pageProperties.maxExtent - topPadding
+              : 0.0,
           imageBuilder: imageBuilder,
-          bottomPositionImage: isNarrow ? 42.0 : 0.0,
-          bottom: bottom,
+          bottomPositionImage: 0.0, //isNarrow ? 42.0 : 0.0,
+          bottom: preferredWidget,
           appBarBackgroundBuilder: (
               {required BuildContext context,
               required EdgeInsets padding,
@@ -93,7 +129,7 @@ class TablePageScrollBars extends StatelessWidget {
               child: Material(
                   color: scrolledUnderColor,
                   shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(8.0))),
+                      borderRadius: BorderRadius.all(Radius.circular(16.0))),
                   child: child),
             );
           }),

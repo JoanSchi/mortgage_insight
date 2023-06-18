@@ -1,33 +1,40 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:custom_sliver_appbar/shapeborder_appbar/shapeborder_lb_rb_rounded.dart';
 import 'package:custom_sliver_appbar/title_image_appbar/title_image_appbar.dart';
 import 'package:flutter/material.dart';
+import 'package:mortgage_insight/my_widgets/oh_no.dart';
 import 'package:mortgage_insight/platform_page_format/default_page.dart';
 import 'package:mortgage_insight/platform_page_format/fab_properties.dart';
 import 'package:mortgage_insight/utilities/device_info.dart';
 import 'page_actions.dart';
 import 'page_bottom_actions_layout.dart';
-import 'page_properties.dart';
+import 'tab_bar.dart';
 
 class PhonePageScrollBars extends StatelessWidget {
   final String? title;
   final WidgetBuilder? imageBuilder;
-  final PageProperties pageProperties;
+  final GetPageProperties getPageProperties;
   final PreferredSizeWidget? bottom;
-  final BodyBuilder bodyBuilder;
+  final BodyBuilder? bodyBuilder;
+  final SliversBuilder? sliversBuilder;
   final FabProperties? fabProperties;
   final int notificationDept;
+  final TabController? tabController;
+  final List<Tab>? tabs;
 
   const PhonePageScrollBars({
-    Key? key,
+    super.key,
+    required this.getPageProperties,
     this.title,
     this.imageBuilder,
-    PageProperties? pageProperties,
     this.bottom,
     this.fabProperties,
     required this.notificationDept,
-    required this.bodyBuilder,
-  })  : pageProperties = pageProperties ?? const PageProperties(),
-        super(key: key);
+    this.tabController,
+    this.tabs,
+    this.bodyBuilder,
+    this.sliversBuilder,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +46,22 @@ class PhonePageScrollBars extends StatelessWidget {
 
     double toolbarHeight = 0.0;
     const imageHeight = 100.0;
-    final bottomHeight = bottom?.preferredSize.height ?? 0.0;
+
+    PreferredSizeWidget? preferredWidget =
+        (tabController != null && tabs != null)
+            ? MyTabBar(
+                formFactorType: deviceScreen.formFactorType,
+                controller: tabController,
+                tabs: tabs!)
+            : bottom;
+
+    final bottomHeight = preferredWidget?.preferredSize.height ?? 0.0;
+
+    final pageProperties = getPageProperties(
+        hasScrollBars: true,
+        formFactorType: deviceScreen.formFactorType,
+        orientation: deviceScreen.orientation,
+        bottom: bottomHeight);
 
     bool showTitle = false;
     bool showImage = false;
@@ -56,32 +78,9 @@ class PhonePageScrollBars extends StatelessWidget {
       action: pageActionsToIconButton(context, pageProperties.rightTopActions),
     );
 
-    Widget body = bodyBuilder(
-        context: context, nested: false, topPadding: 8.0, bottomPadding: 8.0);
+    const padding = EdgeInsets.all(8.0);
 
-    body = PageActionBottomLayout(
-        leftBottomActions: pageProperties.leftBottomActions,
-        rightBottomActions: pageProperties.rightBottomActions,
-        body: body);
-
-    double leftPaddingAppBar;
-    double leftPadding;
-
-    if ((!isPortrait && pageProperties.hasNavigationBar)) {
-      leftPadding =
-          leftPaddingAppBar = pageProperties.leftPaddingWithNavigation;
-    } else {
-      leftPadding = pageProperties.leftPadding;
-      leftPaddingAppBar = 0.0;
-    }
-
-    body = Padding(
-      padding: EdgeInsets.only(
-          left: leftPadding, right: pageProperties.rightPadding),
-      child: body,
-    );
-
-    if (bottom != null) {
+    if (preferredWidget != null) {
       if (title != null && heightLeft - toolbarHeight > 500.0) {
         showTitle = true;
         toolbarHeight = kToolbarHeight;
@@ -102,6 +101,25 @@ class PhonePageScrollBars extends StatelessWidget {
     final floatingActionButton =
         fabProperties == null ? null : Fab(fabProperties: fabProperties!);
 
+    Widget body = bodyBuilder?.call(context: context, padding: padding) ??
+        sliversBuilder?.call(context: context, padding: padding) ??
+        const OhNo(text: 'No body');
+
+    body = PageActionBottomLayout(
+        leftBottomActions: pageProperties.leftBottomActions,
+        rightBottomActions: pageProperties.rightBottomActions,
+        body: body);
+
+    double leftPaddingAppBar = 0.0;
+
+    if ((!isPortrait && pageProperties.hasNavigationBar)) {
+      leftPaddingAppBar = pageProperties.leftPaddingWithNavigation;
+      body = Padding(
+        padding: EdgeInsets.only(left: leftPaddingAppBar),
+        child: body,
+      );
+    }
+
     return Scaffold(
       appBar: TitleImageAppBar(
           notificationPredicate: (ScrollNotification notification) =>
@@ -114,7 +132,7 @@ class PhonePageScrollBars extends StatelessWidget {
           titleHeight: toolbarHeight,
           imageHeight: showImage ? imageHeight : 0.0,
           imageBuilder: showImage ? imageBuilder : null,
-          bottom: bottom,
+          bottom: preferredWidget,
           bottomPositionImage: 42.0,
           appBarBackgroundBuilder: (
               {required BuildContext context,

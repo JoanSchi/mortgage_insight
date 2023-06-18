@@ -1,8 +1,25 @@
+// Copyright (C) 2023 Joan Schipper
+//
+// This file is part of mortgage_insight.
+//
+// mortgage_insight is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// mortgage_insight is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with mortgage_insight.  If not, see <http://www.gnu.org/licenses/>.
+
 import 'package:date_input_picker/date_input_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mortgage_insight/model/nl/schulden/doorlopendkrediet_verwerken.dart';
-import 'package:mortgage_insight/model/nl/schulden/schulden.dart';
+import 'package:hypotheek_berekeningen/schulden/gegevens/schulden.dart';
+import 'package:hypotheek_berekeningen/schulden/uitwerken/doorlopendkrediet_verwerken.dart';
 import 'package:mortgage_insight/my_widgets/oh_no.dart';
 import '../../../my_widgets/selectable_widgets/single_checkbox.dart';
 import '../../../my_widgets/simple_widgets.dart';
@@ -12,35 +29,35 @@ import '../schuld_provider.dart';
 import 'doorlopend_krediet_overzicht.dart';
 
 class DoorlopendKredietPanel extends StatelessWidget {
-  final double topPadding;
-  final double bottomPadding;
+  final EdgeInsets padding;
+  final Widget? appBar;
 
   const DoorlopendKredietPanel({
-    Key? key,
-    required this.topPadding,
-    required this.bottomPadding,
-  }) : super(key: key);
+    super.key,
+    required this.padding,
+    this.appBar,
+  });
 
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(slivers: [
-      SliverList(
-          delegate: SliverChildListDelegate.fixed([
-        SizedBox(height: topPadding),
-        DoorlopendKredietInvulPanel(),
-        OverzichtDoorlopendKrediet(),
-        SizedBox(
-          height: bottomPadding,
-        ),
-      ])),
+      if (appBar != null) appBar!,
+      SliverPadding(
+        padding: padding,
+        sliver: const SliverList(
+            delegate: SliverChildListDelegate.fixed([
+          DoorlopendKredietInvulPanel(),
+          OverzichtDoorlopendKrediet(),
+        ])),
+      ),
     ]);
   }
 }
 
 class DoorlopendKredietInvulPanel extends ConsumerStatefulWidget {
-  DoorlopendKredietInvulPanel({
-    Key? key,
-  }) : super(key: key);
+  const DoorlopendKredietInvulPanel({
+    super.key,
+  });
 
   @override
   ConsumerState<DoorlopendKredietInvulPanel> createState() {
@@ -51,26 +68,27 @@ class DoorlopendKredietInvulPanel extends ConsumerStatefulWidget {
 class DoorlopendKredietInvulPanelState
     extends ConsumerState<DoorlopendKredietInvulPanel>
     with SingleTickerProviderStateMixin {
-  late TextEditingController _tecOmschrijving =
+  late final TextEditingController _tecOmschrijving =
       TextEditingController(text: toText((dk) => dk.omschrijving));
-  late TextEditingController _tecBedrag =
+  late final TextEditingController _tecBedrag =
       TextEditingController(text: doubleToText((dk) => dk.bedrag));
-  late FocusNode _fnOmschrijving = FocusNode()
+  late final FocusNode _fnOmschrijving = FocusNode()
     ..addListener(() {
       if (!_fnOmschrijving.hasFocus) {
         _veranderingOmschrijving(_tecOmschrijving.text);
       }
     });
-  late FocusNode _fnBedrag = FocusNode()
+  late final FocusNode _fnBedrag = FocusNode()
     ..addListener(() {
       if (!_fnBedrag.hasFocus) {
         _veranderingBedrag(_tecBedrag.text);
       }
     });
-  late AnimationController _animationControllerEindDatum = AnimationController(
+  late final AnimationController _animationControllerEindDatum =
+      AnimationController(
     value: (dk?.heeftEindDatum ?? false) ? 1 : 0,
     vsync: this,
-    duration: Duration(milliseconds: 200),
+    duration: const Duration(milliseconds: 200),
   );
 
   late MyNumberFormat nf = MyNumberFormat(context);
@@ -127,7 +145,7 @@ class DoorlopendKredietInvulPanelState
 
     return ref.watch(schuldProvider).schuld?.mapOrNull(
             doorlopendKrediet: (DoorlopendKrediet dk) => _build(context, dk)) ??
-        OhNo(text: 'DoorlopendKrediet fout');
+        const OhNo(text: 'DoorlopendKrediet fout');
   }
 
   Widget _build(BuildContext context, DoorlopendKrediet dk) {
@@ -137,7 +155,7 @@ class DoorlopendKredietInvulPanelState
         Kalender.dagenPerMaand(jaar: dateNow.year + 10, maand: 12));
 
     final list = <Widget>[
-      SizedBox(
+      const SizedBox(
         height: 6,
       ),
       OmschrijvingTextField(
@@ -156,7 +174,7 @@ class DoorlopendKredietInvulPanelState
       const SizedBox(
         height: 16.0,
       ),
-      Text(
+      const Text(
         'Einddatum/Krediet:',
       ),
       MyCheckbox(

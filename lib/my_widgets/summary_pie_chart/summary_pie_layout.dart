@@ -8,7 +8,7 @@ class SummaryPieLayout extends MultiChildRenderObjectWidget {
   final double innerPadding;
   final double innerLegendPadding;
 
-  SummaryPieLayout({
+  const SummaryPieLayout({
     Key? key,
     List<Widget> children = const <Widget>[],
     this.innerPadding = 12.0,

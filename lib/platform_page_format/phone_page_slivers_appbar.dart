@@ -7,28 +7,36 @@ import 'package:custom_sliver_appbar/title_image_sliver_appbar/title_image_slive
 import 'package:flutter/material.dart';
 import 'package:mortgage_insight/platform_page_format/default_page.dart';
 import 'package:mortgage_insight/platform_page_format/fab_properties.dart';
+import '../my_widgets/oh_no.dart';
 import '../utilities/device_info.dart';
+import 'adjust_scroll_configuration.dart';
 import 'page_actions.dart';
 import 'page_bottom_actions_layout.dart';
 import 'page_properties.dart';
+import 'tab_bar.dart';
 
 class PhonePageSliverAppBar extends StatelessWidget {
   final String title;
   final WidgetBuilder? imageBuilder;
-  final PageProperties pageProperties;
+  final GetPageProperties getPageProperties;
   final PreferredSizeWidget? bottom;
-  final BodyBuilder bodyBuilder;
+  final BodyBuilder? bodyBuilder;
+  final SliversBuilder? sliversBuilder;
   final FabProperties? fabProperties;
+  final TabController? tabController;
+  final List<Tab>? tabs;
 
   const PhonePageSliverAppBar(
       {super.key,
       this.title = '',
       this.imageBuilder,
-      PageProperties? pageProperties,
+      required this.getPageProperties,
       this.bottom,
-      required this.bodyBuilder,
-      this.fabProperties})
-      : pageProperties = pageProperties ?? const PageProperties();
+      this.bodyBuilder,
+      this.sliversBuilder,
+      this.fabProperties,
+      this.tabController,
+      this.tabs});
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +44,22 @@ class PhonePageSliverAppBar extends StatelessWidget {
 
     final theme = deviceScreen.theme;
     final isPortrait = deviceScreen.orientation == Orientation.portrait;
-    // final bottomHeight = bottom?.preferredSize.height ?? 0.0;
+
+    PreferredSizeWidget? preferredWidget =
+        (tabController != null && tabs != null)
+            ? MyTabBar(
+                formFactorType: deviceScreen.formFactorType,
+                controller: tabController,
+                tabs: tabs!)
+            : bottom;
+
+    final bottomHeight = preferredWidget?.preferredSize.height ?? 0.0;
+
+    final pageProperties = getPageProperties(
+        hasScrollBars: false,
+        formFactorType: FormFactorType.largePhone,
+        orientation: deviceScreen.orientation,
+        bottom: bottomHeight);
 
     final left = buildActionRow(
       context: context,
@@ -51,124 +74,130 @@ class PhonePageSliverAppBar extends StatelessWidget {
       action: pageActionsToIconButton(context, pageProperties.rightTopActions),
     );
 
-    Widget body = bodyBuilder(
-        context: context, nested: false, topPadding: 8.0, bottomPadding: 8.0);
+    final floatingActionButton =
+        fabProperties == null ? null : Fab(fabProperties: fabProperties!);
+
+    double leftPaddingAppBar = (!isPortrait && pageProperties.hasNavigationBar)
+        ? pageProperties.leftPaddingWithNavigation
+        : 0.0;
+
+    final minExtent = pageProperties.minExtent;
+    final floatingExtent = pageProperties.floatingExtent;
+    final maxExtent = pageProperties.maxExtent;
+
+    Widget appBar(BuildContext context, {bool? innerBoxIsScrolled}) =>
+        TextImageSliverAppBar(
+            innerBoxIsScrolled: innerBoxIsScrolled,
+            backgroundColor: theme.appBarTheme.backgroundColor,
+            scrolledUnderBackgroundColor: theme.colorScheme.surface,
+            minExtent: minExtent,
+            floatingExtent: floatingExtent,
+            maxCenter: maxExtent, //isPortrait ? 200.0 : 112.0,
+            tween: isPortrait
+                ? Tween(begin: 42, end: 48)
+                : Tween(begin: 0.0, end: 0.0),
+            lrTbFit: isPortrait ? LrTbFit.no : LrTbFit.fit,
+            leftActions: left != null
+                ? (BuildContext context, double height) => ClipTop(
+                      maxHeight: height,
+                      child: CenterY(
+                        child: left,
+                      ),
+                    )
+                : null,
+            rightActions: right != null
+                ? (BuildContext context, double height) => ClipTop(
+                      maxHeight: height,
+                      child: CenterY(
+                        child: right,
+                      ),
+                    )
+                : null,
+            title: title.isEmpty
+                ? null
+                : CustomTitle(
+                    title: title,
+                    textStyleTween: TextStyleTween(
+                        begin: const TextStyle(fontSize: 24.0),
+                        end: const TextStyle(fontSize: 20.0)),
+                    height: Tween(begin: 56.0, end: 56.0),
+                  ),
+            image: imageBuilder != null
+                ? CustomImage(
+                    includeTopWithMinium: !isPortrait,
+                    imageBuilder: imageBuilder!,
+                  )
+                : null,
+            pinned: true,
+            bottom: preferredWidget,
+            orientation: deviceScreen.orientation,
+            appBarBackgroundBuilder: (
+                {required BuildContext context,
+                required EdgeInsets padding,
+                required double safeTopPadding,
+                required bool scrolledUnder,
+                Widget? child}) {
+              final scrolledUnderColor = scrolledUnder
+                  ? theme.colorScheme.surface
+                  : theme.appBarTheme.backgroundColor;
+
+              return isPortrait
+                  ? Material(
+                      color: scrolledUnderColor,
+                      child: child,
+                    )
+                  : Material(
+                      color: scrolledUnderColor,
+                      shape: ShapeBorderLbRbRounded(
+                        topPadding: safeTopPadding,
+                        leftInsets: leftPaddingAppBar,
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                            left: leftPaddingAppBar + 6.0, right: 6.0),
+                        child: child,
+                      ));
+            });
+
+    const padding = EdgeInsets.all(8.0);
+
+    Widget body = bodyBuilder?.call(context: context, padding: padding) ??
+        sliversBuilder?.call(
+            context: context, appBar: appBar(context), padding: padding) ??
+        const OhNo(text: 'No body');
 
     body = PageActionBottomLayout(
         leftBottomActions: pageProperties.leftBottomActions,
         rightBottomActions: pageProperties.rightBottomActions,
         body: body);
 
-    double leftPaddingAppBar;
-    double leftPadding;
-    if ((!isPortrait && pageProperties.hasNavigationBar)) {
-      leftPadding =
-          leftPaddingAppBar = pageProperties.leftPaddingWithNavigation;
-    } else {
-      leftPadding = pageProperties.leftPadding;
-      leftPaddingAppBar = 0.0;
+    if (leftPaddingAppBar != 0.0) {
+      body = Padding(
+        padding: EdgeInsets.only(
+          left: leftPaddingAppBar,
+        ),
+        child: body,
+      );
     }
 
-    body = Padding(
-      padding: EdgeInsets.only(
-          left: leftPadding, right: pageProperties.rightPadding),
-      child: body,
-    );
-
-    final floatingActionButton =
-        fabProperties == null ? null : Fab(fabProperties: fabProperties!);
-
     return Scaffold(
-        body: NestedScrollView(
-            headerSliverBuilder:
-                (BuildContext context, bool innerBoxIsScrolled) {
-              return <Widget>[
-                SliverOverlapAbsorber(
-                  // This widget takes the overlapping behavior of the SliverAppBar,
-                  // and redirects it to the SliverOverlapInjector below. If it is
-                  // missing, then it is possible for the nested "inner" scroll view
-                  // below to end up under the SliverAppBar even when the inner
-                  // scroll view thinks it has not been scrolled.
-                  // This is not necessary if the "headerSliverBuilder" only builds
-                  // widgets that do not overlap the next sliver.
-                  handle:
-                      NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-                  sliver: TextImageSliverAppBar(
-                      backgroundColor: theme.appBarTheme.backgroundColor,
-                      scrolledUnderBackground: theme.colorScheme.surface,
-                      minExtent: 56,
-                      floatingExtent: 56.0,
-                      maxCenter: isPortrait ? 200.0 : 100.0,
-                      tween: isPortrait
-                          ? Tween(begin: 42, end: 48)
-                          : Tween(begin: 0.0, end: 0.0),
-                      lrTbFit: isPortrait ? LrTbFit.no : LrTbFit.fit,
-                      leftActions: left != null
-                          ? (BuildContext context, double height) => ClipTop(
-                                maxHeight: height,
-                                child: CenterY(
-                                  child: left,
-                                ),
-                              )
-                          : null,
-                      rightActions: right != null
-                          ? (BuildContext context, double height) => ClipTop(
-                                maxHeight: height,
-                                child: CenterY(
-                                  child: right,
-                                ),
-                              )
-                          : null,
-                      title: title.isEmpty
-                          ? null
-                          : CustomTitle(
-                              title: title,
-                              textStyleTween: TextStyleTween(
-                                  begin: const TextStyle(fontSize: 24.0),
-                                  end: const TextStyle(fontSize: 20.0)),
-                              height: Tween(begin: 56.0, end: 56.0),
-                            ),
-                      image: imageBuilder != null
-                          ? CustomImage(
-                              includeTopWithMinium: !isPortrait,
-                              imageBuilder: imageBuilder!,
-                            )
-                          : null,
-                      pinned: true,
-                      bottom: bottom,
-                      orientation: deviceScreen.orientation,
-                      appBarBackgroundBuilder: (
-                          {required BuildContext context,
-                          required EdgeInsets padding,
-                          required double safeTopPadding,
-                          required bool scrolledUnder,
-                          Widget? child}) {
-                        final scrolledUnderColor = scrolledUnder
-                            ? theme.colorScheme.surface
-                            : theme.appBarTheme.backgroundColor;
-
-                        return isPortrait
-                            ? Material(
-                                color: scrolledUnderColor,
-                                child: child,
-                              )
-                            : Material(
-                                color: scrolledUnderColor,
-                                shape: ShapeBorderLbRbRounded(
-                                  topPadding: safeTopPadding,
-                                  leftInsets: leftPaddingAppBar,
-                                ),
-                                child: Padding(
-                                  padding: EdgeInsets.only(
-                                      left: leftPaddingAppBar + 6.0,
-                                      right: 6.0),
-                                  child: child,
-                                ));
-                      }),
-                ),
-              ];
-            },
-            body: body),
+        body: sliversBuilder != null
+            ? body
+            : AdjustedScrollConfiguration(
+                child: NestedScrollView(
+                    headerSliverBuilder:
+                        (BuildContext context, bool innerBoxIsScrolled) {
+                      return <Widget>[
+                        // SliverOverlapAbsorber(
+                        //     handle:
+                        //         NestedScrollView.sliverOverlapAbsorberHandleFor(
+                        //             context)
+                        // sliver: appBar),
+                        appBar(context, innerBoxIsScrolled: innerBoxIsScrolled)
+                      ];
+                    },
+                    body: body),
+              ),
         floatingActionButton: floatingActionButton);
   }
 }

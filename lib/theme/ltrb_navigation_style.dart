@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:mortgage_insight/theme/theme.dart';
-
-import '../layout/letter_spacing.dart';
 import '../utilities/device_info.dart';
 
 class LtrbNavigationStyle extends ThemeExtension<LtrbNavigationStyle> {
@@ -52,6 +49,7 @@ class LtrbNavigationStyle extends ThemeExtension<LtrbNavigationStyle> {
     );
   }
 
+  @override
   ThemeExtension<LtrbNavigationStyle> copyWith({
     Color? background,
     Color? secondBackground,
@@ -73,7 +71,7 @@ class LtrbNavigationStyle extends ThemeExtension<LtrbNavigationStyle> {
           backgroundSelectedItem ?? this.backgroundSelectedItem,
       imageColor: imageColor ?? this.imageColor,
       headerTextStyle: headerTextStyle ?? this.headerTextStyle,
-      headerColorPrimair: headerColorPrimair ?? this.headerColorPrimair,
+      headerColorPrimair: headerColorPrimair ?? headerColorPrimair,
       barTextStyle: barTextStyle ?? this.barTextStyle,
     );
   }
@@ -81,20 +79,19 @@ class LtrbNavigationStyle extends ThemeExtension<LtrbNavigationStyle> {
 
 buildLtrbNavigationStyle(FormFactorType formFactorType) {
   return LtrbNavigationStyle(
-    imageColor: Colors.white,
+    imageColor: const Color.fromARGB(255, 6, 65, 91), // Colors.white,
     background: Colors.white,
-    secondBackground: Color(0xFF70b7d3),
-    headerColorPrimair: Color(0xFF5a92a9),
-    colorItem: Colors.white,
-    colorSelectedItem: Color.fromARGB(255, 2, 2, 2),
+    secondBackground: const Color.fromARGB(255, 183, 221, 237),
+    headerColorPrimair: const Color(0xFF5a92a9),
+    colorItem: const Color.fromARGB(255, 6, 65, 91),
+    colorSelectedItem: const Color.fromARGB(
+        255, 6, 65, 91), //const Color.fromARGB(255, 2, 2, 2),
     backgroundItem: null,
-    backgroundSelectedItem: Colors.white.withOpacity(0.6),
+    backgroundSelectedItem: const Color.fromARGB(255, 231, 246, 248),
     headerTextStyle: GoogleFonts.notoSansVai(
-        textStyle: TextStyle(
-            fontSize: 32.0,
-            letterSpacing: letterSpacingOrNone(defaultLetterSpacing),
-            color: Color.fromARGB(255, 5, 66, 92))),
+        textStyle: const TextStyle(
+            fontSize: 28.0, color: Color.fromARGB(255, 6, 65, 91))),
     barTextStyle: GoogleFonts.rubik(
-        textStyle: TextStyle(fontSize: 14.0, color: Colors.white)),
+        textStyle: const TextStyle(fontSize: 14.0, color: Colors.white)),
   );
 }

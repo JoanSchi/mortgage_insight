@@ -1,14 +1,12 @@
+import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mortgage_insight/model/nl/hypotheek_document/provider/hypotheek_document_provider.dart';
-import 'package:mortgage_insight/navigation/navigation_page_items.dart';
+import 'package:hypotheek_berekeningen/schulden/gegevens/schulden.dart';
+import 'package:mortgage_insight/model/nl/provider/hypotheek_document_provider.dart';
 import 'package:mortgage_insight/pages/schulden/schuld_provider.dart';
-import 'package:mortgage_insight/state_manager/routes/routes_app.dart';
-import '../../model/nl/schulden/schulden.dart';
+import '../../platform_page_format/default_match_page_properties.dart';
 import '../../platform_page_format/default_page.dart';
 import '../../platform_page_format/fab_properties.dart';
-import '../../platform_page_format/page_properties.dart';
-import '../../utilities/device_info.dart';
 import 'schulden_card/schulden_card.dart';
 
 class SchuldenOverzichtPanel extends ConsumerStatefulWidget {
@@ -23,9 +21,8 @@ class _SchuldenOverzichtPanelState
     extends ConsumerState<SchuldenOverzichtPanel> {
   add() {
     ref.read(schuldProvider.notifier).resetSchuld();
-    ref
-        .read(routeDocumentProvider.notifier)
-        .setEditRouteName(name: routeDebtsAdd);
+    Beamer.of(context, root: true)
+        .beamToNamed('/document/schulden/specificatie');
   }
 
   @override
@@ -36,20 +33,16 @@ class _SchuldenOverzichtPanelState
         hypotheekDocumentProvider.select((value) => value.schuldenOverzicht));
 
     final lijst = schulden.lijst;
-    bodyBuilder(
-            {required BuildContext context,
-            required bool nested,
-            required double topPadding,
-            required double bottomPadding}) =>
+    bodyBuilder({required BuildContext context, required EdgeInsets padding}) =>
         Builder(
             builder: (context) => CustomScrollView(slivers: [
-                  if (nested)
-                    SliverOverlapInjector(
-                      // This is the flip side of the SliverOverlapAbsorber
-                      // above.
-                      handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
-                          context),
-                    ),
+                  // if (nested)
+                  //   SliverOverlapInjector(
+                  //     // This is the flip side of the SliverOverlapAbsorber
+                  //     // above.
+                  //     handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
+                  //         context),
+                  //   ),
                   if (schulden.lijst.isNotEmpty)
                     SliverGrid(
                         gridDelegate:
@@ -92,11 +85,17 @@ class _SchuldenOverzichtPanelState
 
     return DefaultPage(
       title: 'Schulden',
-      matchPageProperties: const [
-        MatchPageProperties(
-            types: {FormFactorType.unknown},
-            pageProperties: PageProperties(hasNavigationBar: true))
-      ],
+      getPageProperties: (
+              {required hasScrollBars,
+              required formFactorType,
+              required orientation,
+              required bottom}) =>
+          hypotheekPageProperties(
+              hasScrollBars: hasScrollBars,
+              formFactorType: formFactorType,
+              orientation: orientation,
+              bottom: bottom,
+              hasNavigationBar: true),
       imageBuilder: (_) => Image(
           image: const AssetImage(
             'graphics/schuld.png',
@@ -109,9 +108,17 @@ class _SchuldenOverzichtPanelState
 
   void aanpassen(Schuld schuld) {
     ref.read(schuldProvider.notifier).editSchuld(schuld);
-    ref
-        .read(routeDocumentProvider.notifier)
-        .setEditRouteName(name: routeDebtsEdit);
+
+    final specificatie = switch (schuld) {
+      (AflopendKrediet _) => 'ak',
+      (VerzendKrediet _) => 'vk',
+      (LeaseAuto _) => 'oa',
+      (DoorlopendKrediet _) => 'dk',
+      (_) => '',
+    };
+
+    Beamer.of(context, root: true)
+        .beamToNamed('/document/schulden/$specificatie');
   }
 
   void verwijderen(Schuld schuld) {

@@ -2,14 +2,14 @@
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../model/nl/inkomen/inkomen.dart';
+import 'package:hypotheek_berekeningen/inkomen/gegevens/inkomen.dart';
 import '../../../utilities/kalender.dart';
 import '../../../utilities/date.dart';
-import 'inkomen_bewerken.dart';
+import 'inkomen_bewerken_view_state.dart';
 
-final inkomenBewerkenProvider =
-    StateNotifierProvider<InkomenBewerkenNotifier, InkomenBewerken>((ref) {
-  return InkomenBewerkenNotifier(InkomenBewerken(
+final inkomenBewerkenViewProvider = StateNotifierProvider<
+    InkomenBewerkenViewModelNotifier, InkomenBewerkenViewState>((ref) {
+  return InkomenBewerkenViewModelNotifier(InkomenBewerkenViewState(
       inkomen: Inkomen(
         datum: monthYear(DateTime.now()),
         partner: false,
@@ -26,8 +26,9 @@ final inkomenBewerkenProvider =
       blokDatum: DateTime(0)));
 });
 
-class InkomenBewerkenNotifier extends StateNotifier<InkomenBewerken> {
-  InkomenBewerkenNotifier(super.state);
+class InkomenBewerkenViewModelNotifier
+    extends StateNotifier<InkomenBewerkenViewState> {
+  InkomenBewerkenViewModelNotifier(super.state);
 
   void bestaand({required IList<Inkomen> lijst, required Inkomen inkomen}) {
     _evaluatie(inkomen: inkomen, lijst: lijst);
@@ -40,7 +41,8 @@ class InkomenBewerkenNotifier extends StateNotifier<InkomenBewerken> {
       final last = lijst.last;
 
       datum = datum.compareTo(last.datum) <= 0
-          ? Kalender.voegPeriodeToe(last.datum, maanden: 1)
+          ? Kalender.voegPeriodeToe(last.datum,
+              maanden: 1, periodeOpties: PeriodeOpties.volgende)
           : datum;
 
       bool pensioenKeuze;

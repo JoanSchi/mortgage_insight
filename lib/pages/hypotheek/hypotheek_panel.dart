@@ -1,23 +1,25 @@
 import 'dart:async';
 
+import 'package:beamer/beamer.dart';
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mortgage_insight/model/nl/hypotheek_document/provider/hypotheek_document_provider.dart';
-import 'package:mortgage_insight/navigation/navigation_page_items.dart';
+import 'package:hypotheek_berekeningen/hypotheek/gegevens/hypotheek/hypotheek.dart';
+import 'package:hypotheek_berekeningen/hypotheek/gegevens/hypotheek_dossier/hypotheek_dossier.dart';
+import 'package:hypotheek_berekeningen/hypotheek/gegevens/hypotheek_dossier_overzicht/hypotheek_dossier_overzicht.dart';
+import 'package:mortgage_insight/model/nl/provider/hypotheek_document_provider.dart';
 import 'package:mortgage_insight/pages/hypotheek/hypotheek_card.dart';
-import 'package:mortgage_insight/pages/hypotheek/dossier_bewerken/hypotheek_dossier_model.dart';
+import 'package:mortgage_insight/pages/hypotheek/dossier_bewerken/model/hypotheek_dossier_view_model.dart';
 import 'package:mortgage_insight/pages/hypotheek/hypotheek_dossier_card.dart';
 import 'package:mortgage_insight/platform_page_format/default_page.dart';
-import '../../model/nl/hypotheek/gegevens/hypotheek/hypotheek.dart';
-import '../../model/nl/hypotheek/gegevens/hypotheek_dossier/hypotheek_dossier.dart';
-import '../../model/nl/hypotheek/gegevens/hypotheek_dossier_overzicht/hypotheek_dossier_overzicht.dart';
+import '../../platform_page_format/default_match_page_properties.dart';
 import '../../platform_page_format/fab_properties.dart';
-import '../../platform_page_format/page_properties.dart';
-import '../../state_manager/routes/routes_app.dart';
+import 'hypotheek_bewerken/model/hypotheek_view_model.dart';
 import 'state_hypotheek/state_page_hypotheek.dart';
 
 class HypotheekPanel extends ConsumerStatefulWidget {
-  const HypotheekPanel({super.key});
+  final String onderwerp;
+  const HypotheekPanel({super.key, required this.onderwerp});
 
   @override
   ConsumerState<HypotheekPanel> createState() => HypotheekPanelState();
@@ -25,26 +27,74 @@ class HypotheekPanel extends ConsumerStatefulWidget {
 
 class HypotheekPanelState extends ConsumerState<HypotheekPanel>
     with SingleTickerProviderStateMixin {
-  TabController? _tabController;
+  late TabController _tabController;
+  BeamerDelegate? beamerDelegate;
 
   static const int dossierOverzichtTab = 0,
       hypotheekOverzichtTab = 1,
       hyptheekTabel = 2;
   int tab = dossierOverzichtTab;
 
-  TabController get tabController {
-    _tabController ??= TabController(initialIndex: tab, vsync: this, length: 3)
+  @override
+  void initState() {
+    tab = onderwerpNaTabIndex(widget.onderwerp);
+    _tabController = TabController(initialIndex: tab, vsync: this, length: 3)
       ..animation?.addListener(() {
-        final value = _tabController?.animation?.value;
+        final value = _tabController.animation?.value;
         final toTab = (value == null) ? 0 : value.round();
 
         if (toTab != tab) {
           setState(() {
             tab = toTab;
           });
+          Beamer.of(context).beamToNamed('/document/hypotheek/${switch (toTab) {
+            0 => 'dossier',
+            1 => 'lening',
+            _ => 'overzicht'
+          }}');
         }
       });
-    return _tabController!;
+
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    beamerDelegate ??= Beamer.of(context)..addListener(blu);
+    super.didChangeDependencies();
+  }
+
+  blu() {
+    String onderwerp =
+        (beamerDelegate?.currentBeamLocation.state.routeInformation.location ??
+                '')
+            .split('/')
+            .last;
+
+    if (onderwerp != tabIndexNaOnderwerp(tab)) {
+      _tabController.animateTo(onderwerpNaTabIndex(onderwerp));
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant HypotheekPanel oldWidget) {
+    if (widget.onderwerp != oldWidget.onderwerp) {
+      _tabController.animateTo(onderwerpNaTabIndex(widget.onderwerp));
+    }
+    super.didUpdateWidget(oldWidget);
+  }
+
+  int onderwerpNaTabIndex(String onderwerp) =>
+      switch (onderwerp) { 'lening' => 1, 'overzicht' => 2, _ => 0 };
+
+  String tabIndexNaOnderwerp(int tab) =>
+      switch (tab) { 1 => 'lening', 2 => 'overzicht', _ => 'dossier' };
+
+  @override
+  void dispose() {
+    beamerDelegate?.removeListener(blu);
+    _tabController.dispose();
+    super.dispose();
   }
 
   add() {
@@ -53,14 +103,25 @@ class HypotheekPanelState extends ConsumerState<HypotheekPanel>
     switch (tab) {
       case dossierOverzichtTab:
         {
-          ref.read(hypotheekDossierBewerkenProvider.notifier).nieuw();
-          ref
-              .read(routeDocumentProvider.notifier)
-              .setEditRouteName(name: routeHypotheekDossierEdit);
+          ref.read(hypotheekDossierProvider.notifier).bewerken(
+              dossiers: document.hypotheekDossierOverzicht.hypotheekDossiers);
+          Beamer.of(context, root: true).beamToNamed(
+            '/document/hypotheek/dossier/toevoegen',
+          );
           break;
         }
       case hypotheekOverzichtTab:
         {
+          final hypotheekDossier =
+              document.hypotheekDossierOverzicht.hypotheekDossierGeselecteerd;
+          if (hypotheekDossier != null) {
+            ref
+                .read(hypotheekBewerkenProvider.notifier)
+                .bewerken(hypotheekDocument: document);
+            Beamer.of(context, root: true).beamToNamed(
+              '/document/hypotheek/lening/toevoegen',
+            );
+          }
           break;
         }
     }
@@ -88,17 +149,6 @@ class HypotheekPanelState extends ConsumerState<HypotheekPanel>
   }
 
   @override
-  void didUpdateWidget(covariant HypotheekPanel oldWidget) {
-    super.didUpdateWidget(oldWidget);
-  }
-
-  @override
-  void dispose() {
-    _tabController?.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final hypotheekDossierOverzicht =
         ref.watch(hypotheekDocumentProvider).hypotheekDossierOverzicht;
@@ -106,36 +156,29 @@ class HypotheekPanelState extends ConsumerState<HypotheekPanel>
     ref.listen(pageHypotheekProvider,
         (PageHypotheekState? previous, PageHypotheekState next) {
       scheduleMicrotask(() {
-        if (_tabController != null) {
-          final old = _tabController?.index ?? -1;
-          if (old != next.page) {
-            _tabController!.animateTo(next.page,
-                duration: const Duration(milliseconds: 1000));
-          }
+        final old = _tabController.index;
+        if (old != next.page) {
+          _tabController.animateTo(next.page,
+              duration: const Duration(milliseconds: 1000));
         }
       });
     });
 
     final theme = Theme.of(context);
 
-    bodyBuilder(
-        {required BuildContext context,
-        required bool nested,
-        required double topPadding,
-        required double bottomPadding}) {
+    Widget bodyBuilder(
+        {required BuildContext context, required EdgeInsets padding}) {
       Widget subBody;
 
       if (hypotheekDossierOverzicht.isEmpty) {
         subBody = const _Empty();
       } else {
-        subBody = TabBarView(controller: tabController, children: [
+        subBody = TabBarView(controller: _tabController, children: [
           HypotheekDossiersOverzicht(
-            nested: nested,
-            topPadding: topPadding,
-            bottomPadding: bottomPadding,
+            padding: padding,
           ),
           ListViewHypotheekLeningen(
-            nested: nested,
+            padding: padding,
           ),
           const Center(
               child: Text(
@@ -148,22 +191,9 @@ class HypotheekPanelState extends ConsumerState<HypotheekPanel>
       return subBody;
     }
 
-    PreferredSizeWidget? bottomAppBar = hypotheekDossierOverzicht.isEmpty
-        ? null
-        : TabBar(
-            padding: const EdgeInsets.only(left: 4.0, right: 4.0, bottom: 4.0),
-            tabs: const [
-              Tab(
-                text: 'Profiel',
-              ),
-              Tab(text: 'Leningen'),
-              Tab(text: 'Overzicht'),
-            ],
-            controller: tabController,
-          );
+    bool hasBottomAppBar = !hypotheekDossierOverzicht.isEmpty;
 
     return DefaultPage(
-      bottom: bottomAppBar,
       title: 'Hypotheek',
       imageBuilder: (_) => Image(
           image: const AssetImage(
@@ -171,11 +201,32 @@ class HypotheekPanelState extends ConsumerState<HypotheekPanel>
           ),
           color: theme.colorScheme.onSurface),
       bodyBuilder: bodyBuilder,
-      matchPageProperties: const [
-        MatchPageProperties(
-            pageProperties: PageProperties(hasNavigationBar: true))
-      ],
+      getPageProperties: (
+              {required hasScrollBars,
+              required formFactorType,
+              required orientation,
+              required bottom}) =>
+          hypotheekPageProperties(
+              hasScrollBars: hasScrollBars,
+              formFactorType: formFactorType,
+              orientation: orientation,
+              hasNavigationBar: true,
+              bottom: bottom),
       fabProperties: FabProperties(icon: const Icon(Icons.add), onTap: add),
+      tabController: hasBottomAppBar ? _tabController : null,
+      tabs: hasBottomAppBar
+          ? const [
+              Tab(
+                text: 'Dossier',
+              ),
+              Tab(
+                text: 'Hypotheek',
+              ),
+              Tab(
+                text: 'Overzicht',
+              )
+            ]
+          : null,
     );
   }
 }
@@ -194,15 +245,11 @@ class _Empty extends StatelessWidget {
 }
 
 class HypotheekDossiersOverzicht extends ConsumerStatefulWidget {
-  final bool nested;
-  final double topPadding;
-  final double bottomPadding;
+  final EdgeInsets padding;
 
   const HypotheekDossiersOverzicht({
     super.key,
-    required this.nested,
-    required this.topPadding,
-    required this.bottomPadding,
+    required this.padding,
   });
 
   @override
@@ -222,68 +269,66 @@ class _HypotheekDossiersOverzichtState
     return CustomScrollView(
       key: const PageStorageKey<String>('listViewHypotheekProfiel'),
       slivers: [
-        if (widget.nested)
-          SliverOverlapInjector(
-            // This is the flip side of the SliverOverlapAbsorber
-            // above.
-            handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-          ),
-        SliverToBoxAdapter(
-            child: SizedBox(
-          height: widget.topPadding,
-        )),
+        // if (widget.nested)
+        //   SliverOverlapInjector(
+        //     // This is the flip side of the SliverOverlapAbsorber
+        //     // above.
+        //     handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+        //   ),
         if (dossiers.isNotEmpty)
-          SliverGrid(
-              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 600.0,
-                mainAxisSpacing: 4.0,
-                crossAxisSpacing: 10.0,
-                childAspectRatio: 1.5,
-              ),
-              delegate: SliverChildBuilderDelegate(
-                (BuildContext context, int index) {
-                  final hd = dossiers[index];
-                  return DossierCard(
-                    geselecteerd: overzicht.geselecteerd,
-                    hd: hd,
-                    selecteren: () => selecteren(hd),
-                    verwijderen: () => verwijderen(hd),
-                    bewerken: () => bewerken(hd),
-                  );
-                },
-                childCount: dossiers.length,
-              )),
-        SliverToBoxAdapter(
-            child: SizedBox(
-          height: widget.bottomPadding,
-        ))
+          SliverPadding(
+            padding: widget.padding,
+            sliver: SliverGrid(
+                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 600.0,
+                  mainAxisSpacing: 4.0,
+                  crossAxisSpacing: 10.0,
+                  childAspectRatio: 1.5,
+                ),
+                delegate: SliverChildBuilderDelegate(
+                  (BuildContext context, int index) {
+                    final hd = dossiers[index];
+                    return DossierCard(
+                      geselecteerd: overzicht.geselecteerd,
+                      hd: hd,
+                      selecteren: () => selecteren(hd),
+                      verwijderen: () => verwijderen(hd),
+                      bewerken: () => bewerken(hd),
+                    );
+                  },
+                  childCount: dossiers.length,
+                )),
+          ),
       ],
     );
   }
 
-  void selecteren(HypotheekDossier hd) {
-    ref.read(hypotheekDocumentProvider.notifier).selecteerHypotheekDossier(hd);
-  }
-
-  void verwijderen(HypotheekDossier hd) {
+  void selecteren(HypotheekDossier hypotheekDossier) {
     ref
         .read(hypotheekDocumentProvider.notifier)
-        .hypotheekDossierVerwijderen(hypotheekDossier: hd);
+        .selecteerHypotheekDossier(hypotheekDossier);
   }
 
-  void bewerken(HypotheekDossier hd) {
-    ref.read(hypotheekDossierBewerkenProvider.notifier).bewerken(hd);
+  void verwijderen(HypotheekDossier hypotheekDossier) {
     ref
-        .read(routeDocumentProvider.notifier)
-        .setEditRouteName(name: routeHypotheekDossierEdit);
+        .read(hypotheekDocumentProvider.notifier)
+        .hypotheekDossierVerwijderen(hypotheekDossier: hypotheekDossier);
+  }
+
+  void bewerken(HypotheekDossier hypotheekDossier) {
+    ref
+        .read(hypotheekDossierProvider.notifier)
+        .bewerken(hypotheekDossier: hypotheekDossier);
+
+    Beamer.of(context, root: true)
+        .beamToNamed('/document/hypotheek/dossier/bewerken');
   }
 }
 
 class ListViewHypotheekLeningen extends ConsumerWidget {
-  final bool nested;
+  final EdgeInsets padding;
 
-  const ListViewHypotheekLeningen({Key? key, required this.nested})
-      : super(key: key);
+  const ListViewHypotheekLeningen({super.key, required this.padding});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -300,7 +345,7 @@ class ListViewHypotheekLeningen extends ConsumerWidget {
     if (dossier == null) {
       return const Text(
         ':{',
-        textScaleFactor: 24,
+        textScaleFactor: 24.0,
       );
     }
 
@@ -310,14 +355,24 @@ class ListViewHypotheekLeningen extends ConsumerWidget {
     List<Hypotheek> list = [];
 
     if (eersteHypotheken.isNotEmpty) {
-      for (var e in eersteHypotheken) {
-        list.add(e);
-        debugPrint('eerste ${e.id}');
+      for (String id in eersteHypotheken) {
+        Hypotheek? hypotheek = dossier.hypotheken[id];
 
-        while (e.volgende.isNotEmpty) {
-          e = hypotheken[e.volgende]!;
-          list.add(e);
-          debugPrint('volgende ${e.id}');
+        if (hypotheek == null) {
+          continue;
+        }
+        list.add(hypotheek);
+        debugPrint('eerste $id');
+        String volgende = hypotheek.volgende;
+
+        while (volgende.isNotEmpty) {
+          hypotheek = hypotheken[volgende];
+          assert(hypotheek != null, 'Hypotheek kan niet null zijn!');
+          if (hypotheek != null) {
+            list.add(hypotheek);
+          }
+
+          volgende = hypotheek?.volgende ?? '';
         }
       }
     }
@@ -325,31 +380,34 @@ class ListViewHypotheekLeningen extends ConsumerWidget {
     return CustomScrollView(
       key: const PageStorageKey<String>('listViewHypotheekProfiel'),
       slivers: [
-        if (nested)
-          SliverOverlapInjector(
-            // This is the flip side of the SliverOverlapAbsorber
-            // above.
-            handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-          ),
+        // if (nested)
+        //   SliverOverlapInjector(
+        //     // This is the flip side of the SliverOverlapAbsorber
+        //     // above.
+        //     handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+        //   ),
         if (list.isNotEmpty)
-          SliverGrid(
-              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 600.0,
-                mainAxisSpacing: 10.0,
-                crossAxisSpacing: 10.0,
-                childAspectRatio: 1.5,
-              ),
-              delegate: SliverChildBuilderDelegate(
-                (BuildContext context, int index) {
-                  final hypotheek = list[index];
-                  return HypotheekCard(
-                    hypotheek: hypotheek,
-                    bewerken: () => bewerken,
-                    verwijderen: () => verwijderen,
-                  );
-                },
-                childCount: list.length,
-              )),
+          SliverPadding(
+            padding: padding,
+            sliver: SliverGrid(
+                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 600.0,
+                  mainAxisSpacing: 10.0,
+                  crossAxisSpacing: 10.0,
+                  childAspectRatio: 1.5,
+                ),
+                delegate: SliverChildBuilderDelegate(
+                  (BuildContext context, int index) {
+                    final hypotheek = list[index];
+                    return HypotheekCard(
+                      hypotheek: hypotheek,
+                      bewerken: () => bewerken,
+                      verwijderen: () => verwijderen,
+                    );
+                  },
+                  childCount: list.length,
+                )),
+          ),
       ],
     );
 

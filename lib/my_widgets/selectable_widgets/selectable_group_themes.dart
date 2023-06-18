@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
 import 'package:selectable_group_widgets/selectable_group_layout/selectable_group_layout.dart';
 import 'package:selectable_group_widgets/selectable_group_widgets.dart';
 import 'package:selectable_group_widgets/selected_group_themes/material_group.dart';
@@ -156,6 +157,7 @@ class MyCheckGroup<V> extends CheckGroup<V, SelectableGroupOptions> {
                 value: s.value,
                 primaryColor: primaryColor,
                 onPrimaryColor: onPrimaryColor,
+                enabled: s.enabled,
               )
           ];
         }
@@ -169,6 +171,7 @@ class MyCheckGroup<V> extends CheckGroup<V, SelectableGroupOptions> {
                 value: s.value,
                 primaryColor: primaryColor,
                 onPrimaryColor: onPrimaryColor,
+                enabled: s.enabled,
               )
           ];
         }
@@ -257,9 +260,11 @@ class UndefinedSelectableGroup extends StatelessWidget {
   final List<SelectableGroup> groups;
   final List<MatchTargetWrap<GroupLayoutProperties>>? matchTargetWrap;
 
-  const UndefinedSelectableGroup(
-      {Key? key, required this.groups, this.matchTargetWrap})
-      : super(key: key);
+  const UndefinedSelectableGroup({
+    Key? key,
+    required this.groups,
+    this.matchTargetWrap,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

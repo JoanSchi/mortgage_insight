@@ -1,9 +1,8 @@
+import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mortgage_insight/model/nl/hypotheek_document/provider/hypotheek_document_provider.dart';
-import 'package:mortgage_insight/state_manager/routes/routes_app.dart';
-import 'package:mortgage_insight/navigation/navigation_page_items.dart';
-import '../../model/nl/inkomen/inkomen.dart';
+import 'package:hypotheek_berekeningen/inkomen/gegevens/inkomen.dart';
+import 'package:mortgage_insight/model/nl/provider/hypotheek_document_provider.dart';
 import '../../my_widgets/custom_fitted_box.dart';
 import '../../my_widgets/mortgage_card.dart';
 import '../../utilities/my_number_format.dart';
@@ -145,14 +144,14 @@ class _IncomeCardState extends ConsumerState<InkomenCard> {
   }
 
   void edit() {
-    editRoute(ref: ref, name: routeIncomeEdit);
-    ref.read(inkomenBewerkenProvider.notifier).bestaand(
+    ref.read(inkomenBewerkenViewProvider.notifier).bestaand(
           lijst: ref
               .read(hypotheekDocumentProvider)
               .inkomenOverzicht
               .lijst(partner: widget.partner),
           inkomen: widget.inkomenItem,
         );
+    Beamer.of(context, root: true).beamToNamed('/document/inkomen/aanpassen');
   }
 
   void onSelected(String selected) {
