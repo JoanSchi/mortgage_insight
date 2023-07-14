@@ -3,8 +3,10 @@ import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
 import 'package:mortgage_insight/my_widgets/oh_no.dart';
 import 'package:mortgage_insight/pages/hypotheek/dossier_bewerken/hypotheek_dossier_bewerken.dart';
+import 'package:mortgage_insight/pages/welkom/welkom.dart';
 import 'package:mortgage_insight/routes/navigation_large.dart';
 import 'package:mortgage_insight/routes/navigation_medium.dart';
+import '../pages/route_fout/route_fout.dart';
 import '../pages/hypotheek/hypotheek_bewerken/hypotheek_bewerken.dart';
 import '../pages/schulden/schuld_specificatie_panel.dart';
 import 'navigation_mobile.dart';
@@ -114,12 +116,19 @@ class PaginaLocation extends BeamLocation<BeamState> {
             title: 'hypotheek',
             child: HypotheekPanel(onderwerp: p.length >= 3 ? p[2] : ''),
           ),
+        (List<String> p) when p.length == 1 && p.contains('document') =>
+          const BeamPage(
+            key: ValueKey('Welkom'),
+            name: 'Welkom',
+            title: 'Welkom',
+            child: Welkom(),
+          ),
         (_) => const BeamPage(
-            key: ValueKey('Ohno'),
-            name: 'Ohno',
-            title: 'Ohno',
-            child: OhNo(text: 'Ohno'),
-          )
+            key: ValueKey('DeWegKwijt'),
+            name: 'DeWegKwijt',
+            title: 'DeWegKwijt',
+            child: RouteFout(),
+          ),
       },
       if (!isPhone && pathPatternSegments.length > 2) ..._aanpassen(state)
     ];
@@ -191,7 +200,7 @@ List<BeamPage> _aanpassen(BeamState state) {
     if (segment[1] == 'hypotheek' && segment.length == 4)
       switch ((segment[2], segment[3])) {
         (String l2, String l3)
-            when l2 == 'dossier' && (l3 == 'toevoegen' || l3 == 'bewerken') =>
+            when l2 == 'dossier' && (l3 == 'toevoegen' || l3 == 'aanpassen') =>
           BeamPage(
             key: ValueKey(l3),
             name: l3,
@@ -199,7 +208,7 @@ List<BeamPage> _aanpassen(BeamState state) {
             child: const HypotheekDossierBewerken(),
           ),
         (String l2, String l3)
-            when l2 == 'lening' && (l3 == 'toevoegen' || l3 == 'bewerken') =>
+            when l2 == 'lening' && (l3 == 'toevoegen' || l3 == 'aanpassen') =>
           BeamPage(
             key: ValueKey(l3),
             name: l3,

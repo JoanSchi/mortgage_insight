@@ -1,17 +1,17 @@
 // Copyright (C) 2023 Joan Schipper
-// 
+//
 // This file is part of mortgage_insight.
-// 
+//
 // mortgage_insight is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // mortgage_insight is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with mortgage_insight.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -62,6 +62,7 @@ class OverzichtDoorlopendKredietState
 
   Widget buildSummary(BuildContext context, DoorlopendKrediet dk) {
     final ThemeData theme = Theme.of(context);
+    final TextStyle? displaySmall = theme.textTheme.displaySmall;
     final map = _overzicht(dk, DateTime.now());
 
     if (map.containsKey('fout')) {
@@ -150,7 +151,8 @@ class OverzichtDoorlopendKredietState
 
       return Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
         const SizedBox(height: 24.0),
-        const Text(
+        Text(
+          style: displaySmall,
           'Overzicht',
         ),
         const SizedBox(height: 16.0),

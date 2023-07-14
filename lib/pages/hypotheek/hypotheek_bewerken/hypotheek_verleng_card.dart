@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hypotheek_berekeningen/hypotheek/gegevens/hypotheek/hypotheek.dart';
 import 'package:hypotheek_berekeningen/hypotheek/gegevens/hypotheek_dossier/hypotheek_dossier.dart';
 import 'package:hypotheek_berekeningen/hypotheek/gegevens/vervolg_lening/vervolg_lening.dart';
 import '../../../my_widgets/custom_fitted_box.dart';

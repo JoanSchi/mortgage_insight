@@ -16,52 +16,58 @@
 // along with mortgage_insight.  If not, see <http://www.gnu.org/licenses/>.
 
 import 'package:flutter/material.dart';
-import 'package:mortgage_insight/utilities/my_number_format.dart';
-
-import 'kosten_item_box_properties.dart';
 
 class StandardKostenItem extends StatelessWidget {
-  final KostenItemBoxProperties properties;
+  final double height;
+  final String omschrijving;
+  final String bedrag;
+  final String sup;
 
   final VoidCallback changePanel;
 
   const StandardKostenItem({
     Key? key,
-    required this.properties,
+    required this.height,
+    required this.omschrijving,
+    required this.bedrag,
+    this.sup = '',
     required this.changePanel,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final MyNumberFormat nf = MyNumberFormat(context);
-
     final theme = Theme.of(context);
+
     return SizedBox(
-      height: KostenItemBoxProperties.kostenHeightNormal,
+      height: height,
       child: InkWell(
         canRequestFocus: false,
         onTap: changePanel,
         child: Row(
           children: [
             const SizedBox(
-              width: 16.0,
+              width: 8.0,
             ),
             Expanded(
-                child: properties.value.omschrijving.isEmpty
+                child: omschrijving.isEmpty
                     ? Text(
-                        'Omschrijving?',
+                        '...',
                         style: theme.textTheme.bodyLarge
-                            ?.copyWith(color: theme.colorScheme.error),
+                            ?.copyWith(color: Colors.blueGrey[500]),
                       )
-                    : Text(properties.value.omschrijving,
-                        style: theme.textTheme.bodyLarge)),
-            Text(
-                nf.parseDoubleToText(
-                  properties.value.getal,
-                ),
-                style: theme.textTheme.bodyLarge),
+                    : Text(omschrijving, style: theme.textTheme.bodyLarge)),
+            if (sup.isNotEmpty)
+              Align(
+                  alignment: const Alignment(0, -0.35),
+                  child: Text(
+                    sup,
+                    style: theme.textTheme.bodyLarge
+                        ?.copyWith(color: Colors.blueGrey[500]),
+                    textScaleFactor: 0.5,
+                  )),
+            Text(bedrag, style: theme.textTheme.bodyLarge),
             const SizedBox(
-              width: 16.0,
+              width: 8.0,
             )
           ],
         ),

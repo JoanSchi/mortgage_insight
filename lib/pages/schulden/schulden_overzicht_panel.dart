@@ -44,43 +44,46 @@ class _SchuldenOverzichtPanelState
                   //         context),
                   //   ),
                   if (schulden.lijst.isNotEmpty)
-                    SliverGrid(
-                        gridDelegate:
-                            const SliverGridDelegateWithMaxCrossAxisExtent(
-                          maxCrossAxisExtent: 600.0,
-                          mainAxisSpacing: 5.0,
-                          crossAxisSpacing: 5.0,
-                          childAspectRatio: 1.5,
-                        ),
-                        delegate: SliverChildBuilderDelegate(
-                          (BuildContext context, int index) {
-                            final schuld = lijst[index];
+                    SliverPadding(
+                      padding: padding.copyWith(top: 0.0),
+                      sliver: SliverGrid(
+                          gridDelegate:
+                              const SliverGridDelegateWithMaxCrossAxisExtent(
+                            maxCrossAxisExtent: 600.0,
+                            mainAxisSpacing: 5.0,
+                            crossAxisSpacing: 5.0,
+                            childAspectRatio: 1.5,
+                          ),
+                          delegate: SliverChildBuilderDelegate(
+                            (BuildContext context, int index) {
+                              final schuld = lijst[index];
 
-                            return schuld.map(
-                                leaseAuto: (LeaseAuto leaseAuto) =>
-                                    LeaseAutoCard(
-                                        leaseAuto: leaseAuto,
-                                        aanpassen: () => aanpassen(leaseAuto),
-                                        verwijderen: () =>
-                                            verwijderen(leaseAuto)),
-                                aflopendKrediet: (AflopendKrediet ak) =>
-                                    AflopendKredietCard(
-                                        ak: ak,
-                                        aanpassen: () => aanpassen(ak),
-                                        verwijderen: () => verwijderen(ak)),
-                                verzendKrediet: (VerzendKrediet vk) =>
-                                    VerzendKredietCard(
-                                        vk: vk,
-                                        aanpassen: () => aanpassen(vk),
-                                        verwijderen: () => verwijderen(vk)),
-                                doorlopendKrediet: (DoorlopendKrediet dk) =>
-                                    DoorlopendKredietCard(
-                                        dk: dk,
-                                        aanpassen: () => aanpassen(dk),
-                                        verwijderen: () => verwijderen(dk)));
-                          },
-                          childCount: lijst.length,
-                        ))
+                              return schuld.map(
+                                  leaseAuto: (LeaseAuto leaseAuto) =>
+                                      LeaseAutoCard(
+                                          leaseAuto: leaseAuto,
+                                          aanpassen: () => aanpassen(leaseAuto),
+                                          verwijderen: () =>
+                                              verwijderen(leaseAuto)),
+                                  aflopendKrediet: (AflopendKrediet ak) =>
+                                      AflopendKredietCard(
+                                          ak: ak,
+                                          aanpassen: () => aanpassen(ak),
+                                          verwijderen: () => verwijderen(ak)),
+                                  verzendKrediet: (VerzendKrediet vk) =>
+                                      VerzendKredietCard(
+                                          vk: vk,
+                                          aanpassen: () => aanpassen(vk),
+                                          verwijderen: () => verwijderen(vk)),
+                                  doorlopendKrediet: (DoorlopendKrediet dk) =>
+                                      DoorlopendKredietCard(
+                                          dk: dk,
+                                          aanpassen: () => aanpassen(dk),
+                                          verwijderen: () => verwijderen(dk)));
+                            },
+                            childCount: lijst.length,
+                          )),
+                    )
                 ]));
 
     return DefaultPage(

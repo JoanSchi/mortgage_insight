@@ -1,10 +1,14 @@
 import 'package:beamer/beamer.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mortgage_insight/platform_page_format/adjust_scroll_configuration.dart';
 import 'package:mortgage_insight/routes/routes.dart';
 import 'package:mortgage_insight/theme/theme.dart';
+import 'package:mortgage_insight/utilities/device_info.dart';
 
 void main() {
   setOverlayStyle();
@@ -28,18 +32,22 @@ class _SizeDependentRouteState extends State<SizeDependentRoute> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      routerDelegate: _beamerDelegate,
-      routeInformationParser: BeamerParser(),
-      backButtonDispatcher:
-          BeamerBackButtonDispatcher(delegate: _beamerDelegate),
-      theme: buildTheme(context),
-      localizationsDelegates: GlobalMaterialLocalizations.delegates,
-      supportedLocales: const [
-        Locale('en', 'US'),
-        Locale('nl', 'NL'),
-      ],
-    );
+    //
+    //
+    return ScrollConfiguration(
+        behavior: const MyMaterialScrollBarBehavior(),
+        child: MaterialApp.router(
+          routerDelegate: _beamerDelegate,
+          routeInformationParser: BeamerParser(),
+          backButtonDispatcher:
+              BeamerBackButtonDispatcher(delegate: _beamerDelegate),
+          theme: buildTheme(context),
+          localizationsDelegates: GlobalMaterialLocalizations.delegates,
+          supportedLocales: const [
+            Locale('en', 'US'),
+            Locale('nl', 'NL'),
+          ],
+        ));
   }
 }
 

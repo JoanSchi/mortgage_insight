@@ -1,21 +1,22 @@
 // Copyright (C) 2023 Joan Schipper
-// 
+//
 // This file is part of mortgage_insight.
-// 
+//
 // mortgage_insight is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // mortgage_insight is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with mortgage_insight.  If not, see <http://www.gnu.org/licenses/>.
 
 import 'package:flextable/flextable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hypotheek_berekeningen/schulden/gegevens/schulden.dart';
@@ -49,12 +50,17 @@ class _DebtTableState
   late DateFormat df = DateFormat.yMd(localeToString(context));
   Map<String, WidthColumn> map = {};
   FlexTableController flexTableController = FlexTableController();
+  FlexTableScaleChangeNotifier? _scaleChangeNotifier;
 
-  // TextToWidth _textToWidthDate = TextToWidth();
-  // ValueToWidth _numberToWidthLening = ValueToWidth();
-  // ValueToWidth _numberToWidthInterest = ValueToWidth();
-  // ValueToWidth _numberToWidthTermijnBedrag = ValueToWidth();
-  // ValueToWidth _numberToWidthAflossen = ValueToWidth();
+  FlexTableScaleChangeNotifier get scaleChangeNotifier =>
+      _scaleChangeNotifier ??= FlexTableScaleChangeNotifier();
+
+  @override
+  void dispose() {
+    flexTableController.dispose();
+    _scaleChangeNotifier?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget buildAflopendKrediet(BuildContext context, AflopendKrediet ak) {
@@ -73,22 +79,33 @@ class _DebtTableState
       return _buildEmpty();
     }
 
-    return DefaultTextStyle(
-        style: textStyle,
-        child: FlexTableToSliverBox(
-            flexTableController: flexTableController,
-            child: FlexTable(
-              flexTableController: flexTableController,
-              flexTableModel: tableModel,
+    Widget buildTable({FlexTableScaleChangeNotifier? scaleChangeNotifier}) {
+      return FlexTable(
+        scaleChangeNotifier: scaleChangeNotifier,
+        flexTableController: flexTableController,
+        flexTableModel: tableModel,
+      );
+    }
 
-              // sidePanelWidget: [
-              //   if (!touch)
-              //     (tableModel) => FlexTableLayoutParentDataWidget(
-              //         tableLayoutPosition: const FlexTableLayoutPosition.bottom(),
-              //         child: TableBottomBar(
-              //             tableModel: tableModel, maxWidthSlider: 200.0))
-              // ],
-            )));
+    return FlexTableToSliverBox(
+        flexTableController: flexTableController,
+        child: switch (defaultTargetPlatform) {
+          TargetPlatform.linux ||
+          TargetPlatform.macOS ||
+          TargetPlatform.windows =>
+            GridBorderLayout(children: [
+              buildTable(scaleChangeNotifier: scaleChangeNotifier),
+              GridBorderLayoutPosition(
+                  row: 2,
+                  squeezeRatio: 1.0,
+                  measureHeight: true,
+                  child: TableBottomBar(
+                      scaleChangeNotifier: scaleChangeNotifier,
+                      flexTableController: flexTableController,
+                      maxWidthSlider: 200.0))
+            ]),
+          (_) => buildTable()
+        });
   }
 
   _buildEmpty() {

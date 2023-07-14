@@ -105,4 +105,18 @@ class KostenItemBoxProperties extends BoxItemProperties {
     _animateOnInitiation = false;
     return a;
   }
+
+  setTransitionStatus(BoxItemTransitionState state) {
+    transitionStatus = switch ((transitionStatus, state)) {
+      (BoxItemTransitionState a, BoxItemTransitionState b)
+          when a == BoxItemTransitionState.visible &&
+              b == BoxItemTransitionState.appear =>
+        BoxItemTransitionState.visible,
+      (BoxItemTransitionState a, BoxItemTransitionState b)
+          when a == BoxItemTransitionState.visible &&
+              b == BoxItemTransitionState.disappear =>
+        BoxItemTransitionState.invisible,
+      (_, BoxItemTransitionState b) => b,
+    };
+  }
 }

@@ -55,6 +55,8 @@ dependencies:
   hypotheek_berekeningen:
    path: ../hypotheek_berekeningen
   beamer: ^1.5.5
+  custom_sliver:
+    path: ../custom_sliver
   
 
 dev_dependencies:
@@ -63,7 +65,7 @@ dev_dependencies:
   flutter_lints: ^2.0.1
   build_runner: ^2.3.3
   freezed: ^2.3.4
-  json_serializable: ^6.6.1
+  json_serializable: ^6.7.0
     
     
 

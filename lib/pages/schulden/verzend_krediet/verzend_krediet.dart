@@ -18,6 +18,7 @@
 import 'package:date_input_picker/date_input_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hypotheek_berekeningen/gereedschap/kalender.dart';
 import 'package:hypotheek_berekeningen/schulden/gegevens/schulden.dart';
 import 'package:hypotheek_berekeningen/schulden/uitwerken/verzendkrediet_verwerken.dart';
 import 'package:mortgage_insight/my_widgets/mortgage_chip.dart';
@@ -28,9 +29,7 @@ import 'package:mortgage_insight/pages/schulden/verzend_krediet/verzend_krediet_
 import 'package:selectable_group_widgets/selectable_group_widgets.dart';
 import '../../../my_widgets/selectable_widgets/selectable_group_themes.dart';
 import '../../../my_widgets/simple_widgets.dart';
-import '../../../utilities/kalender.dart';
 import '../../../utilities/my_number_format.dart';
-import '../../../utilities/match_properties.dart';
 
 class VerzendKredietPanel extends StatelessWidget {
   final EdgeInsets padding;
@@ -347,20 +346,20 @@ class VerzendKredietOptiePanelState
       const SizedBox(
         height: 8.0,
       ),
-      UndefinedSelectableGroup(groups: [
-        MyRadioGroup<VKbedrag>(
-          groupValue: vk.vkBedrag,
-          list: [
-            RadioSelectable(text: 'Totaalbedrag', value: VKbedrag.totaal),
-            RadioSelectable(
-                text: 'Termijnbedrag per maand', value: VKbedrag.mnd)
+      UndefinedSelectableGroup(
+          groups: [
+            MyRadioGroup<VKbedrag>(
+              groupValue: vk.vkBedrag,
+              list: [
+                RadioSelectable(text: 'Totaalbedrag', value: VKbedrag.totaal),
+                RadioSelectable(
+                    text: 'Termijnbedrag per maand', value: VKbedrag.mnd)
+              ],
+              onChange: _veranderingBedragPerMaandOfTotaal,
+            )
           ],
-          onChange: _veranderingBedragPerMaandOfTotaal,
-        )
-      ], matchTargetWrap: [
-        MatchTargetWrap<GroupLayoutProperties>(
-            object: GroupLayoutProperties.vertical())
-      ]),
+          getGroupLayoutProperties: (targetPlatform, formFactorType) =>
+              GroupLayoutProperties.vertical()),
       Padding(
         padding: const EdgeInsets.only(left: 32.0),
         child: SizeTransition(

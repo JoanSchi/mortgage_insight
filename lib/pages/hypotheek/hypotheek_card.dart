@@ -26,9 +26,10 @@ class HypotheekCard extends StatelessWidget {
         DateFormat.yMMMMd(localeToString(context)).format(hypotheek.startDatum);
 
     final bottom = Text(
-        'Aflostermijn: ${hypotheek.aflosTermijnInMaanden ~/ 12} J ; RentePeriode: ${hypotheek.aflosTermijnInMaanden ~/ 12} (J) ; Rente: ${hypotheek.rente} %');
+        'Termijn: ${hypotheek.aflosTermijnInJaren} J ; Periode: ${hypotheek.periodeInJaren} (J) ; Rente: ${hypotheek.rente} %');
 
     return MoCard(
+      onLongPress: bewerken,
       color: const Color(0xFFe6f5fa),
       top: SizedBox(
         height: 56.0,

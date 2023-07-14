@@ -3,6 +3,7 @@ import 'package:animated_sliver_box/sliver_box_controller.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hypotheek_berekeningen/hypotheek/gegevens/hypotheek/hypotheek.dart';
 import 'package:hypotheek_berekeningen/hypotheek/gegevens/hypotheek_dossier/hypotheek_dossier.dart';
+import 'package:hypotheek_berekeningen/hypotheek/gegevens/norm/norm_inkomen/inkomens_op_datum.dart';
 import 'package:hypotheek_berekeningen/hypotheek/gegevens/vervolg_lening/vervolg_lening.dart';
 import 'package:mortgage_insight/pages/hypotheek/hypotheek_bewerken/model/hypotheek_view_model.dart';
 import 'lening_kosten_sliver_box_model.dart';
@@ -16,6 +17,7 @@ class HypotheekViewState with _$HypotheekViewState {
 
   const factory HypotheekViewState({
     required HypotheekDossier hypotheekDossier,
+    @Default([]) List<InkomenOpDatum> inkomensOpDatum,
     @Default(0.0) double heightVervolg,
     @Default('') String id,
     @Default([]) List<LeningVerlengen> teVerlengen,

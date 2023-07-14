@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:beamer/beamer.dart';
-import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hypotheek_berekeningen/hypotheek/gegevens/hypotheek/hypotheek.dart';
@@ -60,18 +59,21 @@ class HypotheekPanelState extends ConsumerState<HypotheekPanel>
 
   @override
   void didChangeDependencies() {
-    beamerDelegate ??= Beamer.of(context)..addListener(blu);
+    beamerDelegate ??= Beamer.of(context)..addListener(changeTab);
     super.didChangeDependencies();
   }
 
-  blu() {
+  void changeTab() {
     String onderwerp =
         (beamerDelegate?.currentBeamLocation.state.routeInformation.location ??
                 '')
             .split('/')
             .last;
 
-    if (onderwerp != tabIndexNaOnderwerp(tab)) {
+    if ((onderwerp == 'dossier' ||
+            onderwerp == 'lening' ||
+            onderwerp == 'overzicht') &&
+        onderwerp != tabIndexNaOnderwerp(tab)) {
       _tabController.animateTo(onderwerpNaTabIndex(onderwerp));
     }
   }
@@ -92,7 +94,7 @@ class HypotheekPanelState extends ConsumerState<HypotheekPanel>
 
   @override
   void dispose() {
-    beamerDelegate?.removeListener(blu);
+    beamerDelegate?.removeListener(changeTab);
     _tabController.dispose();
     super.dispose();
   }
@@ -220,7 +222,7 @@ class HypotheekPanelState extends ConsumerState<HypotheekPanel>
                 text: 'Dossier',
               ),
               Tab(
-                text: 'Hypotheek',
+                text: 'Lening',
               ),
               Tab(
                 text: 'Overzicht',
@@ -267,7 +269,7 @@ class _HypotheekDossiersOverzichtState
     final dossiers = overzicht.hypotheekDossiers.values.map((e) => e).toList();
 
     return CustomScrollView(
-      key: const PageStorageKey<String>('listViewHypotheekProfiel'),
+      key: const PageStorageKey<String>('hypotheekDossier'),
       slivers: [
         // if (widget.nested)
         //   SliverOverlapInjector(
@@ -321,17 +323,27 @@ class _HypotheekDossiersOverzichtState
         .bewerken(hypotheekDossier: hypotheekDossier);
 
     Beamer.of(context, root: true)
-        .beamToNamed('/document/hypotheek/dossier/bewerken');
+        .beamToNamed('/document/hypotheek/dossier/aanpassen');
   }
 }
 
-class ListViewHypotheekLeningen extends ConsumerWidget {
+class ListViewHypotheekLeningen extends ConsumerStatefulWidget {
   final EdgeInsets padding;
 
-  const ListViewHypotheekLeningen({super.key, required this.padding});
+  const ListViewHypotheekLeningen({
+    super.key,
+    required this.padding,
+  });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _ListViewHypotheekLeningenState();
+}
+
+class _ListViewHypotheekLeningenState
+    extends ConsumerState<ListViewHypotheekLeningen> {
+  @override
+  Widget build(BuildContext context) {
     // final theme = Theme.of(context);
     // final primaryColor = Colors.white; //theme.colorScheme.inversePrimary;
     // final headline4 = theme.textTheme.headline4?.copyWith(color: Colors.white);
@@ -378,7 +390,7 @@ class ListViewHypotheekLeningen extends ConsumerWidget {
     }
 
     return CustomScrollView(
-      key: const PageStorageKey<String>('listViewHypotheekProfiel'),
+      key: const PageStorageKey<String>('Lening'),
       slivers: [
         // if (nested)
         //   SliverOverlapInjector(
@@ -388,7 +400,7 @@ class ListViewHypotheekLeningen extends ConsumerWidget {
         //   ),
         if (list.isNotEmpty)
           SliverPadding(
-            padding: padding,
+            padding: widget.padding,
             sliver: SliverGrid(
                 gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                   maxCrossAxisExtent: 600.0,
@@ -401,8 +413,8 @@ class ListViewHypotheekLeningen extends ConsumerWidget {
                     final hypotheek = list[index];
                     return HypotheekCard(
                       hypotheek: hypotheek,
-                      bewerken: () => bewerken,
-                      verwijderen: () => verwijderen,
+                      bewerken: () => bewerken(hypotheek),
+                      verwijderen: () => verwijderen(hypotheek),
                     );
                   },
                   childCount: list.length,
@@ -428,7 +440,18 @@ class ListViewHypotheekLeningen extends ConsumerWidget {
     //     color: Color(0xFFe6f5fa));
   }
 
-  bewerken(Hypotheek hypotheek) {}
+  void bewerken(Hypotheek hypotheek) {
+    ref.read(hypotheekBewerkenProvider.notifier).bewerken(
+        hypotheekDocument: ref.read(hypotheekDocumentProvider),
+        hypotheek: hypotheek);
 
-  verwijderen(Hypotheek hypotheek) {}
+    Beamer.of(context, root: true)
+        .beamToNamed('/document/hypotheek/lening/aanpassen');
+  }
+
+  verwijderen(Hypotheek hypotheek) {
+    ref
+        .read(hypotheekDocumentProvider.notifier)
+        .hypotheekVerwijderen(hypotheek);
+  }
 }

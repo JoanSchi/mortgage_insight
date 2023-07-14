@@ -17,6 +17,8 @@ final _privateConstructorUsedError = UnsupportedError(
 /// @nodoc
 mixin _$HypotheekViewState {
   HypotheekDossier get hypotheekDossier => throw _privateConstructorUsedError;
+  List<InkomenOpDatum> get inkomensOpDatum =>
+      throw _privateConstructorUsedError;
   double get heightVervolg => throw _privateConstructorUsedError;
   String get id => throw _privateConstructorUsedError;
   List<LeningVerlengen> get teVerlengen => throw _privateConstructorUsedError;
@@ -44,6 +46,7 @@ abstract class $HypotheekViewStateCopyWith<$Res> {
   @useResult
   $Res call(
       {HypotheekDossier hypotheekDossier,
+      List<InkomenOpDatum> inkomensOpDatum,
       double heightVervolg,
       String id,
       List<LeningVerlengen> teVerlengen,
@@ -72,6 +75,7 @@ class _$HypotheekViewStateCopyWithImpl<$Res, $Val extends HypotheekViewState>
   @override
   $Res call({
     Object? hypotheekDossier = null,
+    Object? inkomensOpDatum = null,
     Object? heightVervolg = null,
     Object? id = null,
     Object? teVerlengen = null,
@@ -85,6 +89,10 @@ class _$HypotheekViewStateCopyWithImpl<$Res, $Val extends HypotheekViewState>
           ? _value.hypotheekDossier
           : hypotheekDossier // ignore: cast_nullable_to_non_nullable
               as HypotheekDossier,
+      inkomensOpDatum: null == inkomensOpDatum
+          ? _value.inkomensOpDatum
+          : inkomensOpDatum // ignore: cast_nullable_to_non_nullable
+              as List<InkomenOpDatum>,
       heightVervolg: null == heightVervolg
           ? _value.heightVervolg
           : heightVervolg // ignore: cast_nullable_to_non_nullable
@@ -136,6 +144,7 @@ abstract class _$$_HypotheekViewStateCopyWith<$Res>
   @useResult
   $Res call(
       {HypotheekDossier hypotheekDossier,
+      List<InkomenOpDatum> inkomensOpDatum,
       double heightVervolg,
       String id,
       List<LeningVerlengen> teVerlengen,
@@ -163,6 +172,7 @@ class __$$_HypotheekViewStateCopyWithImpl<$Res>
   @override
   $Res call({
     Object? hypotheekDossier = null,
+    Object? inkomensOpDatum = null,
     Object? heightVervolg = null,
     Object? id = null,
     Object? teVerlengen = null,
@@ -176,6 +186,10 @@ class __$$_HypotheekViewStateCopyWithImpl<$Res>
           ? _value.hypotheekDossier
           : hypotheekDossier // ignore: cast_nullable_to_non_nullable
               as HypotheekDossier,
+      inkomensOpDatum: null == inkomensOpDatum
+          ? _value._inkomensOpDatum
+          : inkomensOpDatum // ignore: cast_nullable_to_non_nullable
+              as List<InkomenOpDatum>,
       heightVervolg: null == heightVervolg
           ? _value.heightVervolg
           : heightVervolg // ignore: cast_nullable_to_non_nullable
@@ -214,6 +228,7 @@ class __$$_HypotheekViewStateCopyWithImpl<$Res>
 class _$_HypotheekViewState extends _HypotheekViewState {
   const _$_HypotheekViewState(
       {required this.hypotheekDossier,
+      final List<InkomenOpDatum> inkomensOpDatum = const [],
       this.heightVervolg = 0.0,
       this.id = '',
       final List<LeningVerlengen> teVerlengen = const [],
@@ -221,12 +236,22 @@ class _$_HypotheekViewState extends _HypotheekViewState {
       required this.kostenSliverBoxController,
       required this.verbouwKostenSliverBoxController,
       required this.vervolgHypotheekSliverBoxController})
-      : _teVerlengen = teVerlengen,
+      : _inkomensOpDatum = inkomensOpDatum,
+        _teVerlengen = teVerlengen,
         _teHerFinancieren = teHerFinancieren,
         super._();
 
   @override
   final HypotheekDossier hypotheekDossier;
+  final List<InkomenOpDatum> _inkomensOpDatum;
+  @override
+  @JsonKey()
+  List<InkomenOpDatum> get inkomensOpDatum {
+    if (_inkomensOpDatum is EqualUnmodifiableListView) return _inkomensOpDatum;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_inkomensOpDatum);
+  }
+
   @override
   @JsonKey()
   final double heightVervolg;
@@ -264,7 +289,7 @@ class _$_HypotheekViewState extends _HypotheekViewState {
 
   @override
   String toString() {
-    return 'HypotheekViewState(hypotheekDossier: $hypotheekDossier, heightVervolg: $heightVervolg, id: $id, teVerlengen: $teVerlengen, teHerFinancieren: $teHerFinancieren, kostenSliverBoxController: $kostenSliverBoxController, verbouwKostenSliverBoxController: $verbouwKostenSliverBoxController, vervolgHypotheekSliverBoxController: $vervolgHypotheekSliverBoxController)';
+    return 'HypotheekViewState(hypotheekDossier: $hypotheekDossier, inkomensOpDatum: $inkomensOpDatum, heightVervolg: $heightVervolg, id: $id, teVerlengen: $teVerlengen, teHerFinancieren: $teHerFinancieren, kostenSliverBoxController: $kostenSliverBoxController, verbouwKostenSliverBoxController: $verbouwKostenSliverBoxController, vervolgHypotheekSliverBoxController: $vervolgHypotheekSliverBoxController)';
   }
 
   @override
@@ -274,6 +299,8 @@ class _$_HypotheekViewState extends _HypotheekViewState {
             other is _$_HypotheekViewState &&
             (identical(other.hypotheekDossier, hypotheekDossier) ||
                 other.hypotheekDossier == hypotheekDossier) &&
+            const DeepCollectionEquality()
+                .equals(other._inkomensOpDatum, _inkomensOpDatum) &&
             (identical(other.heightVervolg, heightVervolg) ||
                 other.heightVervolg == heightVervolg) &&
             (identical(other.id, id) || other.id == id) &&
@@ -298,6 +325,7 @@ class _$_HypotheekViewState extends _HypotheekViewState {
   int get hashCode => Object.hash(
       runtimeType,
       hypotheekDossier,
+      const DeepCollectionEquality().hash(_inkomensOpDatum),
       heightVervolg,
       id,
       const DeepCollectionEquality().hash(_teVerlengen),
@@ -317,6 +345,7 @@ class _$_HypotheekViewState extends _HypotheekViewState {
 abstract class _HypotheekViewState extends HypotheekViewState {
   const factory _HypotheekViewState(
       {required final HypotheekDossier hypotheekDossier,
+      final List<InkomenOpDatum> inkomensOpDatum,
       final double heightVervolg,
       final String id,
       final List<LeningVerlengen> teVerlengen,
@@ -331,6 +360,8 @@ abstract class _HypotheekViewState extends HypotheekViewState {
 
   @override
   HypotheekDossier get hypotheekDossier;
+  @override
+  List<InkomenOpDatum> get inkomensOpDatum;
   @override
   double get heightVervolg;
   @override

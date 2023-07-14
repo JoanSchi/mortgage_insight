@@ -18,12 +18,12 @@
 import 'package:date_input_picker/date_input_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hypotheek_berekeningen/gereedschap/kalender.dart';
 import 'package:hypotheek_berekeningen/schulden/gegevens/schulden.dart';
 import 'package:hypotheek_berekeningen/schulden/uitwerken/doorlopendkrediet_verwerken.dart';
 import 'package:mortgage_insight/my_widgets/oh_no.dart';
 import '../../../my_widgets/selectable_widgets/single_checkbox.dart';
 import '../../../my_widgets/simple_widgets.dart';
-import '../../../utilities/kalender.dart';
 import '../../../utilities/my_number_format.dart';
 import '../schuld_provider.dart';
 import 'doorlopend_krediet_overzicht.dart';

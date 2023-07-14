@@ -1,17 +1,17 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
 import 'package:selectable_group_widgets/selectable_group_layout/selectable_group_layout.dart';
 import 'package:selectable_group_widgets/selectable_group_widgets.dart';
 import 'package:selectable_group_widgets/selected_group_themes/material_group.dart';
 import 'package:selectable_group_widgets/selected_group_themes/material_inkwell_group.dart';
 import 'package:selectable_group_widgets/selected_group_themes/rounded_group.dart';
-
 import 'package:mortgage_insight/utilities/device_info.dart';
-
-import '../../platform_page_format/page_properties.dart';
 import '../../utilities/match_properties.dart';
+
+typedef GetGroupLayoutProperties = GroupLayoutProperties Function(
+  TargetPlatform targetPlatform,
+  FormFactorType formFactorType,
+);
 
 enum SelectedGroupTheme {
   material,
@@ -47,7 +47,7 @@ class MyRadioGroup<V> extends RadioGroup<V, SelectableGroupOptions> {
   @override
   List<Widget> buildChildren(
       BuildContext context, SelectableGroupOptions? options) {
-    final o = findOption(context) ?? options ?? const SelectableGroupOptions();
+    final o = options ?? const SelectableGroupOptions();
 
     switch (o.selectedGroupTheme) {
       case SelectedGroupTheme.material:
@@ -95,41 +95,11 @@ class MyRadioGroup<V> extends RadioGroup<V, SelectableGroupOptions> {
         }
     }
   }
-
-  SelectableGroupOptions? findOption(context) {
-    final match = listMatch;
-
-    if (match == null) {
-      return null;
-    }
-
-    final wrap = DeviceScreen3.of(context).wrapSelectionWidgets;
-    final target = defaultTargetPlatform;
-
-    int latestMatchPoints = -1;
-    SelectableGroupOptions? object;
-
-    for (MatchTargetWrap f in match) {
-      final matchPoints = f.matchPoints(target, wrap);
-
-      if (matchPoints > latestMatchPoints) {
-        if (matchPoints == MatchPageProperties.maxPoints) {
-          return f.object;
-        } else {
-          latestMatchPoints = matchPoints;
-          object = f.object;
-        }
-      }
-    }
-
-    return object ?? const SelectableGroupOptions();
-  }
 }
 
 class MyCheckGroup<V> extends CheckGroup<V, SelectableGroupOptions> {
   final Color? primaryColor;
   final Color? onPrimaryColor;
-  final List<MatchTargetWrap<SelectableGroupOptions>>? listMatch;
 
   MyCheckGroup({
     required super.list,
@@ -137,14 +107,12 @@ class MyCheckGroup<V> extends CheckGroup<V, SelectableGroupOptions> {
     super.enabled,
     this.primaryColor,
     this.onPrimaryColor,
-    this.listMatch,
   });
 
   @override
   List<Widget> buildChildren(
       BuildContext context, SelectableGroupOptions? options) {
-    final o =
-        this.findMatch(context) ?? options ?? const SelectableGroupOptions();
+    final o = options ?? const SelectableGroupOptions();
 
     switch (o.selectedGroupTheme) {
       case SelectedGroupTheme.material:
@@ -195,35 +163,6 @@ class MyCheckGroup<V> extends CheckGroup<V, SelectableGroupOptions> {
         }
     }
   }
-
-  SelectableGroupOptions? findMatch(context) {
-    final match = listMatch;
-
-    if (match == null) {
-      return null;
-    }
-
-    final wrap = DeviceScreen3.of(context).wrapSelectionWidgets;
-    final target = defaultTargetPlatform;
-
-    int latestMatchPoints = -1;
-    SelectableGroupOptions? object;
-
-    for (MatchTargetWrap f in match) {
-      final matchPoints = f.matchPoints(target, wrap);
-
-      if (matchPoints > latestMatchPoints) {
-        if (matchPoints == MatchPageProperties.maxPoints) {
-          return f.object;
-        } else {
-          latestMatchPoints = matchPoints;
-          object = f.object;
-        }
-      }
-    }
-
-    return object ?? const SelectableGroupOptions();
-  }
 }
 
 class GroupLayoutProperties {
@@ -258,20 +197,23 @@ class GroupLayoutProperties {
 
 class UndefinedSelectableGroup extends StatelessWidget {
   final List<SelectableGroup> groups;
-  final List<MatchTargetWrap<GroupLayoutProperties>>? matchTargetWrap;
+  final GetGroupLayoutProperties? getGroupLayoutProperties;
 
   const UndefinedSelectableGroup({
     Key? key,
     required this.groups,
-    this.matchTargetWrap,
+    this.getGroupLayoutProperties,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final deviceScreen = DeviceScreen3.of(context);
 
-    final properties = findPageProperties(
-        defaultTargetPlatform, deviceScreen.wrapSelectionWidgets);
+    final properties = getGroupLayoutProperties?.call(
+            deviceScreen.platform, deviceScreen.formFactorType) ??
+        (deviceScreen.wrapSelectionWidgets
+            ? GroupLayoutProperties.horizontal()
+            : GroupLayoutProperties.vertical());
 
     final children = [
       for (SelectableGroup group in groups)
@@ -292,35 +234,5 @@ class UndefinedSelectableGroup extends StatelessWidget {
       // ],
       children: children,
     );
-  }
-
-  GroupLayoutProperties findPageProperties(TargetPlatform target, bool wrap) {
-    final gl = matchTargetWrap;
-
-    if (gl == null) {
-      return (wrap
-          ? GroupLayoutProperties.horizontal()
-          : GroupLayoutProperties.vertical());
-    }
-    int latestMatchPoints = -1;
-    GroupLayoutProperties? object;
-
-    for (MatchTargetWrap f in gl) {
-      final matchPoints = f.matchPoints(target, wrap);
-
-      if (matchPoints > latestMatchPoints) {
-        if (matchPoints == MatchPageProperties.maxPoints) {
-          return f.object;
-        } else {
-          latestMatchPoints = matchPoints;
-          object = f.object;
-        }
-      }
-    }
-
-    return object ??
-        (wrap
-            ? GroupLayoutProperties.horizontal()
-            : GroupLayoutProperties.vertical());
   }
 }

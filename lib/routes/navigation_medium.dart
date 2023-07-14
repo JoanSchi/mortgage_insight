@@ -12,6 +12,7 @@ import 'package:ltrb_navigation_drawer/ltbr_drawer_widgets.dart';
 import 'package:ltrb_navigation_drawer/overlay_indicator/ltbr_drawer_indicator.dart';
 import 'package:mortgage_insight/model/nl/provider/hypotheek_document_provider.dart';
 import '../layout/transition/scale_size_transition.dart';
+import '../platform_page_format/adjust_scroll_configuration.dart';
 import 'routes.dart';
 import '../theme/ltrb_navigation_style.dart';
 import 'navigation_document_examples.dart';
@@ -24,7 +25,9 @@ class MediumNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(body: MediumDrawer(body: Pagina()));
+    return const ScrollConfiguration(
+        behavior: MyMaterialScrollBarBehavior(),
+        child: Scaffold(body: MediumDrawer(body: Pagina())));
   }
 }
 
@@ -136,14 +139,21 @@ class LeftNavigation extends ConsumerWidget {
       ),
       IconButton(
         icon: const ImageIcon(AssetImage('graphics/ic_open.png')),
-        onPressed: () => debugPrint("open"),
+        onPressed: () {
+          Beamer.of(context, root: true).beamToNamed('/document');
+          ref.read(hypotheekDocumentProvider.notifier).openHypotheek();
+        },
       ),
       IconButton(
-        icon: const Icon(Icons.import_export),
+        icon: const Icon(Icons.save_alt),
+        onPressed: () =>
+            ref.read(hypotheekDocumentProvider.notifier).saveHypotheek(),
+      ),
+      IconButton(
+        icon: const Icon(Icons.rotate_left),
         onPressed: () {
-          // TODO:
-          //ref.read(removeHypotheekContainerProvider).saveHypotheekContainer();
-          drawerModel.pop();
+          Beamer.of(context, root: true).beamToNamed('/document');
+          ref.read(hypotheekDocumentProvider.notifier).reset();
         },
       )
     ];

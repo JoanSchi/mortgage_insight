@@ -47,6 +47,7 @@ class _SchuldBewerkenPanelState extends ConsumerState<SchuldBewerkenPanel> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    SchuldBewerken bewerken = ref.watch(schuldProvider);
 
     final save = PageActionItem(
         text: 'Opslaan',
@@ -73,6 +74,20 @@ class _SchuldBewerkenPanelState extends ConsumerState<SchuldBewerkenPanel> {
         icon: Icons.arrow_back,
         voidCallback: Beamer.of(context).beamBack);
 
+    var (title, image) = switch (bewerken.schuld) {
+      (LeaseAuto _) => ('Leaseauto', 'graphics/leaseauto.png'),
+      (VerzendKrediet _) => ('Verzendkrediet', 'graphics/verzendkrediet.png'),
+      (DoorlopendKrediet _) => (
+          'Doorlopendkrediet',
+          'graphics/doorlopendkrediet.png'
+        ),
+      (AflopendKrediet _) => (
+          'Aflopendkrediet',
+          'graphics/aflopendkrediet.png'
+        ),
+      (_) => ('Onbekend?', 'graphics/schuld.png')
+    };
+
     return DefaultPage(
         getPageProperties: (
                 {required hasScrollBars,
@@ -86,44 +101,40 @@ class _SchuldBewerkenPanelState extends ConsumerState<SchuldBewerkenPanel> {
                 bottom: bottom,
                 leftTopActions: [cancel],
                 rightTopActions: [save]),
-        title: 'Aanpassen',
+        title: title,
         imageBuilder: (_) => Image(
-            image: const AssetImage(
-              'graphics/schuld.png',
+            image: AssetImage(
+              image,
             ),
             color: theme.colorScheme.onSurface),
         sliversBuilder: (
                 {required BuildContext context,
                 Widget? appBar,
                 required EdgeInsets padding}) =>
-            _build(context, theme, appBar, padding));
+            _build(context, theme, appBar, padding, bewerken));
   }
 
   Widget _build(BuildContext context, ThemeData theme, Widget? appBar,
-      EdgeInsets padding) {
-    SchuldBewerken bewerken = ref.watch(schuldProvider);
-
+      EdgeInsets padding, SchuldBewerken bewerken) {
     return Form(
         key: _formKey,
-        child: bewerken.schuld?.map<Widget>(leaseAuto: (LeaseAuto value) {
-              return LeaseAutoPanel(
-                key: const Key('edit_operationalLeaseAuto'),
-                padding: padding,
-                appBar: appBar,
-              );
-            }, verzendKrediet: (VerzendKrediet verzend) {
-              return VerzendKredietPanel(
-                padding: padding,
-                appBar: appBar,
-              );
-            }, doorlopendKrediet: (DoorlopendKrediet value) {
-              return DoorlopendKredietPanel(padding: padding, appBar: appBar);
-            }, aflopendKrediet: (AflopendKrediet value) {
-              return AflopendKredietPanel(
-                padding: padding,
-                appBar: appBar,
-              );
-            }) ??
-            const OhNo(text: 'Schuld not found.'));
+        child: switch (bewerken.schuld) {
+          (LeaseAuto _) => LeaseAutoPanel(
+              key: const Key('edit_operationalLeaseAuto'),
+              padding: padding,
+              appBar: appBar,
+            ),
+          (VerzendKrediet _) => VerzendKredietPanel(
+              padding: padding,
+              appBar: appBar,
+            ),
+          (DoorlopendKrediet _) =>
+            DoorlopendKredietPanel(padding: padding, appBar: appBar),
+          (AflopendKrediet _) => AflopendKredietPanel(
+              padding: padding,
+              appBar: appBar,
+            ),
+          (_) => const OhNo(text: 'Schuld not found.')
+        });
   }
 }

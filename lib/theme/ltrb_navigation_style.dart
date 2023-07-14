@@ -3,18 +3,18 @@ import 'package:google_fonts/google_fonts.dart';
 import '../utilities/device_info.dart';
 
 class LtrbNavigationStyle extends ThemeExtension<LtrbNavigationStyle> {
-  Color? background;
-  Color? secondBackground;
-  Color? colorItem;
-  Color? colorSelectedItem;
-  Color? backgroundItem;
-  Color? backgroundSelectedItem;
-  Color? imageColor;
-  TextStyle? headerTextStyle;
-  Color? headerColorPrimair;
-  TextStyle? barTextStyle;
+  final Color? background;
+  final Color? secondBackground;
+  final Color? colorItem;
+  final Color? colorSelectedItem;
+  final Color? backgroundItem;
+  final Color? backgroundSelectedItem;
+  final Color? imageColor;
+  final TextStyle? headerTextStyle;
+  final Color? headerColorPrimair;
+  final TextStyle? barTextStyle;
 
-  LtrbNavigationStyle({
+  const LtrbNavigationStyle({
     required this.background,
     required this.secondBackground,
     required this.colorItem,
@@ -37,9 +37,11 @@ class LtrbNavigationStyle extends ThemeExtension<LtrbNavigationStyle> {
       background: Color.lerp(background, other.background, t),
       secondBackground: Color.lerp(secondBackground, other.secondBackground, t),
       colorItem: Color.lerp(colorItem, other.colorItem, t),
-      colorSelectedItem: Color.lerp(colorItem, other.colorItem, t),
-      backgroundItem: Color.lerp(colorItem, other.colorItem, t),
-      backgroundSelectedItem: Color.lerp(colorItem, other.colorItem, t),
+      colorSelectedItem:
+          Color.lerp(colorSelectedItem, other.colorSelectedItem, t),
+      backgroundItem: Color.lerp(backgroundItem, other.backgroundItem, t),
+      backgroundSelectedItem:
+          Color.lerp(backgroundSelectedItem, other.backgroundSelectedItem, t),
       imageColor: Color.lerp(imageColor, other.imageColor, t),
       headerTextStyle:
           TextStyle.lerp(headerTextStyle, other.headerTextStyle, t),

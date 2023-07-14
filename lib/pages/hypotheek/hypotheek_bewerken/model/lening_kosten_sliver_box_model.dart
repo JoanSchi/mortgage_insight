@@ -25,25 +25,29 @@ class HypotheekKostenSliverBoxModel extends AnimatedSliverBoxModel<String> {
   HypotheekKostenSliverBoxModel(
       {required super.sliverBoxContext,
       required this.topBox,
-      required this.dossierBox,
+      required this.gedeeldeKosten,
       required this.bottomBox,
       required super.axis,
       required super.duration});
-  SingleBoxModel<String, EditableBoxProperties> topBox;
-  SingleBoxModel<String, KostenItemBoxProperties> dossierBox;
-  SingleBoxModel<String, BoxItemProperties> bottomBox;
+  SingleBoxModel<String, DefaultBoxItemProperties> topBox;
+  List<SingleBoxModel<String, KostenItemBoxProperties>> gedeeldeKosten;
+  SingleBoxModel<String, DefaultBoxItemProperties> bottomBox;
 
   @override
   Iterable<SingleBoxModel> iterator() sync* {
     yield topBox;
 
-    yield dossierBox;
+    for (var single in gedeeldeKosten) {
+      yield single;
+    }
 
     yield bottomBox;
   }
 
   @override
-  void disposeSingleModel(SingleBoxModel singleBoxModel) {}
+  void disposeSingleModel(SingleBoxModel singleBoxModel) {
+    gedeeldeKosten.remove(singleBoxModel);
+  }
 
   @override
   double? estimateMaxScrollOffset(

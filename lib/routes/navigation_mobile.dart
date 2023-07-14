@@ -20,6 +20,7 @@ import 'package:ltrb_navigation_drawer/ltbr_drawer.dart';
 import 'package:ltrb_navigation_drawer/ltbr_drawer_model.dart';
 import 'package:ltrb_navigation_drawer/overlay_indicator/ltbr_drawer_indicator.dart';
 import 'package:mortgage_insight/routes/navigation_mobile_left.dart';
+import '../platform_page_format/adjust_scroll_configuration.dart';
 import 'navigation_mobile_bottom.dart';
 import 'routes.dart';
 
@@ -86,8 +87,10 @@ class _MobileNavigationState extends State<MobileNavigation> {
             navigationBarSize: 16.0,
           );
 
-    return Scaffold(
-      body: drawer,
-    );
+    return ScrollConfiguration(
+        behavior: const MyMaterialScrollBarBehavior(),
+        child: Scaffold(
+          body: drawer,
+        ));
   }
 }

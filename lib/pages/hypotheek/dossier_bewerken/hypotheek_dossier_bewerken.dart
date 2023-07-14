@@ -185,7 +185,6 @@ class _HypotheekDossierOptiePanelState
   }
 
   @override
-  @override
   Widget buildHypotheekDossier(BuildContext context,
       HypotheekDossierViewState bewerken, HypotheekDossier hd) {
     final theme = Theme.of(context);
@@ -219,45 +218,6 @@ class _HypotheekDossierOptiePanelState
               groupValue: hd.doelHypotheekOverzicht,
               onChange: (DoelHypotheekOverzicht? value) =>
                   notifier.verandering(doelHypotheekOverzicht: value))
-        ],
-      ),
-      const SizedBox(
-        height: 16.0,
-      ),
-      Text(
-        'Financieringsnorm',
-        style: headlineMedium,
-      ),
-      const SizedBox(
-        height: 4.0,
-      ),
-      UndefinedSelectableGroup(
-        groups: [
-          MyCheckGroup<String>(
-              list: [
-                CheckSelectable<String>(
-                    identifier: 'inkomen',
-                    text: 'Inkomen',
-                    value: hd.inkomensNormToepassen),
-                CheckSelectable<String>(
-                    identifier: 'woningwaarde',
-                    text: 'Woningwaarde',
-                    value: hd.woningWaardeNormToepassen)
-              ],
-              onChange: (String identifier, bool value) {
-                switch (identifier) {
-                  case 'inkomen':
-                    {
-                      notifier.verandering(inkomensNormToepassen: !value);
-                      break;
-                    }
-                  case 'woningwaarde':
-                    {
-                      notifier.verandering(woningWaardeNormToepassen: !value);
-                      break;
-                    }
-                }
-              })
         ],
       ),
       const SizedBox(
@@ -502,14 +462,20 @@ class DossierHypotheekErwWoningLeningKostenState
     //
     //
 
-    Widget standard(bool complete) => StandardKostenItem(
-          properties: properties,
-          changePanel: () {
-            setState(() {
-              properties.setToPanel(BoxPropertiesPanels.edit);
-            });
-          },
-        );
+    Widget standard(bool complete) {
+      Waarde w = properties.value;
+
+      return StandardKostenItem(
+        height: properties.suggestedSize(model.axis),
+        omschrijving: w.omschrijving,
+        bedrag: nf.parseDoubleToText(w.getal),
+        changePanel: () {
+          setState(() {
+            properties.setToPanel(BoxPropertiesPanels.edit);
+          });
+        },
+      );
+    }
 
     Widget edit(bool complete) => DossierKostenItemBewerken(
           properties: properties,
@@ -571,28 +537,26 @@ class DossierHypotheekErwWoningLeningKostenState
                   height: 16.0,
                 ),
                 UndefinedSelectableGroup(
-                  groups: [
-                    MyRadioGroup<bool>(
-                        primaryColor: theme.colorScheme.onSurface,
-                        onPrimaryColor: theme.colorScheme.surface,
-                        list: [
-                          RadioSelectable(text: 'Invullen', value: false),
-                          RadioSelectable(text: 'Berekenen', value: true)
-                        ],
-                        groupValue: hd.ewrBerekenen,
-                        onChange: (bool? value) {
-                          notifier.verandering(ewrBerekenen: value);
-                        })
-                  ],
-                  matchTargetWrap: [
-                    MatchTargetWrap<GroupLayoutProperties>(
-                        object: GroupLayoutProperties.horizontal(
-                            options: const SelectableGroupOptions(
-                                space: 4.0,
-                                selectedGroupTheme:
-                                    SelectedGroupTheme.button))),
-                  ],
-                ),
+                    groups: [
+                      MyRadioGroup<bool>(
+                          primaryColor: theme.colorScheme.onSurface,
+                          onPrimaryColor: theme.colorScheme.surface,
+                          list: [
+                            RadioSelectable(text: 'Invullen', value: false),
+                            RadioSelectable(text: 'Berekenen', value: true)
+                          ],
+                          groupValue: hd.ewrBerekenen,
+                          onChange: (bool? value) {
+                            notifier.verandering(ewrBerekenen: value);
+                          })
+                    ],
+                    getGroupLayoutProperties:
+                        (targetPlatform, formFactorType) =>
+                            GroupLayoutProperties.horizontal(
+                                options: const SelectableGroupOptions(
+                                    space: 4.0,
+                                    selectedGroupTheme:
+                                        SelectedGroupTheme.button))),
                 const SizedBox(
                   height: 4.0,
                 ),
@@ -893,20 +857,23 @@ class DossierHypotheekErwWoningLeningKostenState
 
       case 'bottom':
         {
-          final child = TotaleKostenEnToevoegen(
-              totaleKosten: hd.kosten.isEmpty ? null : hd.totaleKosten,
-              toevoegen: () => toevoegKostenItem(hd));
-
-          return SliverBoxTransferWidget(
-              model: model,
-              animation: animation,
-              key: Key(properties.id),
-              boxItemProperties: properties,
-              singleBoxModel: singleBoxModel,
+          final child = SizedBox(
+              height: 48.0,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                child: child,
+                child: TotaleKostenEnToevoegen(
+                    totaleKosten: hd.kosten.isEmpty ? null : hd.totaleKosten,
+                    toevoegen: () => toevoegKostenItem(hd)),
               ));
+
+          return SliverBoxTransferWidget(
+            model: model,
+            animation: animation,
+            key: Key(properties.id),
+            boxItemProperties: properties,
+            singleBoxModel: singleBoxModel,
+            child: child,
+          );
         }
 
       default:

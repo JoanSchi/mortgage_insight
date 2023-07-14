@@ -1,6 +1,5 @@
 import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hypotheek_berekeningen/schulden/gegevens/schulden.dart';
 import 'package:mortgage_insight/pages/schulden/schuld_provider.dart';
@@ -70,8 +69,12 @@ class _SchuldenCategoriePanelState
             _build(context, theme, appBar, padding));
   }
 
-  Widget _build(BuildContext context, ThemeData theme, Widget? appBar,
-      EdgeInsets padding) {
+  Widget _build(
+    BuildContext context,
+    ThemeData theme,
+    Widget? appBar,
+    EdgeInsets padding,
+  ) {
     SchuldBewerken bewerken = ref.watch(schuldProvider);
 
     return CustomScrollView(slivers: [

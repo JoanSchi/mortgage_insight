@@ -153,22 +153,25 @@ class _LijstInkomenPanelState extends ConsumerState<LijstInkomenPanel> {
         //     handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
         //   ),
         if (inkomenLijst.isNotEmpty)
-          SliverGrid(
-              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 600.0,
-                mainAxisSpacing: 8.0,
-                crossAxisSpacing: 8.0,
-                childAspectRatio: 1.5,
-              ),
-              delegate: SliverChildBuilderDelegate(
-                (BuildContext context, int index) {
-                  return InkomenCard(
-                    inkomenItem: inkomenLijst[index],
-                    partner: widget.partner,
-                  );
-                },
-                childCount: inkomenLijst.length,
-              )),
+          SliverPadding(
+            padding: widget.padding,
+            sliver: SliverGrid(
+                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 600.0,
+                  mainAxisSpacing: 8.0,
+                  crossAxisSpacing: 8.0,
+                  childAspectRatio: 1.5,
+                ),
+                delegate: SliverChildBuilderDelegate(
+                  (BuildContext context, int index) {
+                    return InkomenCard(
+                      inkomenItem: inkomenLijst[index],
+                      partner: widget.partner,
+                    );
+                  },
+                  childCount: inkomenLijst.length,
+                )),
+          ),
       ],
     );
   }

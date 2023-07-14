@@ -2,8 +2,8 @@
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hypotheek_berekeningen/gereedschap/kalender.dart';
 import 'package:hypotheek_berekeningen/inkomen/gegevens/inkomen.dart';
-import '../../../utilities/kalender.dart';
 import '../../../utilities/date.dart';
 import 'inkomen_bewerken_view_state.dart';
 

@@ -2,30 +2,52 @@
 import 'dart:async';
 
 import 'package:animated_sliver_box/animated_sliver_box.dart';
+import 'package:animated_sliver_box/animated_sliver_box_goodies/sliver_box_resize_switcher.dart';
 import 'package:animated_sliver_box/animated_sliver_box_goodies/sliver_box_transfer_widget.dart';
 import 'package:animated_sliver_box/animated_sliver_box_model.dart';
 import 'package:beamer/beamer.dart';
+import 'package:custom_sliver/sliver_layer/sliver_layer_box.dart';
+import 'package:custom_sliver/sliver_layer/sliver_layer_clip.dart';
+import 'package:custom_sliver/sliver_layer/sliver_layer_outside.dart';
+import 'package:custom_sliver/sliver_layer/sliver_layer_padding.dart';
+import 'package:custom_sliver/sliver_padding_constrain_align.dart';
 import 'package:date_input_picker/date_input_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hypotheek_berekeningen/gereedschap/kalender.dart';
+import 'package:hypotheek_berekeningen/hypotheek/gegevens/extra_of_kosten_lening/extra_of_kosten_lening.dart';
 import 'package:hypotheek_berekeningen/hypotheek/gegevens/hypotheek/hypotheek.dart';
 import 'package:hypotheek_berekeningen/hypotheek/gegevens/hypotheek_dossier/hypotheek_dossier.dart';
+import 'package:hypotheek_berekeningen/hypotheek/gegevens/norm/normen_toepassen.dart';
 import 'package:hypotheek_berekeningen/hypotheek/gegevens/vervolg_lening/vervolg_lening.dart';
+import 'package:hypotheek_berekeningen/hypotheek/uitwerken/hypotheek_bewerken.dart';
 import 'package:hypotheek_berekeningen/hypotheek/uitwerken/hypotheek_verwerken.dart';
 import 'package:mortgage_insight/model/nl/provider/hypotheek_document_provider.dart';
+import 'package:mortgage_insight/my_widgets/animated_scale_resize_switcher.dart';
+import 'package:mortgage_insight/my_widgets/animated_sliver_widgets/box_properties_constants.dart';
+import 'package:mortgage_insight/my_widgets/animated_sliver_widgets/kosten_item_box_properties.dart';
 import 'package:mortgage_insight/my_widgets/simple_widgets.dart';
+import 'package:mortgage_insight/pages/hypotheek/hypotheek_bewerken/model/lening_kosten_sliver_box_model.dart';
 import 'package:mortgage_insight/pages/hypotheek/hypotheek_bewerken/model/vervolg_hypotheek_sliver_box_model.dart';
+import 'package:mortgage_insight/pages/route_fout/route_fout.dart';
 import 'package:mortgage_insight/platform_page_format/default_match_page_properties.dart';
 import 'package:selectable_group_widgets/selectable_group_widgets.dart';
+import '../../../my_widgets/animated_sliver_widgets/kosten_dialog.dart';
+import '../../../my_widgets/animated_sliver_widgets/standard_kosten_item.dart';
+import '../../../my_widgets/end_focus.dart';
 import '../../../my_widgets/selectable_widgets/selectable_group_themes.dart';
+import '../../../my_widgets/selectable_widgets/single_checkbox.dart';
 import '../../../platform_page_format/default_page.dart';
 import '../../../platform_page_format/page_actions.dart';
 import '../../../utilities/device_info.dart';
-import '../../../utilities/match_properties.dart';
+import '../../../utilities/my_number_format.dart';
 import 'abstract_hypotheek_consumer.dart';
+import 'hypotheek_kosten_item_bewerken.dart';
 import 'hypotheek_verleng_card.dart';
 import 'model/hypotheek_view_model.dart';
 import 'model/hypotheek_view_state.dart';
+import 'overzicht_hypotheek.dart';
+import 'overzicht_hypotheek_tabel.dart';
 
 class BewerkHypotheek extends ConsumerStatefulWidget {
   const BewerkHypotheek({super.key});
@@ -44,6 +66,15 @@ class BewerkHypotheekState extends ConsumerState<BewerkHypotheek> {
 
   @override
   Widget build(BuildContext context) {
+    bool geenHypotheek = ref.watch(
+        hypotheekBewerkenProvider.select((value) => value.hypotheek == null));
+
+    if (geenHypotheek) {
+      return const RouteFout(
+        routeFoutOpties: RouteFoutOpties.afsnijden,
+      );
+    }
+
     final deviceScreen = DeviceScreen3.of(context);
     final theme = deviceScreen.theme;
 
@@ -54,7 +85,7 @@ class BewerkHypotheekState extends ConsumerState<BewerkHypotheek> {
         text: 'Annuleren', icon: Icons.arrow_back, voidCallback: _pop);
 
     return DefaultPage(
-        title: 'Toevoegen',
+        title: 'Lening',
         imageBuilder: (_) => Image(
             image: const AssetImage(
               'graphics/fit_geldzak.png',
@@ -83,16 +114,45 @@ class BewerkHypotheekState extends ConsumerState<BewerkHypotheek> {
         SliverPadding(
             padding: padding.copyWith(bottom: 0.0),
             sliver: const HypotheekBewerkOmschrijvingToevoegOptie()),
-        const HypotheekBewerkDatumVerlengen(),
-        // const TermijnPeriodePanel(),
-        // const HypotheekKostenPanel(),
+        SliverPadding(
+            padding: padding.copyWith(
+              top: 0.0,
+              bottom: 0.0,
+            ),
+            sliver: const HypotheekDatumEnVervolg()),
+        SliverPadding(
+            padding: padding.copyWith(
+              top: 0.0,
+              bottom: 0.0,
+            ),
+            sliver: const VormRentePeriodePanel()),
+        SliverPadding(
+          padding: padding.copyWith(
+            top: 0.0,
+            bottom: 0.0,
+          ),
+          sliver: const FinancieringsNormPanel(),
+        ),
+
+        SliverPaddingConstrainAlign(
+          padding: padding.copyWith(top: 0.0, bottom: 8.0),
+          maxCrossSize: 900.0,
+          sliver: const HypotheekKostenPanel(),
+        ),
+
         // const VerduurzamenPanel(),
-        // const LeningPanel(),
+        SliverPadding(
+          padding: padding.copyWith(
+            top: 8.0,
+            bottom: 0.0,
+          ),
+          sliver: const TeLenenPanel(),
+        ),
         // SpacerFinancieringsTabel(),
         // FinancieringsNormTable(),
         // VerdelingLeningen(),
-        // OverzichtHypotheek(),
-        // OverzichtHypotheekTabel()
+        const OverzichtHypotheek(),
+        const OverzichtHypotheekTabel()
       ]),
     );
   }
@@ -157,6 +217,7 @@ class HypotheekBewerkOmschrijvingToevoegOptieState
           _veranderingOmschrijving(_tecOmschrijving.text);
         }
       });
+
     super.initState();
   }
 
@@ -164,6 +225,7 @@ class HypotheekBewerkOmschrijvingToevoegOptieState
   void dispose() {
     _tecOmschrijving.dispose();
     _fnOmschrijving.dispose();
+
     super.dispose();
   }
 
@@ -184,49 +246,81 @@ class HypotheekBewerkOmschrijvingToevoegOptieState
       const SizedBox(
         height: 16.0,
       ),
-      Text(
-        'Hypotheek',
-        style: headlineMedium,
+      Center(
+        child: Text(
+          'Hypotheek',
+          style: headlineMedium,
+        ),
       ),
     ];
+
+    final firstDate =
+        HypotheekVerwerken.eersteKalenderDatum(hypotheekDossier, hypotheek);
+    final lastDate =
+        HypotheekVerwerken.laatsteKalenderDatum(hypotheekDossier, hypotheek);
 
     if (hypotheekViewState.teVerlengen.isNotEmpty) {
       children.addAll([
         const SizedBox(
-          height: 8.0,
+          height: 12.0,
         ),
         UndefinedSelectableGroup(
-          groups: [
-            MyRadioGroup<OptiesHypotheekToevoegen>(
-                list: [
-                  RadioSelectable(
-                      text: 'Nieuw', value: OptiesHypotheekToevoegen.nieuw),
-                  RadioSelectable(
-                      text: 'Verlengen',
-                      value: OptiesHypotheekToevoegen.verlengen)
-                ],
-                groupValue: hypotheek.optiesHypotheekToevoegen,
-                onChange: _veranderingHypotheekToevoegen)
-          ],
-          matchTargetWrap: [
-            MatchTargetWrap<GroupLayoutProperties>(
-                object: GroupLayoutProperties.horizontal(
+            groups: [
+              MyRadioGroup<OptiesHypotheekToevoegen>(
+                  list: [
+                    RadioSelectable(
+                        text: 'Nieuw', value: OptiesHypotheekToevoegen.nieuw),
+                    RadioSelectable(
+                        text: 'Verlengen',
+                        value: OptiesHypotheekToevoegen.verlengen)
+                  ],
+                  groupValue: hypotheek.optiesHypotheekToevoegen,
+                  onChange: _veranderingHypotheekToevoegen)
+            ],
+            getGroupLayoutProperties: (targetPlatform, formFactorType) =>
+                GroupLayoutProperties.horizontal(
+                    runAlignment: WrapAlignment.center,
+                    alignment: WrapAlignment.center,
                     options: const SelectableGroupOptions(
                         selectedGroupTheme: SelectedGroupTheme.button,
                         space: 6.0))),
-          ],
+        if (hypotheekViewState.teHerFinancieren.isNotEmpty)
+          AnimatedScaleResizeSwitcher(
+              child: hypotheek.optiesHypotheekToevoegen ==
+                      OptiesHypotheekToevoegen.nieuw
+                  ? DateInputPicker(
+                      date: hypotheek.startDatum,
+                      firstDate: firstDate,
+                      lastDate: lastDate,
+                      changeDate: _veranderingStartDatum,
+                      saveDate: _veranderingStartDatum,
+                    )
+                  : const SizedBox.shrink()),
+        const SizedBox(
+          height: 8.0,
+        )
+      ]);
+    } else {
+      children.addAll([
+        const SizedBox(
+          height: 12.0,
+        ),
+        DateInputPicker(
+          date: hypotheek.startDatum,
+          firstDate: firstDate,
+          lastDate: lastDate,
+          changeDate: _veranderingStartDatum,
+          saveDate: _veranderingStartDatum,
+        ),
+        const SizedBox(
+          height: 12.0,
         ),
       ]);
     }
 
-    return SliverToBoxAdapter(
-        child: Padding(
-      padding: const EdgeInsets.only(bottom: 4.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: children,
-      ),
-    ));
+    return SliverList(
+      delegate: SliverChildListDelegate.fixed(children),
+    );
   }
 
   _veranderingOmschrijving(String value) {
@@ -236,9 +330,13 @@ class HypotheekBewerkOmschrijvingToevoegOptieState
   _veranderingHypotheekToevoegen(OptiesHypotheekToevoegen? value) {
     notifier.verandering(optiesHypotheekToevoegen: value);
   }
+
+  _veranderingStartDatum(DateTime? value) {
+    notifier.verandering(startDatum: value);
+  }
 }
 
-/// Datum en Verlengen
+/// Vervolg hypotheek
 ///
 ///
 ///
@@ -246,8 +344,8 @@ class HypotheekBewerkOmschrijvingToevoegOptieState
 ///
 ///
 
-class HypotheekBewerkDatumVerlengen extends ConsumerStatefulWidget {
-  const HypotheekBewerkDatumVerlengen({super.key});
+class HypotheekDatumEnVervolg extends ConsumerStatefulWidget {
+  const HypotheekDatumEnVervolg({super.key});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -255,7 +353,7 @@ class HypotheekBewerkDatumVerlengen extends ConsumerStatefulWidget {
 }
 
 class HypotheekBewerkDatumVerlengenState
-    extends AbstractHypotheekConsumerState<HypotheekBewerkDatumVerlengen>
+    extends AbstractHypotheekConsumerState<HypotheekDatumEnVervolg>
     with SingleTickerProviderStateMixin {
   late VervolgHypotheekSliverBoxModel vervolgHypotheekSliverBoxModel;
   late final AnimationController animationController;
@@ -280,7 +378,7 @@ class HypotheekBewerkDatumVerlengenState
   }
 
   @override
-  void didUpdateWidget(covariant HypotheekBewerkDatumVerlengen oldWidget) {
+  void didUpdateWidget(covariant HypotheekDatumEnVervolg oldWidget) {
     super.didUpdateWidget(oldWidget);
   }
 
@@ -344,24 +442,10 @@ class HypotheekBewerkDatumVerlengenState
         checkHeight(next);
       }
     });
-    final firstDate =
-        HypotheekVerwerken.eersteKalenderDatum(hypotheekDossier, hypotheek);
-    final lastDate =
-        HypotheekVerwerken.laatsteKalenderDatum(hypotheekDossier, hypotheek);
-    final theme = Theme.of(context);
-    final headerlineMedium = theme.textTheme.headlineMedium;
-
-    Widget vorigeOfDatum;
 
     List<Widget> slivers = [
       // if (hypotheek.optiesHypotheekToevoegen == OptiesHypotheekToevoegen.nieuw)
-      DateInputPicker(
-        date: hypotheek.startDatum,
-        firstDate: firstDate,
-        lastDate: lastDate,
-        changeDate: _veranderingStartDatum,
-        saveDate: _veranderingStartDatum,
-      ),
+
       AnimatedBuilder(
           animation: animation,
           builder: (BuildContext context, Widget? child) => SizedBox(
@@ -386,75 +470,6 @@ class HypotheekBewerkDatumVerlengenState
           ]))
     ];
 
-    //   Map<DateTime, RestSchuldHypotheken> restSchuldHypotheken =
-    //       HypotheekVerwerken.restSchuldInventarisatie(
-    //           hypotheekBewerken.hypotheekDossier, hypotheekBewerken.id);
-
-    //   if (restSchuldHypotheken.isNotEmpty) {
-    //     vorigeOfDatum = Column(children: [
-    //       vorigeOfDatum,
-    //       const SizedBox(
-    //         height: 16.0,
-    //       ),
-    //       Text('Oversluiten', style: headerlineMedium),
-    //       const SizedBox(
-    //         height: 8.0,
-    //       ),
-    //       LayoutBuilder(
-    //           builder: (BuildContext context, BoxConstraints constraints) {
-    //         double width = constraints.maxWidth;
-
-    //         const max = 150.0;
-    //         const inner = 6.0;
-
-    //         final r = 1.0 + ((width - max) / (max + inner)).floorToDouble();
-
-    //         final w = (width - r * inner + inner) / r;
-
-    //         return Wrap(spacing: 6.0, children: [
-    //           for (CombiRestSchuld r in hypotheekBewerken.restSchulden.values)
-    //             SizedBox(
-    //               width: w,
-    //               height: w / 3.0 * 2.0,
-    //               child: RestSchuldHypotheekCard(
-    //                 hypotheekDossier: hypotheekDossier,
-    //                 restSchuld: r,
-    //                 selected: hypotheek.startDatum,
-    //                 changed: _veranderingStartDatum,
-    //               ),
-    //             )
-    //         ]);
-    //       })
-    //     ]);
-    //   }
-    // } else {
-    //   vorigeOfDatum = LayoutBuilder(
-    //       builder: (BuildContext context, BoxConstraints constraints) {
-    //     double width = constraints.maxWidth;
-
-    //     const max = 300.0;
-    //     const inner = 6.0;
-
-    //     final r = 1.0 + ((width - max) / (max + inner)).floorToDouble();
-
-    //     final w = (width - r * inner + inner) / r;
-
-    //     return Wrap(
-    //         spacing: 6.0,
-    //         children: hypotheekBewerken.teVerlengen
-    //             .map((Hypotheek e) => SizedBox(
-    //                   width: w,
-    //                   height: w / 3.0 * 2.0,
-    //                   child: VerlengCard(
-    //                     hypotheek: e,
-    //                     selected: hypotheek.vorige,
-    //                     changed: _veranderingVorigeHypotheek,
-    //                   ),
-    //                 ))
-    //             .toList());
-    //   });
-    // }
-
     return SliverList(
       delegate: SliverChildListDelegate.fixed(slivers),
     );
@@ -473,16 +488,20 @@ class HypotheekBewerkDatumVerlengenState
       var (Widget child, String id) = switch (properties.vervolgLening) {
         (HerFinancieren herFinancieren) => (
             HerfinancierenCard(
-              changed: (DateTime? value) {},
+              changed: (DateTime? value) {
+                notifier.verandering(startDatum: value);
+              },
               hypotheekDossier: hypotheekViewState.hypotheekDossier,
               herfinancieren: herFinancieren,
-              selected: null,
+              selected: hypotheekViewState.hypotheek?.startDatum,
             ),
             'hf_${herFinancieren.id}'
           ),
         (LeningVerlengen leningVerlengen) => (
             VerlengCard(
-                changed: (String? v) {},
+                changed: (String? v) {
+                  notifier.verandering(vorige: v);
+                },
                 leningVerlengen: leningVerlengen,
                 selected: hypotheekViewState.hypotheek?.vorige),
             'vl_${leningVerlengen.id}'
@@ -498,249 +517,1048 @@ class HypotheekBewerkDatumVerlengenState
           child: SizedBox(width: properties.size(model.axis), child: child));
     };
   }
+}
 
-  _veranderingStartDatum(DateTime? value) {
-    notifier.verandering(startDatum: value);
+/// Termijn, Periode, NHG en Verduurzamen
+///
+///
+///
+///
+///
+///
+
+class VormRentePeriodePanel extends ConsumerStatefulWidget {
+  const VormRentePeriodePanel({super.key});
+
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      VormRentePeriodeState();
+}
+
+class VormRentePeriodeState
+    extends AbstractHypotheekConsumerState<VormRentePeriodePanel> {
+  late final TextEditingController _tecAflosTermijnInJaren;
+  late final FocusNode _fnAflosTermijnInJaren;
+  late final TextEditingController _tecPeriodeInJaren;
+  late final FocusNode _fnPeriodeInJaren;
+  late final TextEditingController _tecRente;
+  late final FocusNode _fnRente;
+  late final TextEditingController _tecLening;
+  late final FocusNode _fnLening;
+
+  @override
+  void initState() {
+    _tecAflosTermijnInJaren = TextEditingController(
+        text: intToText((hypotheek) => hypotheek.aflosTermijnInJaren));
+
+    _fnAflosTermijnInJaren = FocusNode()
+      ..addListener(() {
+        if (!_fnAflosTermijnInJaren.hasFocus) {
+          _veranderenAflosTermijnInJaren(
+            value: int.tryParse(_tecAflosTermijnInJaren.text),
+          );
+        }
+      });
+
+    _tecLening = TextEditingController(
+        text: doubleToText((hypotheek) => hypotheek.gewensteLening));
+
+    _fnLening = FocusNode()
+      ..addListener(() {
+        if (!_fnLening.hasFocus) {
+          _veranderingLening(
+            _tecLening.text,
+          );
+        }
+      });
+
+    _tecPeriodeInJaren = TextEditingController(
+        text: intToText((hypotheek) => hypotheek.periodeInJaren));
+
+    _fnPeriodeInJaren = FocusNode()
+      ..addListener(() {
+        if (!_fnPeriodeInJaren.hasFocus) {
+          _veranderenPeriodeInJaren(
+            value: int.tryParse(_tecPeriodeInJaren.text),
+          );
+        }
+      });
+
+    _tecRente = TextEditingController(
+        text: doubleToText((Hypotheek hypotheek) => hypotheek.rente));
+
+    _fnRente = FocusNode()
+      ..addListener(() {
+        if (!_fnRente.hasFocus) {
+          _veranderingRente(_tecRente.text);
+        }
+      });
+
+    super.initState();
   }
 
-  _veranderingVorigeHypotheek(String? value) {
-    notifier.verandering(vorige: value ?? '');
+  // int? get maxTermijnenInJaren {
+  //   final hypotheekBewerken = ref.read(hypotheekBewerkenProvider);
+  //   final hp = hypotheekBewerken.hypotheekDossier;
+  //   final hypotheek = hypotheekBewerken.hypotheek;
+
+  //   return hp != null && hypotheek != null
+  //       ? HypotheekVerwerken.maxTermijnenInJaren(hp, hypotheek)
+  //       : null;
+  // }
+
+  @override
+  void dispose() {
+    _tecAflosTermijnInJaren.dispose();
+    _fnAflosTermijnInJaren.dispose();
+
+    _tecPeriodeInJaren.dispose();
+    _fnPeriodeInJaren.dispose();
+    _tecLening.dispose();
+    _fnLening.dispose();
+    _tecRente.dispose();
+    _fnRente.dispose();
+    super.dispose();
+  }
+
+  listen(Hypotheek? previous, Hypotheek? next) {
+    if (next == null) return;
+
+    if (previous?.aflosTermijnInJaren != next.aflosTermijnInJaren &&
+        nf.parsToInt(_tecAflosTermijnInJaren.text) !=
+            next.aflosTermijnInJaren) {
+      _tecAflosTermijnInJaren.text = '${next.aflosTermijnInJaren}';
+    }
+
+    if (previous?.periodeInJaren != next.periodeInJaren &&
+        nf.parsToInt(_tecPeriodeInJaren.text) != next.periodeInJaren) {
+      _tecPeriodeInJaren.text = '${next.periodeInJaren}';
+    }
+
+    double? nextLening = HypotheekBewerken.leningGewenstOfVast(hypotheek);
+
+    if (nextLening != null && nextLening != nf.parsToDouble(_tecLening.text)) {
+      _tecLening.text = nf.parseDblToText(nextLening);
+    }
+  }
+
+  @override
+  Widget buildHypotheek(
+      BuildContext context,
+      HypotheekViewState hypotheekViewState,
+      HypotheekDossier hypotheekDossier,
+      Hypotheek hypotheek) {
+    ref.listen<Hypotheek?>(
+        hypotheekBewerkenProvider
+            .select((HypotheekViewState value) => value.hypotheek),
+        listen);
+
+    final theme = Theme.of(context);
+    final headlineMedium = theme.textTheme.headlineMedium;
+    final maxTermijnenInJaren =
+        HypotheekVerwerken.maxTermijnenInMaanden(hypotheekDossier, hypotheek) ~/
+            12;
+
+    List<Widget> children = [
+      const SizedBox(
+        height: 8.0,
+      ),
+      // const SizedBox(
+      //   height: 16.0,
+      // ),
+      Text(
+        'Vorm',
+        style: headlineMedium,
+      ),
+      // const SizedBox(
+      //   height: 6.0,
+      // ),
+      UndefinedSelectableGroup(
+        groups: [
+          MyRadioGroup<HypotheekVorm>(
+              groupValue: hypotheek.hypotheekvorm,
+              list: [
+                RadioSelectable(
+                    text: 'Annuïteit', value: HypotheekVorm.annuiteit),
+                RadioSelectable(text: 'Lineair', value: HypotheekVorm.lineair),
+                RadioSelectable(
+                  text: 'Aflosvrij',
+                  value: HypotheekVorm.aflosvrij,
+                )
+              ],
+              onChange: _veranderingHypotheekvorm)
+        ],
+      ),
+      Row(
+        children: [
+          Expanded(
+            child: TextFormField(
+                textAlign: TextAlign.end,
+                controller: _tecLening,
+                focusNode: _fnLening,
+                onSaved: _veranderingLening,
+                validator: (String? value) {
+                  double lening = value == null ? 0.0 : nf.parsToDouble(value);
+                  return (lening <= 0.0) ? 'Lening?' : null;
+                },
+                decoration: InputDecoration(
+                    hintText: 'Bedrag',
+                    labelText:
+                        hypotheek.afgesloten ? 'Lening' : 'Gewenste lening'),
+                keyboardType: const TextInputType.numberWithOptions(
+                  signed: true,
+                  decimal: true,
+                ),
+                inputFormatters: [
+                  MyNumberFormat(context).numberInputFormat('#.00')
+                ],
+                textInputAction: TextInputAction.next),
+          ),
+          const SizedBox(
+            width: 16.0,
+          ),
+          SizedBox(
+            width: 80.0,
+            child: TextFormField(
+                textAlign: TextAlign.end,
+                controller: _tecRente,
+                focusNode: _fnRente,
+                onSaved: _veranderingRente,
+                validator: (String? value) {
+                  double rente = value == null ? 0.0 : nf.parsToDouble(value);
+                  return (rente < 0.0 || rente > 10) ? '0-10%' : null;
+                },
+                decoration: const InputDecoration(
+                    hintText: '%', labelText: 'Rente (%)'),
+                keyboardType: const TextInputType.numberWithOptions(
+                  signed: true,
+                  decimal: true,
+                ),
+                inputFormatters: [
+                  MyNumberFormat(context).numberInputFormat('#.00')
+                ],
+                textInputAction: TextInputAction.done),
+          ),
+        ],
+      ),
+      const SizedBox(
+        height: 12.0,
+      ),
+      AnimatedScaleResizeSwitcher(
+          child: hypotheek.optiesHypotheekToevoegen ==
+                  OptiesHypotheekToevoegen.verlengen
+              ? const SizedBox.shrink()
+              : Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  const Text('Aflostermijn (jaren)'),
+                  Row(children: [
+                    Expanded(
+                        child: Slider(
+                            min: 1.0,
+                            max: maxTermijnenInJaren.toDouble(),
+                            value: hypotheek.aflosTermijnInJaren.toDouble(),
+                            divisions: maxTermijnenInJaren - 1 < 1
+                                ? 1
+                                : maxTermijnenInJaren - 1,
+                            onChanged: (double value) =>
+                                _veranderenAflosTermijnInJaren(
+                                  value: value.toInt(),
+                                ))),
+                    SizedBox(
+                      width: 50.0,
+                      child: TextFormField(
+                          controller: _tecAflosTermijnInJaren,
+                          focusNode: _fnAflosTermijnInJaren,
+                          textAlign: TextAlign.center,
+                          decoration: InputDecoration(
+                              hintText: '1-$maxTermijnenInJaren',
+                              labelText: 'Termijn'),
+                          keyboardType: const TextInputType.numberWithOptions(
+                            signed: true,
+                            decimal: false,
+                          ),
+                          inputFormatters: [nf.numberInputFormat('#0')],
+                          textInputAction: TextInputAction.next),
+                    ),
+                    // const SizedBox(
+                    //   width: 16.0,
+                    // )
+                  ]),
+                  const SizedBox(
+                    height: 8.0,
+                  ),
+                ])),
+      const Text('Rentevaste periode (jaren)'),
+      Row(children: [
+        Expanded(
+          child: Slider(
+              min: 1.0,
+              max: hypotheek.aflosTermijnInJaren.toDouble(),
+              value: hypotheek.periodeInJaren.toDouble(),
+              divisions: hypotheek.aflosTermijnInJaren - 1 < 1
+                  ? 1
+                  : hypotheek.aflosTermijnInJaren - 1,
+              onChanged: (double value) =>
+                  _veranderenPeriodeInJaren(value: value.toInt())),
+        ),
+        SizedBox(
+          width: 50.0,
+          child: TextFormField(
+              textAlign: TextAlign.center,
+              controller: _tecPeriodeInJaren,
+              focusNode: _fnPeriodeInJaren,
+              decoration: InputDecoration(
+                  hintText: '1-${hypotheek.aflosTermijnInJaren}',
+                  labelText: 'Periode'),
+              keyboardType: const TextInputType.numberWithOptions(
+                signed: true,
+                decimal: false,
+              ),
+              inputFormatters: [nf.numberInputFormat('#0')],
+              textInputAction: TextInputAction.next),
+        ),
+      ]),
+    ];
+
+    return SliverList(
+      delegate: SliverChildListDelegate.fixed(children),
+    );
+  }
+
+  _veranderingHypotheekvorm(HypotheekVorm? value) {
+    notifier.verandering(hypotheekvorm: value);
+  }
+
+  _veranderingLening(String? value) {
+    notifier.verandering(gewensteLening: nf.parsToDouble(value));
+  }
+
+  _veranderingRente(String? value) {
+    notifier.verandering(rente: nf.parsToDouble(value));
+  }
+
+  _veranderenAflosTermijnInJaren({required int? value}) {
+    if (value == null) return;
+    notifier.verandering(aflosTermijnInMaanden: value * 12);
+  }
+
+  _veranderenPeriodeInJaren({required int? value}) {
+    if (value == null) return;
+    notifier.verandering(periodeInMaanden: value * 12);
+  }
+}
+/* FinancieringsNorm
+ *
+ *
+ *
+ *
+ *
+ *
+ */
+
+class FinancieringsNormPanel extends ConsumerStatefulWidget {
+  const FinancieringsNormPanel({
+    super.key,
+  });
+
+  @override
+  ConsumerState<FinancieringsNormPanel> createState() =>
+      FinancieringsNormPanelState();
+}
+
+class FinancieringsNormPanelState
+    extends AbstractHypotheekConsumerState<FinancieringsNormPanel> {
+  @override
+  Widget buildHypotheek(
+      BuildContext context,
+      HypotheekViewState hypotheekViewState,
+      HypotheekDossier hypotheekDossier,
+      Hypotheek hypotheek) {
+    final theme = Theme.of(context);
+    final headlineMedium = theme.textTheme.headlineMedium;
+
+    NormenToepassen? toepassen =
+        HypotheekBewerken.opDatumOphalen<NormenToepassen>(
+            hypotheekDossier.dNormenToepassen,
+            hypotheek: hypotheek);
+
+    Widget child = hypotheek.afgesloten || toepassen == null
+        ? const SizedBox.shrink()
+        : Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(
+              'Financieringsnorm',
+              style: headlineMedium,
+            ),
+            const SizedBox(
+              height: 4.0,
+            ),
+            UndefinedSelectableGroup(
+              groups: [
+                MyCheckGroup<String>(
+                    list: [
+                      CheckSelectable<String>(
+                          identifier: 'inkomen',
+                          text: 'Inkomen',
+                          value: toepassen.inkomen),
+                      CheckSelectable<String>(
+                          identifier: 'woningwaarde',
+                          text: 'Woningwaarde',
+                          value: toepassen.woningWaarde)
+                    ],
+                    onChange: (String identifier, bool value) {
+                      switch (identifier) {
+                        case 'inkomen':
+                          {
+                            notifier.verandering(normInkomenToepassen: !value);
+                            break;
+                          }
+                        case 'woningwaarde':
+                          {
+                            notifier.verandering(
+                                normWoningWaardeToepassen: !value);
+                            break;
+                          }
+                      }
+                    })
+              ],
+            ),
+          ]);
+
+    return SliverToBoxAdapter(child: AnimatedScaleResizeSwitcher(child: child));
   }
 }
 
-// /// Termijn, Periode, NHG en Verduurzamen
-// ///
-// ///
-// ///
-// ///
-// ///
-// ///
+/* Kosten
+ *
+ *
+ *
+ *
+ *
+ *
+ */
 
-// class TermijnPeriodePanel extends ConsumerStatefulWidget {
-//   const TermijnPeriodePanel({super.key});
+class HypotheekKostenPanel extends ConsumerStatefulWidget {
+  const HypotheekKostenPanel({
+    super.key,
+  });
 
-//   @override
-//   ConsumerState<ConsumerStatefulWidget> createState() =>
-//       TermijnPeriodePanelState();
-// }
+  @override
+  ConsumerState<HypotheekKostenPanel> createState() =>
+      HypotheekKostenPanelState();
+}
 
-// class TermijnPeriodePanelState
-//     extends AbstractHypotheekConsumerState<TermijnPeriodePanel> {
-//   late final TextEditingController _tecAflosTermijnInJaren;
-//   late final FocusNode _fnAflosTermijnInJaren;
-//   late final TextEditingController _tecPeriodeInJaren;
-//   late final FocusNode _fnPeriodeInJaren;
+class HypotheekKostenPanelState
+    extends AbstractHypotheekConsumerState<HypotheekKostenPanel> {
+  late final TextEditingController _tecWoningWaarde;
 
-//   @override
-//   void initState() {
-//     _tecAflosTermijnInJaren = TextEditingController(
-//         text: intToText((hypotheek) => hypotheek.aflosTermijnInJaren));
+  late final FocusNode _fnWoningWaarde;
 
-//     _fnAflosTermijnInJaren = FocusNode()
-//       ..addListener(() {
-//         if (!_fnAflosTermijnInJaren.hasFocus) {
-//           _veranderenAflosTermijnInJaren(
-//             value: int.tryParse(_tecAflosTermijnInJaren.text),
-//           );
-//         }
-//       });
+  @override
+  void initState() {
+    final hypotheekViewState = ref.read(hypotheekBewerkenProvider);
 
-//     _tecPeriodeInJaren = TextEditingController(
-//         text: intToText((hypotheek) => hypotheek.periodeInJaren));
+    _tecWoningWaarde = TextEditingController(
+        text: doubleToText((Hypotheek hypotheek) =>
+            HypotheekBewerken.woningWaardeOpDatum(
+                hypotheekDossier: hypotheekViewState.hypotheekDossier,
+                hypotheek: hypotheekViewState.hypotheek)));
 
-//     _fnPeriodeInJaren = FocusNode()
-//       ..addListener(() {
-//         if (!_fnPeriodeInJaren.hasFocus) {
-//           _veranderenPeriodeInJaren(
-//             value: int.tryParse(_tecPeriodeInJaren.text),
-//           );
-//         }
-//       });
+    _fnWoningWaarde = FocusNode()
+      ..addListener(() {
+        if (!_fnWoningWaarde.hasFocus) {
+          _veranderingWoningwaardeWoning(_tecWoningWaarde.text);
+        }
+      });
 
-//     super.initState();
-//   }
+    super.initState();
+  }
 
-//   // int? get maxTermijnenInJaren {
-//   //   final hypotheekBewerken = ref.read(hypotheekBewerkenProvider);
-//   //   final hp = hypotheekBewerken.hypotheekDossier;
-//   //   final hypotheek = hypotheekBewerken.hypotheek;
+  @override
+  void dispose() {
+    _tecWoningWaarde.dispose();
+    _fnWoningWaarde.dispose();
+    super.dispose();
+  }
 
-//   //   return hp != null && hypotheek != null
-//   //       ? HypotheekVerwerken.maxTermijnenInJaren(hp, hypotheek)
-//   //       : null;
-//   // }
+  @override
+  Widget buildHypotheek(
+      BuildContext context,
+      HypotheekViewState hypotheekViewState,
+      HypotheekDossier hypotheekDossier,
+      Hypotheek hypotheek) {
+    final sliver = AnimatedSliverBox<HypotheekKostenSliverBoxModel>(
+        controllerSliverRowBox: hypotheekViewState.kostenSliverBoxController,
+        createSliverRowBoxModel: (sliverBoxContext, axis) {
+          final visible = !(hypotheekViewState.hypotheek?.afgesloten ?? false);
 
-//   @override
-//   void dispose() {
-//     _tecAflosTermijnInJaren.dispose();
-//     _fnAflosTermijnInJaren.dispose();
-//     _tecPeriodeInJaren.dispose();
-//     _fnPeriodeInJaren.dispose();
-//     super.dispose();
-//   }
+          return HypotheekKostenSliverBoxModel(
+              sliverBoxContext: sliverBoxContext,
+              topBox: SingleBoxModel<String, DefaultBoxItemProperties>(
+                  items: createTop(hypotheekViewState, visible),
+                  tag: 'top',
+                  buildStateItem: _buildTopBottom(hypotheekViewState)),
+              gedeeldeKosten: [
+                SingleBoxModel<String, KostenItemBoxProperties>(
+                    items: [
+                      for (var k in (hypotheekDossier
+                              .dKosten[hypotheek.startDatum]?.kosten ??
+                          <Waarde>[]))
+                        KostenItemBoxProperties(
+                            id: k.id,
+                            panel: BoxPropertiesPanels.standard,
+                            value: k)
+                    ],
+                    tag: Kalender.datumNaTekst(hypotheek.startDatum),
+                    buildStateItem: _buildItem(hypotheekViewState))
+              ],
+              bottomBox: SingleBoxModel<String, DefaultBoxItemProperties>(
+                  items: createBottom(hypotheekViewState, visible),
+                  tag: 'bottom',
+                  buildStateItem: _buildTopBottom(hypotheekViewState)),
+              axis: axis,
+              duration: const Duration(milliseconds: 300));
+        },
+        updateSliverRowBoxModel: (model, axis) {
+          for (var single in model.gedeeldeKosten) {
+            single.buildStateItem = _buildItem(hypotheekViewState);
+          }
+          final buildTopBottom = _buildTopBottom(hypotheekViewState);
+          model
+            ..topBox.buildStateItem = buildTopBottom
+            ..bottomBox.buildStateItem = buildTopBottom;
+        });
 
-//   listen(Hypotheek? previous, Hypotheek? next) {
-//     if (next == null) return;
+    return SliverLayerBox(
+      children: [
+        SliverLayerOutside(
+            beginOutside: 10.0,
+            endOutside: 10.0,
+            child: Container(
+                decoration: const BoxDecoration(
+              borderRadius: BorderRadius.all(
+                Radius.circular(40.0),
+              ),
+              color: Color.fromARGB(255, 241, 250, 250),
+            ))),
+        SliverLayerPadding(
+            padding: const EdgeInsets.all(6.0),
+            sliver: SliverLayerClipRRect(
+                borderRadius: BorderRadius.circular(32.0), sliver: sliver))
+      ],
+    );
+  }
 
-//     if (previous?.aflosTermijnInJaren != next.aflosTermijnInJaren &&
-//         nf.parsToInt(_tecAflosTermijnInJaren.text) !=
-//             next.aflosTermijnInJaren) {
-//       _tecAflosTermijnInJaren.text = '${next.aflosTermijnInJaren}';
-//     }
+  List<DefaultBoxItemProperties> createTop(
+      HypotheekViewState hypotheekViewState, bool visible) {
+    final status = visible
+        ? BoxItemTransitionState.visible
+        : BoxItemTransitionState.invisible;
+    return [
+      DefaultBoxItemProperties(
+          id: 'titleWoning', size: 56.0, transitionStatus: status),
+      DefaultBoxItemProperties(
+          id: 'woning', size: 56.0, transitionStatus: status),
+      DefaultBoxItemProperties(
+          id: 'nhg', size: 1.0, transitionStatus: status, useSizeOfChild: true),
+      DefaultBoxItemProperties(
+          id: 'kostenTitle', size: 42.0, transitionStatus: status),
+    ];
+  }
 
-//     if (previous?.periodeInJaren != next.periodeInJaren &&
-//         nf.parsToInt(_tecPeriodeInJaren.text) != next.periodeInJaren) {
-//       _tecPeriodeInJaren.text = '${next.periodeInJaren}';
-//     }
-//   }
+  List<DefaultBoxItemProperties> createBottom(
+      HypotheekViewState hypotheekViewState, bool visible) {
+    return [
+      DefaultBoxItemProperties(
+          id: 'unfocus',
+          size: 0.0,
+          transitionStatus: visible
+              ? BoxItemTransitionState.visible
+              : BoxItemTransitionState.invisible),
+      DefaultBoxItemProperties(
+          id: 'bottom',
+          size: 56.0,
+          transitionStatus: visible
+              ? BoxItemTransitionState.visible
+              : BoxItemTransitionState.invisible)
+    ];
+  }
 
-//   @override
-//   Widget build(BuildContext context) {
-//     final viewState = ref.watch(hypotheekBewerkenProvider);
-//     final hp = viewState.hypotheekDossier;
-//     final hypotheek = viewState.hypotheek;
+  BuildStateItem<String, KostenItemBoxProperties> _buildItem(
+      HypotheekViewState hypotheekViewState) {
+    return (
+        {required BuildContext buildContext,
+        Animation<double>? animation,
+        required AnimatedSliverBoxModel<String> model,
+        required KostenItemBoxProperties properties,
+        required SingleBoxModel<String, KostenItemBoxProperties> singleBoxModel,
+        required int index}) {
+      Widget child;
+      //
+      //
+      //
+      //
 
-//     return (hypotheek != null)
-//         ? buildHypotheek(context, viewState, hp, hypotheek)
-//         : ohno();
-//   }
+      var (String omschrijving, String bedrag, String sup) =
+          switch (properties.value) {
+        (Waarde w) when w.eenheid == Eenheid.percentageWoningWaarde => (
+            w.omschrijving,
+            nf.parseDblToText(HypotheekBewerken.woningWaardeOpDatum(
+                    hypotheekDossier: hypotheekViewState.hypotheekDossier,
+                    hypotheek: hypotheekViewState.hypotheek) /
+                100.0 *
+                w.getal),
+            '${nf.parseDblToText(w.getal)}%'
+          ),
+        (Waarde w) when w.eenheid == Eenheid.percentageLening => (
+            w.omschrijving,
+            nf.parseDblToText((hypotheekViewState.hypotheek?.lening ?? 0.0) /
+                100.0 *
+                w.getal),
+            '${nf.parseDblToText(w.getal)}%'
+          ),
+        (Waarde w) => (w.omschrijving, nf.parseDblToText(w.getal), '')
+      };
 
-//   Widget buildHypotheek(BuildContext context, HypotheekViewState viewState,
-//       HypotheekDossier hypotheekDossier, Hypotheek hypotheek) {
-//     ref.listen<Hypotheek?>(
-//         hypotheekBewerkenProvider
-//             .select((HypotheekViewState value) => value.hypotheek),
-//         listen);
+      Widget standard(bool complete) => StandardKostenItem(
+            height: properties.suggestedSize(model.axis),
+            omschrijving: omschrijving,
+            bedrag: bedrag,
+            sup: sup,
+            changePanel: () {
+              setState(() {
+                properties.setToPanel(BoxPropertiesPanels.edit);
+              });
+            },
+          );
 
-//     final maxTermijnenInJaren = HypotheekVerwerken.maxTermijnenInJaren(
-//         hypotheekDossier,
-//         vorige: hypotheek.vorige);
+      Widget edit(bool complete) => HypotheekKostenItemBewerken(
+            properties: properties,
+            changePanel: () => setState(() {
+              properties.setToPanel(BoxPropertiesPanels.standard);
+            }),
+          );
 
-//     List<Widget> children = [
-//       const SizedBox(
-//         height: 8.0,
-//       ),
-//       AnimatedScaleResizeSwitcher(
-//           child: hypotheek.optiesHypotheekToevoegen ==
-//                   OptiesHypotheekToevoegen.verlengen
-//               ? const SizedBox.shrink()
-//               : Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-//                   const Text('Aflostermijn (jaren)'),
-//                   Row(children: [
-//                     Expanded(
-//                         child: Slider(
-//                             min: 1.0,
-//                             max: maxTermijnenInJaren.toDouble(),
-//                             value: hypotheek.aflosTermijnInJaren.toDouble(),
-//                             divisions: maxTermijnenInJaren - 1 < 1
-//                                 ? 1
-//                                 : maxTermijnenInJaren - 1,
-//                             onChanged: (double value) =>
-//                                 _veranderenAflosTermijnInJaren(
-//                                   value: value.toInt(),
-//                                 ))),
-//                     SizedBox(
-//                       width: 50.0,
-//                       child: TextFormField(
-//                           controller: _tecAflosTermijnInJaren,
-//                           focusNode: _fnAflosTermijnInJaren,
-//                           textAlign: TextAlign.center,
-//                           decoration: InputDecoration(
-//                               hintText: '1-$maxTermijnenInJaren',
-//                               labelText: 'Termijn'),
-//                           keyboardType: const TextInputType.numberWithOptions(
-//                             signed: true,
-//                             decimal: false,
-//                           ),
-//                           inputFormatters: [nf.numberInputFormat('#0')],
-//                           textInputAction: TextInputAction.next),
-//                     ),
-//                     const SizedBox(
-//                       width: 16.0,
-//                     )
-//                   ]),
-//                   const SizedBox(
-//                     height: 8.0,
-//                   ),
-//                 ])),
-//       const Text('Rentevaste periode (jaren)'),
-//       Row(children: [
-//         Expanded(
-//           child: Slider(
-//               min: 1.0,
-//               max: hypotheek.aflosTermijnInJaren.toDouble(),
-//               value: hypotheek.periodeInJaren.toDouble(),
-//               divisions: hypotheek.aflosTermijnInJaren - 1 < 1
-//                   ? 1
-//                   : hypotheek.aflosTermijnInJaren - 1,
-//               onChanged: (double value) =>
-//                   _veranderenPeriodeInJaren(value: value.toInt())),
-//         ),
-//         SizedBox(
-//           width: 50.0,
-//           child: TextFormField(
-//               textAlign: TextAlign.center,
-//               controller: _tecPeriodeInJaren,
-//               focusNode: _fnPeriodeInJaren,
-//               decoration: InputDecoration(
-//                   hintText: '1-${hypotheek.aflosTermijnInJaren}',
-//                   labelText: 'Periode'),
-//               keyboardType: const TextInputType.numberWithOptions(
-//                 signed: true,
-//                 decimal: false,
-//               ),
-//               inputFormatters: [nf.numberInputFormat('#0')],
-//               textInputAction: TextInputAction.next),
-//         ),
-//         const SizedBox(
-//           width: 16.0,
-//         )
-//       ]),
-//       const SizedBox(
-//         height: 4.0,
-//       ),
-//       AnimatedScaleResizeSwitcher(
-//           child: hypotheek.afgesloten
-//               ? const SizedBox.shrink()
-//               : MyCheckbox(
-//                   text: 'Nationale hypotheek garantie (NHG)',
-//                   value: hypotheek.normNhg.toepassen,
-//                   onChanged: _veranderingToepassenNHG)),
-//     ];
+      if (properties.transfer) {
+        child = SliverBoxResizeAbSwitcher(
+          animateOnInitiation: properties.animateOnInitiation,
+          first: standard,
+          second: edit,
+          crossFadeState: properties.panel == BoxPropertiesPanels.standard
+              ? CrossFadeState.showFirst
+              : CrossFadeState.showSecond,
+          stateChange: () {
+            properties.fixPanel();
+          },
+        );
+      } else if (properties.panel == BoxPropertiesPanels.standard) {
+        child = standard(false);
+      } else {
+        child = edit(false);
+      }
 
-//     return SliverToBoxAdapter(
-//         child: Padding(
-//       padding: const EdgeInsets.only(top: 4.0, bottom: 0.0),
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: children,
-//       ),
-//     ));
-//   }
+      return SliverBoxTransferWidget(
+        key: Key('item_${properties.id}'),
+        model: model,
+        boxItemProperties: properties,
+        animation: animation,
+        singleBoxModel: singleBoxModel,
+        child: child,
+      );
+    };
+  }
 
-//   _veranderenAflosTermijnInJaren({required int? value}) {
-//     if (value == null) return;
-//     notifier.verandering(aflosTermijnInMaanden: value * 12);
-//   }
+  BuildStateItem<String, DefaultBoxItemProperties> _buildTopBottom(
+      HypotheekViewState hypotheekViewState) {
+    return (
+        {required BuildContext buildContext,
+        Animation<double>? animation,
+        required AnimatedSliverBoxModel<String> model,
+        required DefaultBoxItemProperties properties,
+        required SingleBoxModel<String, DefaultBoxItemProperties>
+            singleBoxModel,
+        required int index}) {
+      switch (properties.id) {
+        // case 'topPadding':
+        //   {
+        //     return const SizedBox(
+        //       height: 16.0,
+        //     );
+        //   }
+        case 'titleWoning':
+          {
+            final theme = Theme.of(context);
+            final displaySmall = theme.textTheme.displaySmall;
 
-//   _veranderenPeriodeInJaren({required int? value}) {
-//     if (value == null) return;
-//     notifier.verandering(periodeInMaanden: value * 12);
-//   }
+            final child = SizedBox(
+              height: properties.size(model.axis),
+              child: Center(
+                  child: Text(
+                'Woning',
+                style: displaySmall,
+                textAlign: TextAlign.center,
+              )),
+            );
 
-//   _veranderingToepassenNHG(bool? value) {
-//     notifier.verandering(toepassenNhg: value);
-//   }
-// }
+            return SliverBoxTransferWidget(
+              model: model,
+              animation: animation,
+              key: Key(properties.id),
+              boxItemProperties: properties,
+              singleBoxModel: singleBoxModel,
+              child: child,
+            );
+          }
+        case 'woning':
+          {
+            final child = KeepAlive(
+                keepAlive: true,
+                child: SizedBox(
+                  height: properties.size(model.axis),
+                  child: TextFormField(
+                    textAlign: TextAlign.right,
+                    controller: _tecWoningWaarde,
+                    focusNode: _fnWoningWaarde,
+                    decoration: const InputDecoration(
+                        hintText: 'Bedrag', labelText: 'Woningwaarde'),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      signed: true,
+                      decimal: true,
+                    ),
+                    inputFormatters: [
+                      MyNumberFormat(context).numberInputFormat('#.00')
+                    ],
+                    validator: (String? value) {
+                      NormenToepassen? toepassen =
+                          HypotheekBewerken.opDatumOphalen<NormenToepassen>(
+                              hypotheekViewState
+                                  .hypotheekDossier.dNormenToepassen,
+                              hypotheek: hypotheek);
+                      if ((toepassen?.woningWaarde ?? false) &&
+                          nf.parsToDouble(value) == 0.0) {
+                        return 'Geen bedrag > 0';
+                      }
+                      return null;
+                    },
+                  ),
+                ));
 
-// /* Lenning
-//  *
-//  *
-//  *
-//  * 
-//  *
-//  *
-//  */
+            return SliverBoxTransferWidget(
+                model: model,
+                animation: animation,
+                key: Key(properties.id),
+                boxItemProperties: properties,
+                singleBoxModel: singleBoxModel,
+                child: child);
+          }
+
+        case 'nhg':
+          {
+            var (bool toepasbaar, double? nghBedrag) =
+                HypotheekBewerken.nhgToepasbaarAankoopBedrag(
+                    hypotheekDossier: hypotheekViewState.hypotheekDossier,
+                    hypotheek: hypotheekViewState.hypotheek);
+
+            final child = toepasbaar
+                ? MyCheckbox(
+                    text: 'Nationale hypotheek garantie (NHG)',
+                    value: false, //hypotheek.normNhg.toepassen,
+                    onChanged: _veranderingToepassenNHG)
+                : Padding(
+                    padding: const EdgeInsets.only(left: 8.0, top: 8),
+                    child: Text('NHG aankoopbedrag: €${nghBedrag?.toInt()},-'),
+                  );
+
+            return SliverBoxTransferWidget(
+              model: model,
+              animation: animation,
+              key: Key(properties.id),
+              boxItemProperties: properties,
+              singleBoxModel: singleBoxModel,
+              child: child,
+            );
+          }
+        case 'kostenTitle':
+          {
+            {
+              final theme = Theme.of(context);
+              final displaySmall = theme.textTheme.displaySmall;
+
+              final child = SizedBox(
+                height: properties.size(model.axis),
+                child: Center(
+                  child: Text(
+                    'Kosten',
+                    style: displaySmall,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              );
+
+              return SliverBoxTransferWidget(
+                  model: model,
+                  animation: animation,
+                  key: Key(properties.id),
+                  boxItemProperties: properties,
+                  singleBoxModel: singleBoxModel,
+                  child: child);
+            }
+          }
+        case 'unfocus':
+          {
+            return const EndFocus();
+          }
+
+        case 'bottom':
+          {
+            final child = SizedBox(
+                height: properties.size(model.axis),
+                child: TotaleKostenEnToevoegen(
+                    totaleKosten: HypotheekBewerken.totaleKosten(
+                        hypotheekDossier: hypotheekViewState.hypotheekDossier,
+                        hypotheek: hypotheekViewState.hypotheek),
+                    toevoegen: () => toevoegKostenItem(hypotheekViewState)));
+
+            return SliverBoxTransferWidget(
+              model: model,
+              animation: animation,
+              key: Key(properties.id),
+              boxItemProperties: properties,
+              singleBoxModel: singleBoxModel,
+              child: child,
+            );
+          }
+        // case 'totaleKosten':
+        //   {
+        //     final child = TotaleKostenRowItem(
+        //       backgroundColor: const Color.fromARGB(255, 239, 249, 253),
+        //       totaleKosten: hypotheek.woningLeningKosten.totaleKosten,
+        //     );
+
+        //     return InsertRemoveVisibleAnimatedSliverRowItem(
+        //         model: model,
+        //         animation: animation,
+        //         key: Key('item_${state.key}'),
+        //         state: state,
+        //         child: SliverRowItemBackground(
+        //           key: Key(state.key),
+        //           backgroundColor: const Color.fromARGB(255, 239, 249, 253),
+        //           child: Padding(
+        //             padding: const EdgeInsets.symmetric(horizontal: 12.0),
+        //             child: child,
+        //           ),
+        //         ));
+        //   }
+        default:
+          {
+            return const Text(':(');
+          }
+      }
+    };
+  }
+
+  void toevoegKostenItem(HypotheekViewState hypotheekViewState) {
+    final hypotheek = hypotheekViewState.hypotheek;
+    if (hypotheek == null) {
+      return;
+    }
+    final resterend = HypotheekVerwerken.suggestieKosten(
+        hypotheekDossier: hypotheekViewState.hypotheekDossier,
+        hypotheek: hypotheek);
+
+    if (resterend.length == 1) {
+      notifier.verandering(gedeeldeKostenToevoegen: resterend);
+    } else {
+      showKosten(
+              context: context,
+              lijst: resterend,
+              image: Image.asset('graphics/kapot_varken.png'),
+              title: 'Kosten')
+          .then((List<Waarde>? value) {
+        if (value != null && value.isNotEmpty) {
+          notifier.verandering(gedeeldeKostenToevoegen: value);
+        }
+      });
+    }
+  }
+
+  _veranderingWoningwaardeWoning(String? value) {
+    notifier.verandering(woningWaarde: nf.parsToDouble(value));
+  }
+
+  _veranderingToepassenNHG(bool? value) {
+    notifier.verandering(toepassenNhg: value);
+  }
+}
+
+/* Telenen 
+ *
+ *
+ *
+ * 
+ *
+ *
+ */
+
+class TeLenenPanel extends ConsumerStatefulWidget {
+  const TeLenenPanel({
+    super.key,
+  });
+
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() => TeLenenPanelState();
+}
+
+class TeLenenPanelState extends AbstractHypotheekConsumerState<TeLenenPanel> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
+  Widget buildHypotheek(
+      BuildContext context,
+      HypotheekViewState hypotheekViewState,
+      HypotheekDossier hypotheekDossier,
+      Hypotheek hypotheek) {
+    final theme = Theme.of(context);
+    final displaySmall = theme.textTheme.displaySmall;
+
+    final child =
+        Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+      Text(
+        'Lening',
+        style: displaySmall,
+      ),
+      SizedBox(
+          height: 150.0,
+          child: CustomMultiChildLayout(
+              delegate: _TeLenenLayoutDelegate(logoToLeft: 24.0),
+              children: [
+                LayoutId(
+                    id: 'logo',
+                    child: Image(
+                        image: const AssetImage(
+                          'graphics/fit_geldzak.png',
+                        ),
+                        color: theme.colorScheme.onSurface)),
+                LayoutId(
+                    id: 'bedrag',
+                    child: Text(
+                      nf.parseDblToText(hypotheek.lening, format: '#0'),
+                      style: displaySmall,
+                    )),
+                if (!hypotheek.afgesloten)
+                  LayoutId(
+                    id: 'max',
+                    child: TextButton(
+                      onPressed: veranderingMax,
+                      child: const Text('Max'),
+                    ),
+                  ),
+              ]))
+      // SizedBox(
+      //   height: 150.0,
+      //   child: Row(
+      //     mainAxisAlignment: MainAxisAlignment.center,
+      //     crossAxisAlignment: CrossAxisAlignment.center,
+      //     children: [
+      //       Flexible(
+      //           flex: 1,
+
+      //           child: Stack(
+      //             children: [
+      //               Positioned(
+
+      //                 top: 0.0,
+      //                 right: 0.0,
+      //                 bottom: 0.0,
+      //                 child: Align(
+      //                   alignment: Alignment.centerRight,
+      // child: Text(
+      //   nf.parseDblToText(hypotheek.lening),
+      //   style: displaySmall,
+      // ),
+      //                 ),
+      //               ),
+      //               Positioned(
+      //                 bottom: 8.0,
+      //                 right: 8.0,
+      //                 child: TextButton(
+      //                     child: const Text('Max'), onPressed: veranderingMax),
+      //               )
+      //             ],
+      //           )),
+      //       Flexible(
+      //           flex: 1,
+      //           child: Align(
+      //             alignment: Alignment.centerLeft,
+      //             child: Image(
+      //                 image: const AssetImage(
+      //                   'graphics/fit_geldzak.png',
+      //                 ),
+      //                 color: theme.colorScheme.onSurface),
+      //           ))
+      //     ],
+      //   ),
+      // )
+    ]);
+
+    return SliverToBoxAdapter(
+      child: child,
+    );
+  }
+
+  veranderingMax() {
+    notifier.verandering(zetMaximaleLening: true);
+  }
+}
+
+class _TeLenenLayoutDelegate extends MultiChildLayoutDelegate {
+  final double logoToLeft;
+  _TeLenenLayoutDelegate({required this.logoToLeft});
+
+  @override
+  void performLayout(Size size) {
+    layoutChild(
+      'logo',
+      BoxConstraints(maxHeight: size.height, maxWidth: size.width),
+    );
+
+    positionChild('logo', Offset(size.width / 2.0 - logoToLeft, 0.0));
+
+    final bedragSize = layoutChild(
+      'bedrag',
+      BoxConstraints(maxHeight: size.height, maxWidth: size.width / 2.0),
+    );
+
+    positionChild(
+        'bedrag',
+        Offset(size.width / 2.0 - bedragSize.width,
+            (size.height - bedragSize.height) / 2.0));
+
+    if (hasChild('max')) {
+      final maxSize = layoutChild(
+        'max',
+        BoxConstraints(maxHeight: size.height, maxWidth: size.width / 2.0),
+      );
+
+      positionChild(
+          'max',
+          Offset(size.width / 2.0 - maxSize.width - 4.0,
+              (size.height - maxSize.height) - 8.0));
+    }
+  }
+
+  @override
+  bool shouldRelayout(_TeLenenLayoutDelegate oldDelegate) {
+    return oldDelegate.logoToLeft != logoToLeft;
+  }
+}
+
 
 // class LeningPanel extends ConsumerStatefulWidget {
 //   const LeningPanel({super.key});
@@ -750,8 +1568,6 @@ class HypotheekBewerkDatumVerlengenState
 // }
 
 // class LeningPanelState extends AbstractHypotheekConsumerState<LeningPanel> {
-//   late final TextEditingController _tecRente;
-//   late final FocusNode _fnRente;
 //   late final TextEditingController _tecLening;
 //   late final FocusNode _fnLening;
 
@@ -759,16 +1575,6 @@ class HypotheekBewerkDatumVerlengenState
 
 //   @override
 //   void initState() {
-//     _tecRente = TextEditingController(
-//         text: doubleToText((Hypotheek hypotheek) => hypotheek.rente));
-
-//     _fnRente = FocusNode()
-//       ..addListener(() {
-//         if (!_fnRente.hasFocus) {
-//           _veranderingRente(_tecRente.text);
-//         }
-//       });
-
 //     _tecLening = TextEditingController(
 //         text: doubleToText((Hypotheek hypotheek) => hypotheek.gewensteLening));
 
@@ -788,24 +1594,16 @@ class HypotheekBewerkDatumVerlengenState
 //   void dispose() {
 //     _tecLening.dispose();
 //     _fnLening.dispose();
-//     _tecRente.dispose();
-//     _fnRente.dispose();
+
 //     super.dispose();
 //   }
 
 //   @override
-//   Widget build(BuildContext context) {
-//     final viewState = ref.watch(hypotheekBewerkenProvider);
-//     final hp = viewState.hypotheekDossier;
-//     final hypotheek = viewState.hypotheek;
-
-//     return (hypotheek != null)
-//         ? buildHypotheek(context, viewState, hp, hypotheek)
-//         : ohno();
-//   }
-
-//   Widget buildHypotheek(BuildContext context, HypotheekViewState viewState,
-//       HypotheekDossier hypotheekDossier, Hypotheek hypotheek) {
+//   Widget buildHypotheek(
+//       BuildContext context,
+//       HypotheekViewState hypotheekViewState,
+//       HypotheekDossier hypotheekDossier,
+//       Hypotheek hypotheek) {
 //     final theme = Theme.of(context);
 //     final headerTextStyle = theme.textTheme.headlineMedium;
 //     Widget leningWidget;
@@ -823,17 +1621,6 @@ class HypotheekBewerkDatumVerlengenState
 //     }
 
 //     List<Widget> children = [
-//       const SizedBox(
-//         height: 16.0,
-//       ),
-//       Text(
-//         'Hypotheekvorm',
-//         style: headerTextStyle,
-//       ),
-//       const SizedBox(
-//         height: 8.0,
-//       ),
-//       _vorm(context, hypotheekDossier, hypotheek),
 //       AnimatedScaleResizeSwitcher(
 //         child: leningWidget,
 //       )
@@ -851,7 +1638,6 @@ class HypotheekBewerkDatumVerlengenState
 //     return Column(
 //       key: const Key('NieuwLening'),
 //       children: [
-//         _renteField(),
 //         const SizedBox(
 //           height: 8.0,
 //         ),
@@ -900,7 +1686,7 @@ class HypotheekBewerkDatumVerlengenState
 //             ),
 //             SizedBox(
 //               width: 80.0,
-//               child: _renteField(),
+//               // child: _renteField(),
 //             )
 //           ],
 //         ),
@@ -913,52 +1699,13 @@ class HypotheekBewerkDatumVerlengenState
 //     return Column(
 //       key: const Key('verlengenLening'),
 //       children: [
-//         _renteField(),
+//         // _renteField(),
 //         const SizedBox(
 //           height: 8.0,
 //         ),
 //         LeningInfo(hypotheekDossier: hypotheekDossier, hypotheek: hypotheek),
 //       ],
 //     );
-//   }
-
-//   Widget _vorm(BuildContext context, HypotheekDossier hypotheekDossier,
-//       Hypotheek hypotheek) {
-//     return UndefinedSelectableGroup(
-//       groups: [
-//         MyRadioGroup<HypotheekVorm>(
-//             groupValue: hypotheek.hypotheekvorm,
-//             list: [
-//               RadioSelectable(
-//                   text: 'Annuïteit', value: HypotheekVorm.annuiteit),
-//               RadioSelectable(text: 'Lineair', value: HypotheekVorm.lineair),
-//               RadioSelectable(
-//                 text: 'Aflosvrij',
-//                 value: HypotheekVorm.aflosvrij,
-//               )
-//             ],
-//             onChange: _veranderingHypotheekvorm)
-//       ],
-//     );
-//   }
-
-//   Widget _renteField() {
-//     return TextFormField(
-//         controller: _tecRente,
-//         focusNode: _fnRente,
-//         onSaved: _veranderingRente,
-//         validator: (String? value) {
-//           double rente = value == null ? 0.0 : nf.parsToDouble(value);
-//           return (rente < 0.0 || rente > 10) ? '0-10%' : null;
-//         },
-//         decoration:
-//             const InputDecoration(hintText: '%', labelText: 'Rente (%)'),
-//         keyboardType: const TextInputType.numberWithOptions(
-//           signed: true,
-//           decimal: true,
-//         ),
-//         inputFormatters: [MyNumberFormat(context).numberInputFormat('#.00')],
-//         textInputAction: TextInputAction.done);
 //   }
 
 //   Widget _leningField() {
@@ -978,14 +1725,6 @@ class HypotheekBewerkDatumVerlengenState
 //         textInputAction: TextInputAction.done);
 //   }
 
-//   _veranderingHypotheekvorm(HypotheekVorm? value) {
-//     notifier.verandering(hypotheekvorm: value);
-//   }
-
-//   _veranderingRente(String? value) {
-//     notifier.verandering(rente: nf.parsToDouble(value));
-//   }
-
 //   _veranderingLening(String? value) {
 //     notifier.verandering(gewensteLening: nf.parsToDouble(value));
 //   }
@@ -1000,368 +1739,6 @@ class HypotheekBewerkDatumVerlengenState
 
 //   _veranderingDatumDeelsAfgelosteLening(DateTime? value) {
 //     notifier.verandering(datumDeelsAfgelosteLening: value);
-//   }
-// }
-
-// /* Kosten
-//  *
-//  *
-//  *
-//  * 
-//  *
-//  *
-//  */
-
-// class HypotheekKostenPanel extends ConsumerStatefulWidget {
-//   const HypotheekKostenPanel({
-//     super.key,
-//   });
-
-//   @override
-//   ConsumerState<HypotheekKostenPanel> createState() =>
-//       HypotheekKostenPanelState();
-// }
-
-// class HypotheekKostenPanelState
-//     extends AbstractHypotheekConsumerState<HypotheekKostenPanel> {
-//   late final TextEditingController _tecWoningWaarde;
-
-//   late final FocusNode _fnWoningWaarde;
-
-//   late List<SliverBoxItemState<String>> topList;
-//   late List<SliverBoxItemState<Waarde>> bodyList;
-//   late List<SliverBoxItemState<String>> bottomList;
-
-//   @override
-//   void initState() {
-//     _tecWoningWaarde = TextEditingController(
-//         text: doubleToText((Hypotheek hypotheek) =>
-//             hypotheek.woningLeningKosten.woningWaarde));
-
-//     _fnWoningWaarde = FocusNode()
-//       ..addListener(() {
-//         if (!_fnWoningWaarde.hasFocus) {
-//           _veranderingWoningwaardeWoning(_tecWoningWaarde.text);
-//         }
-//       });
-
-//     topList = HypotheekVerwerken.createTopKosten(hypotheek, true);
-//     bodyList = HypotheekVerwerken.createBodyKosten(hypotheek, true);
-//     bottomList = HypotheekVerwerken.createBottomKosten(hypotheek, true);
-
-//     super.initState();
-//   }
-
-//   @override
-//   void dispose() {
-//     _tecWoningWaarde.dispose();
-//     _fnWoningWaarde.dispose();
-//     super.dispose();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final bewerken = ref.watch(hypotheekBewerkenProvider);
-//     final hp = bewerken.hypotheekDossier;
-//     final hypotheek = bewerken.hypotheek;
-
-//     return (hypotheek != null)
-//         ? buildHypotheek(context, bewerken.controllerKostenLijst, hp, hypotheek)
-//         : ohno();
-//   }
-
-//   Widget buildHypotheek(
-//       BuildContext context,
-//       ControllerSliverRowBox<String, Waarde> controllerKostenLijst,
-//       HypotheekDossier hypotheekDossier,
-//       Hypotheek hypotheek) {
-//     return SliverRowBox<String, Waarde>(
-//       controller: controllerKostenLijst,
-//       topList: topList,
-//       bodyList: bodyList,
-//       bottomList: bottomList,
-//       buildSliverBoxItem: ({
-//         required SliverRowBoxModel<String, Waarde> model,
-//         Animation? animation,
-//         required int index,
-//         required int length,
-//         required SliverBoxItemState<Waarde> state,
-//       }) =>
-//           _buildItem(
-//               model: model,
-//               animation: animation,
-//               index: index,
-//               length: length,
-//               state: state),
-//       buildSliverBoxTopBottom: ({
-//         required SliverRowBoxModel<String, Waarde> model,
-//         Animation? animation,
-//         required int index,
-//         required int length,
-//         required SliverBoxItemState<String> state,
-//       }) =>
-//           _buildTopBottom(
-//               model: model,
-//               hypotheekDossier: hypotheekDossier,
-//               hypotheek: hypotheek,
-//               animation: animation,
-//               index: index,
-//               length: length,
-//               state: state),
-//     );
-//   }
-
-//   Widget _buildItem(
-//       {required SliverRowBoxModel<String, Waarde> model,
-//       Animation? animation,
-//       required int index,
-//       required int length,
-//       required SliverBoxItemState<Waarde> state}) {
-//     final child = DefaultKostenRowItem(
-//         key: Key(state.key),
-//         properties: state,
-//         button: (SliverBoxItemState<Waarde> state) => StandaardKostenMenu(
-//               aanpassenWaarde:
-//                   (SelectedMenuPopupIdentifierValue<String, dynamic> v) =>
-//                       _veranderingWaardeOpties(state: state, iv: v),
-//               waarde: state.value,
-//             ),
-//         omschrijvingAanpassen: (String v) => _veranderingOmschrijving(
-//               state: state,
-//               text: v,
-//             ),
-//         waardeAanpassen: (double value) => _veranderingWaarde(
-//               state: state,
-//               value: value,
-//             ));
-
-//     return InsertRemoveVisibleAnimatedSliverRowItem(
-//       model: model,
-//       animation: animation,
-//       key: Key('item_${state.key}'),
-//       state: state,
-//       child: SliverRowItemBackground(
-//         key: Key(state.key),
-//         backgroundColor: const Color.fromARGB(255, 239, 249, 253),
-//         child: SizedSliverBox(height: state.height, child: child),
-//       ),
-//     );
-//   }
-
-//   Widget _buildTopBottom({
-//     required SliverRowBoxModel<String, Waarde> model,
-//     required HypotheekDossier hypotheekDossier,
-//     required Hypotheek hypotheek,
-//     Animation? animation,
-//     required int index,
-//     required int length,
-//     required SliverBoxItemState<String> state,
-//   }) {
-//     switch (state.key) {
-//       case 'topPadding':
-//         {
-//           return const SizedBox(
-//             height: 16.0,
-//           );
-//         }
-//       case 'woningTitle':
-//         {
-//           final theme = Theme.of(context);
-//           final displaySmall = theme.textTheme.displaySmall;
-
-//           final child = Center(
-//               child: Text(
-//             'Woning',
-//             style: displaySmall,
-//             textAlign: TextAlign.center,
-//           ));
-
-//           return InsertRemoveVisibleAnimatedSliverRowItem(
-//               model: model,
-//               animation: animation,
-//               key: Key('item_${state.key}'),
-//               state: state,
-//               child: SliverRowItemBackground(
-//                 radialTop: 32.0,
-//                 key: Key(state.key),
-//                 backgroundColor: const Color.fromARGB(255, 239, 249, 253),
-//                 child: Padding(
-//                   padding: const EdgeInsets.only(top: 16.0),
-//                   child: child,
-//                 ),
-//               ));
-//         }
-//       case 'woning':
-//         {
-//           final child = TextFormField(
-//             controller: _tecWoningWaarde,
-//             focusNode: _fnWoningWaarde,
-//             decoration: const InputDecoration(
-//                 hintText: 'Bedrag', labelText: 'Woningwaarde'),
-//             keyboardType: const TextInputType.numberWithOptions(
-//               signed: true,
-//               decimal: true,
-//             ),
-//             inputFormatters: [
-//               MyNumberFormat(context).numberInputFormat('#.00')
-//             ],
-//             validator: (String? value) {
-//               if (hypotheekDossier.woningWaardeNormToepassen &&
-//                   nf.parsToDouble(value) == 0.0) {
-//                 return 'Geen bedrag > 0';
-//               }
-//               return null;
-//             },
-//           );
-
-//           return InsertRemoveVisibleAnimatedSliverRowItem(
-//               model: model,
-//               animation: animation,
-//               key: Key('item_${state.key}'),
-//               state: state,
-//               child: SliverRowItemBackground(
-//                 key: Key(state.key),
-//                 backgroundColor: const Color.fromARGB(255, 239, 249, 253),
-//                 child: Padding(
-//                   padding: const EdgeInsets.only(
-//                       left: 16.0, top: 4.0, right: 16.0, bottom: 2.0),
-//                   child: child,
-//                 ),
-//               ));
-//         }
-//       case 'kostenTitle':
-//         {
-//           {
-//             final theme = Theme.of(context);
-//             final displaySmall = theme.textTheme.displaySmall;
-
-//             final child = Center(
-//                 child: Text(
-//               'Kosten',
-//               style: displaySmall,
-//               textAlign: TextAlign.center,
-//             ));
-
-//             return InsertRemoveVisibleAnimatedSliverRowItem(
-//                 model: model,
-//                 animation: animation,
-//                 key: Key('item_${state.key}'),
-//                 state: state,
-//                 child: SliverRowItemBackground(
-//                   key: Key(state.key),
-//                   backgroundColor: const Color.fromARGB(255, 239, 249, 253),
-//                   child: Padding(
-//                     padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-//                     child: child,
-//                   ),
-//                 ));
-//           }
-//         }
-
-//       case 'bottom':
-//         {
-//           return InsertRemoveVisibleAnimatedSliverRowItem(
-//               model: model,
-//               animation: animation,
-//               key: Key('item_${state.key}'),
-//               state: state,
-//               child: SliverRowItemBackground(
-//                 radialbottom: 32.0,
-//                 key: Key(state.key),
-//                 backgroundColor: const Color.fromARGB(255, 239, 249, 253),
-//                 child: Padding(
-//                   padding: const EdgeInsets.only(top: 8.0, bottom: 16.0),
-//                   child: Center(
-//                       child: ToevoegenKostenButton(
-//                           pressed: () => toevoegKostenItem(hypotheek))),
-//                 ),
-//               ));
-//         }
-//       case 'totaleKosten':
-//         {
-//           final child = TotaleKostenRowItem(
-//             backgroundColor: const Color.fromARGB(255, 239, 249, 253),
-//             totaleKosten: hypotheek.woningLeningKosten.totaleKosten,
-//           );
-
-//           return InsertRemoveVisibleAnimatedSliverRowItem(
-//               model: model,
-//               animation: animation,
-//               key: Key('item_${state.key}'),
-//               state: state,
-//               child: SliverRowItemBackground(
-//                 key: Key(state.key),
-//                 backgroundColor: const Color.fromARGB(255, 239, 249, 253),
-//                 child: Padding(
-//                   padding: const EdgeInsets.symmetric(horizontal: 12.0),
-//                   child: child,
-//                 ),
-//               ));
-//         }
-//       default:
-//         {
-//           return const Text(':(');
-//         }
-//     }
-//   }
-
-//   void toevoegKostenItem(Hypotheek hypotheek) {
-//     final resterend = HypotheekVerwerken.suggestieKosten(hypotheek);
-
-//     if (resterend.length == 1) {
-//       notifier.veranderingKostenToevoegen(resterend);
-//     } else {
-//       showKosten(
-//               context: context,
-//               lijst: resterend,
-//               image: Image.asset('graphics/kapot_varken.png'),
-//               title: 'Kosten')
-//           .then((List<Waarde>? value) {
-//         if (value != null && value.isNotEmpty) {
-//           notifier.veranderingKostenToevoegen(value);
-//         }
-//       });
-//     }
-//   }
-
-//   _veranderingWoningwaardeWoning(String? value) {
-//     notifier.veranderingWoningLening(woningWaarde: nf.parsToDouble(value));
-//   }
-
-//   _veranderingOmschrijving(
-//       {required SliverBoxItemState<Waarde> state, required String text}) {
-//     state.value = notifier.veranderingKostenWaarde(
-//         waarde: state.value, omschrijving: text);
-//   }
-
-//   _veranderingWaarde(
-//       {required SliverBoxItemState<Waarde> state, required double value}) {
-//     state.value =
-//         notifier.veranderingKostenWaarde(waarde: state.value, getal: value);
-//   }
-
-//   _veranderingWaardeOpties(
-//       {required SliverBoxItemState<Waarde> state,
-//       required SelectedMenuPopupIdentifierValue<String, dynamic> iv}) {
-//     switch (iv.identifier) {
-//       case 'eenheid':
-//         {
-//           state.value = notifier.veranderingKostenWaarde(
-//               waarde: state.value, eenheid: iv.value);
-//           break;
-//         }
-//       case 'aftrekken':
-//         {
-//           state.value = notifier.veranderingKostenWaarde(
-//               waarde: state.value, aftrekbaar: iv.value);
-//           break;
-//         }
-//       case 'verwijderen':
-//         {
-//           notifier.veranderingKostenVerwijderen(state.value);
-//           break;
-//         }
-//     }
 //   }
 // }
 
@@ -1757,7 +2134,7 @@ class HypotheekBewerkDatumVerlengenState
 //           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
 //             const Text('Maximale Lening:'),
 //             Text(
-//               nf.parseDoubleToText(maxLening.resterend, '#0'),
+//               nf.parseDoubleToText(maxLening.normLening, '#0'),
 //               textScaleFactor: 2.0,
 //             )
 //           ]));

@@ -25,10 +25,17 @@ abstract class AbstractHypotheekConsumerState<T extends ConsumerStatefulWidget>
     return hypotheek != null ? toText(hypotheek) : '';
   }
 
-  String doubleToText(double Function(Hypotheek hypotheek) doubleToText) {
+  String doubleToText(double Function(Hypotheek hypotheek) doubleToText,
+      {zero = false}) {
     final hp = ref.read(hypotheekBewerkenProvider).hypotheek;
 
-    return hp != null ? nf.parseDblToText(doubleToText(hp)) : '';
+    if (hp == null) {
+      return '';
+    }
+    return switch ((doubleToText(hp), zero)) {
+      (double a, bool zero) when a > 0.0 || zero => nf.parseDblToText(a),
+      (_) => ''
+    };
   }
 
   String intToText(int Function(Hypotheek hypotheek) intToText) {

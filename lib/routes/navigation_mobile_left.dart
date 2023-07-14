@@ -2,6 +2,7 @@
 import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ltrb_navigation_drawer/drawer_animation/drawer_animation.dart';
 import 'package:ltrb_navigation_drawer/drawer_animation/drawer_animation_widget.dart';
 import 'package:ltrb_navigation_drawer/drawer_layout.dart';
@@ -12,10 +13,11 @@ import 'package:mortgage_insight/routes/navigation_document_examples.dart';
 import 'package:mortgage_insight/routes/navigation_login_button.dart';
 import 'package:mortgage_insight/utilities/device_info.dart';
 import '../layout/t.dart';
+import '../model/nl/provider/hypotheek_document_provider.dart';
 import 'navigation_page_items.dart';
 import '../theme/ltrb_navigation_style.dart';
 
-class MobileLeftDrawer extends StatefulWidget {
+class MobileLeftDrawer extends ConsumerStatefulWidget {
   final DrawerModel drawerModel;
 
   const MobileLeftDrawer({
@@ -24,10 +26,10 @@ class MobileLeftDrawer extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<MobileLeftDrawer> createState() => _LeftDrawerState();
+  ConsumerState<MobileLeftDrawer> createState() => _LeftDrawerState();
 }
 
-class _LeftDrawerState extends State<MobileLeftDrawer> {
+class _LeftDrawerState extends ConsumerState<MobileLeftDrawer> {
   LtrbDrawerController ltrbDrawerController = LtrbDrawerController();
 
   @override
@@ -231,12 +233,29 @@ class _LeftDrawerState extends State<MobileLeftDrawer> {
                     onPressed: () {},
                   ),
                   IconButton(
-                    icon: const Icon(Icons.file_upload_outlined),
-                    onPressed: () {},
+                    iconSize: 36.0,
+                    icon: const ImageIcon(AssetImage('graphics/ic_open.png')),
+                    onPressed: () {
+                      Beamer.of(context, root: true).beamToNamed('/document');
+                      ref
+                          .read(hypotheekDocumentProvider.notifier)
+                          .openHypotheek();
+                    },
                   ),
                   IconButton(
+                    iconSize: 36.0,
                     icon: const Icon(Icons.save_alt),
-                    onPressed: () {},
+                    onPressed: () => ref
+                        .read(hypotheekDocumentProvider.notifier)
+                        .saveHypotheek(),
+                  ),
+                  IconButton(
+                    iconSize: 36.0,
+                    icon: const Icon(Icons.rotate_left),
+                    onPressed: () {
+                      Beamer.of(context, root: true).beamToNamed('/document');
+                      ref.read(hypotheekDocumentProvider.notifier).reset();
+                    },
                   ),
                   const Expanded(child: SizedBox.expand()),
                 ],

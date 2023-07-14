@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mortgage_insight/my_widgets/oh_no.dart';
 import 'package:mortgage_insight/platform_page_format/phone_page_scrollbars.dart';
 import 'package:mortgage_insight/utilities/device_info.dart';
+import 'adjust_scroll_configuration.dart';
 import 'fab_properties.dart';
 import 'monitor_page.dart';
 import 'page_properties.dart';
@@ -81,10 +82,10 @@ class DefaultPageState extends State<DefaultPage> {
     final deviceScreen = DeviceScreen3.of(context);
 
     if (deviceScreen.hasScrollBars) {
-      switch (deviceScreen.formFactorType) {
-        case FormFactorType.smallPhone:
-        case FormFactorType.largePhone:
-          return PhonePageScrollBars(
+      return switch (deviceScreen.formFactorType) {
+        FormFactorType.smallPhone ||
+        FormFactorType.largePhone =>
+          PhonePageScrollBars(
             title: widget.title,
             imageBuilder: widget.imageBuilder,
             getPageProperties: widget.getPageProperties,
@@ -95,9 +96,8 @@ class DefaultPageState extends State<DefaultPage> {
             tabs: widget.tabs,
             bodyBuilder: widget.bodyBuilder,
             sliversBuilder: widget.sliversBuilder,
-          );
-        case FormFactorType.tablet:
-          return TablePageScrollBars(
+          ),
+        FormFactorType.tablet => TablePageScrollBars(
             title: widget.title,
             imageBuilder: widget.imageBuilder,
             getPageProperties: widget.getPageProperties,
@@ -108,10 +108,8 @@ class DefaultPageState extends State<DefaultPage> {
             tabs: widget.tabs,
             bodyBuilder: widget.bodyBuilder,
             sliversBuilder: widget.sliversBuilder,
-          );
-
-        case FormFactorType.monitor:
-          return MonitorPage(
+          ),
+        FormFactorType.monitor => MonitorPage(
             title: widget.title,
             imageBuilder: widget.imageBuilder,
             getPageProperties: widget.getPageProperties,
@@ -122,15 +120,14 @@ class DefaultPageState extends State<DefaultPage> {
             tabs: widget.tabs,
             bodyBuilder: widget.bodyBuilder,
             sliversBuilder: widget.sliversBuilder,
-          );
-        case FormFactorType.unknown:
-          return const OhNo(text: 'FormFactorType is Unknown!');
-      }
+          ),
+        FormFactorType.unknown => const OhNo(text: 'FormFactorType is Unknown!')
+      };
     } else {
-      switch (deviceScreen.formFactorType) {
-        case FormFactorType.smallPhone:
-        case FormFactorType.largePhone:
-          return PhonePageSliverAppBar(
+      Widget page = switch (deviceScreen.formFactorType) {
+        FormFactorType.smallPhone ||
+        FormFactorType.largePhone =>
+          PhonePageSliverAppBar(
             bottom: widget.bottom,
             imageBuilder: widget.imageBuilder,
             title: widget.title,
@@ -140,10 +137,8 @@ class DefaultPageState extends State<DefaultPage> {
             tabs: widget.tabs,
             bodyBuilder: widget.bodyBuilder,
             sliversBuilder: widget.sliversBuilder,
-          );
-
-        case FormFactorType.tablet:
-          return TablePageSliverAppBar(
+          ),
+        FormFactorType.tablet => TablePageSliverAppBar(
             bottom: widget.bottom,
             imageBuilder: widget.imageBuilder,
             title: widget.title,
@@ -153,9 +148,8 @@ class DefaultPageState extends State<DefaultPage> {
             tabs: widget.tabs,
             bodyBuilder: widget.bodyBuilder,
             sliversBuilder: widget.sliversBuilder,
-          );
-        case FormFactorType.monitor:
-          return MonitorPage(
+          ),
+        FormFactorType.monitor => MonitorPage(
             title: widget.title,
             imageBuilder: widget.imageBuilder,
             getPageProperties: widget.getPageProperties,
@@ -166,10 +160,12 @@ class DefaultPageState extends State<DefaultPage> {
             tabs: widget.tabs,
             bodyBuilder: widget.bodyBuilder,
             sliversBuilder: widget.sliversBuilder,
-          );
-        case FormFactorType.unknown:
-          return const OhNo(text: 'FormFactorType is Unknown!');
-      }
+          ),
+        FormFactorType.unknown => const OhNo(text: 'FormFactorType is Unknown!')
+      };
+
+      return ScrollConfiguration(
+          behavior: const MyMaterialScrollBarBehavior(), child: page);
     }
   }
 }

@@ -61,7 +61,8 @@ class OverzichtLeaseAutoState extends ConsumerState<OverzichtLeaseAuto> {
 
   Widget buildSummary(BuildContext context, LeaseAuto leaseAuto) {
     final ThemeData theme = Theme.of(context);
-    // final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+    final TextStyle? displaySmall = theme.textTheme.displaySmall;
+
     final huidigeDatum = DateUtils.dateOnly(DateTime.now());
     final map = LeaseAutoVerwerken.overzicht(leaseAuto, huidigeDatum);
 
@@ -164,8 +165,9 @@ class OverzichtLeaseAutoState extends ConsumerState<OverzichtLeaseAuto> {
 
       return Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
         const SizedBox(height: 24.0),
-        const Text(
+        Text(
           'Overzicht',
+          style: displaySmall,
         ),
         const SizedBox(height: 16.0),
         tableOverzicht,

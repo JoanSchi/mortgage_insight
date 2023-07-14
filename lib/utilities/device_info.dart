@@ -55,16 +55,18 @@ class DeviceScreen3 {
   double get topPadding => mediaQuery.padding.top;
 
   bool get hasScrollBars {
-    switch (theme.platform) {
-      case TargetPlatform.android:
-      case TargetPlatform.iOS:
-      case TargetPlatform.fuchsia:
-        return false;
-      case TargetPlatform.linux:
-      case TargetPlatform.macOS:
-      case TargetPlatform.windows:
-        return true;
-    }
+    return formFactorType == FormFactorType.monitor;
+
+    // switch (theme.platform) {
+    //   case TargetPlatform.android:
+    //   case TargetPlatform.iOS:
+    //   case TargetPlatform.fuchsia:
+    //     return false;
+    //   case TargetPlatform.linux:
+    //   case TargetPlatform.macOS:
+    //   case TargetPlatform.windows:
+    //     return true;
+    // }
   }
 
   DeviceScreen3.of(BuildContext context)
